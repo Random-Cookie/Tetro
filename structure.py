@@ -256,6 +256,21 @@ class Player:
 		self.color = color
 		self.pieces = initial_pieces
 
+	def select_piece(self, board):
+		# return piece, xy, and any manipulations
+		pass
+
+	def manipulate_piece(self):
+		pass
+
+	def place_piece(self, board):
+		pass
+
+	def take_turn(self, board):
+		self.select_piece(board)
+		self.manipulate_piece()
+		self.place_piece(board)
+
 
 test_board = GameBoard(20)
 test_player = Player('yellow', [])
