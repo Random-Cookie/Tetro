@@ -16,9 +16,9 @@ class BoardSquare:
 class GameBoard:
 	def __init__(self, board_size):
 		self.positions = []
-		for x in range(0, board_size - 1):
+		for x in range(0, board_size):
 			row = []
-			for y in range(0, board_size - 1):
+			for y in range(0, board_size):
 				row.append(BoardSquare(x, y, []))
 			self.positions.append(row)
 
@@ -70,7 +70,7 @@ class GameBoard:
 		for xy_pair in piece.currentCoords:
 			if self.positions[xy_pair[0] + x][xy_pair[1] + y].color is not None:
 				return False
-			if self.check_adj_squares(x, y, piece.color):
+			if self.check_adj_squares(xy_pair[0] + x, xy_pair[1] + y, piece.color):
 				return False
 		return True
 
@@ -156,7 +156,7 @@ class Piece:
 class StandardPiece(Piece):
 	shapes = {
 		1: {
-			'coords': [0, 0],
+			'coords': [[0, 0]],
 			'name': '1'
 		},
 		2: {
@@ -273,7 +273,22 @@ class Player:
 
 
 test_board = GameBoard(20)
-test_player = Player('yellow', [])
-test_board.place_piece(10, 10, StandardPiece(20, 'yellow'))
-test_board.update_placeable_lists([test_player])
-test_board.print_to_cli(test_player)
+test_players = [Player('blue', []), Player('green', []), Player('red', []), Player('yellow', [])]
+test_board.place_piece(0, 0, StandardPiece(1, 'blue'))
+test_board.place_piece(0, 19, StandardPiece(1, 'green'))
+test_board.place_piece(19, 0, StandardPiece(1, 'red'))
+test_board.place_piece(19, 19, StandardPiece(1, 'yellow'))
+test_board.update_placeable_lists(test_players)
+test_board.print_to_cli(test_players[0])
+test_board.print_to_cli(test_players[1])
+test_board.print_to_cli(test_players[2])
+test_board.print_to_cli(test_players[3])
+test_board.place_piece(1, 1, StandardPiece(2, 'blue'))
+test_board.place_piece(1, 17, StandardPiece(2, 'green'))
+test_board.place_piece(18, 1, StandardPiece(2, 'red'))
+test_board.place_piece(18, 17, StandardPiece(2, 'yellow'))
+test_board.update_placeable_lists(test_players)
+test_board.print_to_cli(test_players[0])
+test_board.print_to_cli(test_players[1])
+test_board.print_to_cli(test_players[2])
+test_board.print_to_cli(test_players[3])
