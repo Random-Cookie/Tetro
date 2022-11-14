@@ -82,7 +82,7 @@ class GameBoard:
 					pos.placeable_by = []
 				else:
 					for player in players:
-						if self.check_diag_squares(x, y, player) and not self.check_adj_squares(x, y, player):
+						if self.check_diag_squares(x, y, player.color) and not self.check_adj_squares(x, y, player.color):
 							pos.placeable_by.append(player.color)
 
 	def place_piece(self, x, y, piece):
@@ -110,9 +110,9 @@ class GameBoard:
 
 
 class Piece:
-	def __init__(self, shape_index, color, shapes=None):
-		self.shapeIndex = shape_index
-		self.currentCoords = shapes[str(shape_index)] if shapes is not None else None
+	def __init__(self, name, shape: list, color):
+		self.name = name
+		self.currentCoords = shape
 		self.color = color
 
 	def rotate_left(self):
@@ -154,66 +154,111 @@ class Piece:
 
 
 class StandardPiece(Piece):
-	shapeCoords = {
-		"1": [[0, 0]],
-		"2": [[0, 0], [0, 1]],
-		"3": [[0, 0], [0, 1], [0, 2]],
-		"4": [[0, 0], [0, 1], [1, 1]],
-		"5": [[0, 0], [0, 1], [0, 2], [0, 3]],
-		"6": [[0, 0], [0, 1], [0, 2], [1, 2]],
-		"7": [[0, 0], [1, 0], [1, 1], [2, 0]],
-		"8": [[0, 0], [0, 1], [1, 0], [1, 1]],
-		"9": [[0, 0], [1, 0], [1, 1], [2, 1]],
-		"10": [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]],
-		"11": [[0, 0], [0, 1], [0, 2], [0, 3], [1, 3]],
-		"12": [[0, 0], [1, 0], [1, 1], [2, 1], [3, 1]],
-		"13": [[0, 0], [0, 1], [0, 2], [1, 1], [1, 2]],
-		"14": [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]],
-		"15": [[0, 0], [0, 1], [0, 2], [0, 3], [1, 1]],
-		"16": [[0, 0], [1, 0], [1, 1], [1, 2], [2, 0]],
-		"17": [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]],
-		"18": [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]],
-		"19": [[0, 0], [0, 1], [1, 1], [2, 1], [2, 2]],
-		"20": [[0, 0], [0, 1], [1, 1], [1, 2], [2, 1]],
-		"21": [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]]
-	}
-	shapeNames = {
-		"1": "1",
-		"2": "2",
-		"3": "3I",
-		"4": "3L",
-		"5": "4I",
-		"6": "4L",
-		"7": "4T",
-		"8": "4O",
-		"9": "4Z",
-		"10": "5I",
-		"11": "5l",
-		"12": "5Z",
-		"13": "5b",
-		"14": "5C",
-		"15": "5r",
-		"16": "5T",
-		"17": "5L",
-		"18": "5¬",
-		"19": "5S",
-		"20": "5#",
-		"21": "5+"
+	shapes = {
+		1: {
+			'coords': [0, 0],
+			'name': '1'
+		},
+		2: {
+			'coords': [[0, 0], [0, 1]],
+			'name': '2'
+		},
+		3: {
+			'coords': [[0, 0], [0, 1], [0, 2]],
+			'name': '3I'
+		},
+		4: {
+			'coords': [[0, 0], [0, 1], [1, 1]],
+			'name': '3L'
+		},
+		5: {
+			'coords': [[0, 0], [0, 1], [0, 2], [0, 3]],
+			'name': '4I'
+		},
+		6: {
+			'coords': [[0, 0], [0, 1], [0, 2], [1, 2]],
+			'name': '4l'
+		},
+		7: {
+			'coords': [[0, 0], [1, 0], [1, 1], [2, 0]],
+			'name': '4T'
+		},
+		8: {
+			'coords': [[0, 0], [0, 1], [1, 0], [1, 1]],
+			'name': '4O'
+		},
+		9: {
+			'coords': [[0, 0], [1, 0], [1, 1], [2, 1]],
+			'name': '4Z'
+		},
+		10: {
+			'coords': [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]],
+			'name': '5I'
+		},
+		11: {
+			'coords': [[0, 0], [0, 1], [0, 2], [0, 3], [1, 3]],
+			'name': '5l'
+		},
+		12: {
+			'coords': [[0, 0], [1, 0], [1, 1], [2, 1], [3, 1]],
+			'name': '5Z'
+		},
+		13: {
+			'coords': [[0, 0], [0, 1], [0, 2], [1, 1], [1, 2]],
+			'name': '5b'
+		},
+		14: {
+			'coords': [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]],
+			'name': '5C'
+		},
+		15: {
+			'coords': [[0, 0], [0, 1], [0, 2], [0, 3], [1, 1]],
+			'name': '5r'
+		},
+		16: {
+			'coords': [[0, 0], [1, 0], [1, 1], [1, 2], [2, 0]],
+			'name': '5T'
+		},
+		17: {
+			'coords': [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]],
+			'name': '5L'
+		},
+		18: {
+			'coords': [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]],
+			'name': '5¬'
+		},
+		19: {
+			'coords': [[0, 0], [0, 1], [1, 1], [2, 1], [2, 2]],
+			'name': '5S'
+		},
+		20: {
+			'coords': [[0, 0], [0, 1], [1, 1], [1, 2], [2, 1]],
+			'name': '5#'
+		},
+		21: {
+			'coords': [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]],
+			'name': '5+'
+		}
 	}
 
 	def __init__(self, shape_index, color):
-		Piece.__init__(self, shape_index, color, self.shapeCoords)
+		print(shape_index)
+		shape = self.shapes[shape_index]
+		Piece.__init__(self, shape['name'], shape['coords'], color)
+
+	@staticmethod
+	def produce_set():
+		return []
 
 
 class Player:
-	def __init__(self, color, inital_pieces):
+	def __init__(self, color, initial_pieces):
 		self.color = color
-		self.pieces = inital_pieces
+		self.pieces = initial_pieces
 
 
 test_board = GameBoard(20)
-test_player = Player('yellow')
-# test_board.positions[9][9].placeable_by = ['yellow']
+test_player = Player('yellow', [])
 test_board.place_piece(10, 10, StandardPiece(20, 'yellow'))
-test_board.update_placeable_lists([Player('yellow')])
+test_board.update_placeable_lists([test_player])
 test_board.print_to_cli(test_player)
