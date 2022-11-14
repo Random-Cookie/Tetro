@@ -9,6 +9,7 @@ init()
 class BoardSquare:
 	x: int
 	y: int
+	placeable_by: list[str]
 	color: str = None
 
 
@@ -18,7 +19,7 @@ class GameBoard:
 		for x in range(0, board_size - 1):
 			row = []
 			for y in range(0, board_size - 1):
-				row.append(BoardSquare(x, y))
+				row.append(BoardSquare(x, y, []))
 			self.positions.append(row)
 
 	def calculate_player_coverage(self, player):
@@ -41,27 +42,67 @@ class GameBoard:
 		total_score += self.calculate_player_bonus(player)
 		return total_score
 
+	def check_adj_squares(self, x, y, color):
+		if x > 0 and self.positions[x - 1][y].color == color:
+			return True
+		if x < len(self.positions) - 1 and self.positions[x + 1][y].color == color:
+			return True
+		if y > 0 and self.positions[x][y - 1].color == color:
+			return True
+		if y < len(self.positions[0]) - 1 and self.positions[x][y + 1].color == color:
+			return True
+		return False
+
+	def check_diag_squares(self, x, y, color):
+		mini = 0
+		maxi = len(self.positions) - 1
+		if x > mini and y > mini and self.positions[x - 1][y - 1].color == color:
+			return True
+		if x > mini and y < maxi and self.positions[x - 1][y + 1].color == color:
+			return True
+		if x < maxi and y > mini and self.positions[x + 1][y - 1].color == color:
+			return True
+		if x < maxi and y < maxi and self.positions[x + 1][y + 1].color == color:
+			return True
+		return False
+
 	def check_piece_fits(self, x, y, piece):
 		for xy_pair in piece.currentCoords:
 			if self.positions[xy_pair[0] + x][xy_pair[1] + y].color is not None:
 				return False
+			if self.check_adj_squares(x, y, piece.color):
+				return False
 		return True
+
+	def update_placeable_lists(self, players):
+		for x in range(0, len(self.positions)):
+			for y in range(0, len(self.positions[0])):
+				pos = self.positions[x][y]
+				if pos.color is not None:
+					pos.placeable_by = []
+				else:
+					for player in players:
+						if self.check_diag_squares(x, y, player) and not self.check_adj_squares(x, y, player):
+							pos.placeable_by.append(player.color)
 
 	def place_piece(self, x, y, piece):
 		if self.check_piece_fits(x, y, piece):
 			for xy_pair in piece.currentCoords:
-				self.positions[xy_pair[0] + x][xy_pair[1] + y].color = piece.color
+				pos = self.positions[xy_pair[0] + x][xy_pair[1] + y]
+				pos.color = piece.color
 			return True
 		return False
 
-	def print_to_cli(self):
+	def print_to_cli(self, player):
 		print('_' * ((2 * len(self.positions)) + 3))
 		for y in range(0, len(self.positions[0])):
 			print('| ', end='')
 			for x in range(0, len(self.positions)):
 				pos = self.positions[x][y]
 				if pos.color is not None:
-					print(colored('▩ ', pos.color), end='')
+					print(colored('■ ', pos.color), end='')
+				elif player.color in pos.placeable_by:
+					print(colored('▢ ', player.color), end='')
 				else:
 					print('▢ ', end='')
 			print('|')
@@ -165,10 +206,14 @@ class StandardPiece(Piece):
 
 
 class Player:
-	def __init__(self, color):
+	def __init__(self, color, inital_pieces):
 		self.color = color
+		self.pieces = inital_pieces
 
 
 test_board = GameBoard(20)
-test_board.place_piece(10, 10, StandardPiece(20, 'red'))
-test_board.print_to_cli()
+test_player = Player('yellow')
+# test_board.positions[9][9].placeable_by = ['yellow']
+test_board.place_piece(10, 10, StandardPiece(20, 'yellow'))
+test_board.update_placeable_lists([Player('yellow')])
+test_board.print_to_cli(test_player)
