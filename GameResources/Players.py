@@ -1,14 +1,13 @@
+from __future__ import annotations
 import copy
 import re
 from abc import ABC, abstractmethod
-
 from termcolor import colored
-
-from GameResources.structure import Piece, GameBoard
+import GameResources.structure as GR
 
 
 class Player(ABC):
-	def __init__(self, color, initial_pieces: list[Piece]):
+	def __init__(self, color, initial_pieces: list[GR.Piece]):
 		self.color = color
 		self.pieces = initial_pieces
 
@@ -18,12 +17,12 @@ class Player(ABC):
 			print(str(i) + ' : ' + self.pieces[i].name, end=' | ')
 		print()
 
-	def take_turn(self, board: GameBoard):
+	def take_turn(self, board: GR.GameBoard):
 		place_params = self.select_piece(board)
 		while not self.place_piece(board, place_params):
 			place_params = self.select_piece(board)
 
-	def place_piece(self, board: GameBoard, placement_params: tuple[Piece, int, tuple[int, int]]) -> bool:
+	def place_piece(self, board: GR.GameBoard, placement_params: tuple[GR.Piece, int, tuple[int, int]]) -> bool:
 		piece, index, xy = placement_params
 		x, y = xy
 		if board.place_piece(x, y, piece):
@@ -31,16 +30,19 @@ class Player(ABC):
 			return True
 		return False
 
+	def has_won(self):
+		return len(self.pieces) == 0
+
 	@abstractmethod
-	def select_piece(self, board) -> tuple[Piece, int, tuple[int, int]]:
-		return Piece('', [], ''), 0, (0, 0)
+	def select_piece(self, board) -> tuple[GR.Piece, int, tuple[int, int]]:
+		return GR.Piece('', [], ''), 0, (0, 0)
 
 
 class HumanPlayer(Player):
 	def __init__(self, color, initial_pieces):
 		Player.__init__(self, color, initial_pieces)
 
-	def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]]:
+	def select_piece(self, board: GR.GameBoard) -> tuple[GR.Piece, int, tuple[int, int]]:
 		command_input_string = '| r: Rotate | r{int}: Rotate x times | f: Flip | {int},{int}: Place ' + \
 								colored('▣ ', self.color) + \
 								'at (x, y), ' + \

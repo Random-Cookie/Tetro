@@ -1,3 +1,5 @@
+from __future__ import annotations
+import GameResources.Players
 from dataclasses import dataclass
 from colorama import init
 from termcolor import colored
@@ -15,13 +17,14 @@ class BoardSquare:
 
 
 class GameBoard:
-	def __init__(self, board_size):
+	def __init__(self, board_size, players, starting_positions: list[[int, int]] = None):
 		self.positions = []
 		for x in range(0, board_size):
 			row = []
 			for y in range(0, board_size):
 				row.append(BoardSquare(x, y, []))
 			self.positions.append(row)
+		self.set_starting_positions(players)
 
 	def set_starting_positions(self, players, starting_positions: list[list[int, int]] = None):
 		xmax = len(self.positions) - 1
@@ -31,25 +34,12 @@ class GameBoard:
 			x, y = starting_positions[i]
 			self.positions[x][y].placeable_by.append(players[i].color)
 
-	def calculate_player_coverage(self, player):
-		color = player.color
-		return 0
-
-	def calculate_player_density(self, player):
-		return 0
-
-	def calculate_player_teritory(self, player):
-		return 0
-
-	def calculate_player_bonus(self, player):
-		return 0
-
-	def calculate_total_score(self, player):
-		total_score = self.calculate_player_coverage(player)
-		total_score += self.calculate_player_density(player)
-		total_score += self.calculate_player_teritory(player)
-		total_score += self.calculate_player_bonus(player)
-		return total_score
+	def is_stalemate(self):
+		for y in range(0, len(self.positions[0])):
+			for x in range(0, len(self.positions)):
+				if self.positions[x][y]:
+					return False
+		return True
 
 	def check_adj_squares(self, x, y, color):
 		if x > 0 and self.positions[x - 1][y].color == color:
@@ -108,7 +98,7 @@ class GameBoard:
 			return True
 		return False
 
-	def print_to_cli(self, player):
+	def print_to_cli(self, player: Players.Player = None):
 		# clear console
 		for i in range(30):
 			print()
@@ -119,7 +109,7 @@ class GameBoard:
 				pos = self.positions[x][y]
 				if pos.color is not None:
 					print(colored('▩ ', pos.color), end='')
-				elif player.color in pos.placeable_by:
+				elif player is not None and player.color in pos.placeable_by:
 					print(colored('▢ ', player.color), end='')
 				else:
 					print('▢ ', end='')
