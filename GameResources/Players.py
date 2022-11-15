@@ -1,5 +1,9 @@
 import copy
+import re
 from abc import ABC, abstractmethod
+
+from termcolor import colored
+
 from GameResources.structure import Piece, GameBoard
 
 
@@ -8,9 +12,10 @@ class Player(ABC):
 		self.color = color
 		self.pieces = initial_pieces
 
-	def print_pieces_to_cli(self):
+	def print_pieces_names_to_cli(self):
+		print(end='| ')
 		for i in range(len(self.pieces)):
-			print(str(i) + ': ' + self.pieces[i].name, end=', ')
+			print(str(i) + ' : ' + self.pieces[i].name, end=' | ')
 		print()
 
 	def take_turn(self, board: GameBoard):
@@ -36,9 +41,15 @@ class HumanPlayer(Player):
 		Player.__init__(self, color, initial_pieces)
 
 	def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]]:
+		command_input_string = '| r: Rotate | r{int}: Rotate x times | f: Flip | {int},{int}: Place ' + \
+								colored('▣ ', self.color) + \
+								'at (x, y), ' + \
+								colored('▢ ', self.color) + \
+								'Indicates Placeable position |' + \
+								'\n'
 		board.print_to_cli(self)
 		print('Available Pieces:')
-		self.print_pieces_to_cli()
+		self.print_pieces_names_to_cli()
 		piece_index = int(input('Please select a piece: '))
 		while not 0 <= piece_index < len(self.pieces):
 			piece_index = int(input('Please select a valid a piece: '))
@@ -46,23 +57,20 @@ class HumanPlayer(Player):
 		board.print_to_cli(self)
 		print('Selected Piece:')
 		selected_piece.print_to_cli()
-		flip = input('Flip? (y/n)')
-		if flip.lower() == 'y':
-			selected_piece.flip()
-		board.print_to_cli(self)
-		print('Selected Piece:')
-		selected_piece.print_to_cli()
-		rotate = input('Rotate Clockwise? (y/n)')
-		rotations = 0
-		while rotate.lower() == 'y':
-			rotations += 1
+		command = input(command_input_string).lower()
+		while re.search('[0-9]+,[0-9]+', command) is None:
+			if command == 'r':
+				selected_piece.rotate()
+			if re.search('r[0-9]+', command) is not None:
+				command = command.strip('r')
+				for i in range(int(command) % 4):
+					selected_piece.rotate()
+			if command == 'f':
+				selected_piece.flip()
 			board.print_to_cli(self)
 			print('Selected Piece:')
-			selected_piece.rotate()
 			selected_piece.print_to_cli()
-			rotate = input('Rotate Clockwise? (y/n)')
-		x, y = input('Input (x,y)').strip('()').split(',')
-		while not (0 <= int(x) < len(board.positions) and 0 <= int(y) < len(board.positions[0])):
-			x, y = input('Input (x,y)').strip('()').split(',')
+			command = input(command_input_string).lower()
+		x, y = command.split(',')
 		x, y = int(x), int(y)
 		return selected_piece, piece_index, (x, y)

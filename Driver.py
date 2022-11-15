@@ -12,6 +12,3 @@ while True:
 	for player in players:
 		player.take_turn(board)
 		board.update_placeable_lists(players)
-
-
-print('Done')

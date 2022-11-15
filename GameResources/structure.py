@@ -109,6 +109,9 @@ class GameBoard:
 		return False
 
 	def print_to_cli(self, player):
+		# clear console
+		for i in range(30):
+			print()
 		print('_' * ((2 * len(self.positions)) + 3))
 		for y in range(0, len(self.positions[0])):
 			print('| ', end='')
@@ -121,7 +124,7 @@ class GameBoard:
 				else:
 					print('▢ ', end='')
 			print('|')
-		print('_' * ((2 * len(self.positions)) + 3))
+		print('‾' * ((2 * len(self.positions)) + 3))
 
 
 class Piece:
