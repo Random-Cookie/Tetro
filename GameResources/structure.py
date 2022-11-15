@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from colorama import init
 from termcolor import colored
+from numpy import matmul
 
 init()
 
@@ -21,6 +22,14 @@ class GameBoard:
 			for y in range(0, board_size):
 				row.append(BoardSquare(x, y, []))
 			self.positions.append(row)
+
+	def set_starting_positions(self, players, starting_positions: list[list[int, int]] = None):
+		xmax = len(self.positions) - 1
+		ymax = len(self.positions[0]) - 1
+		starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] if starting_positions is None else starting_positions
+		for i in range(len(players)):
+			x, y = starting_positions[i]
+			self.positions[x][y].placeable_by.append(players[i].color)
 
 	def calculate_player_coverage(self, player):
 		color = player.color
@@ -66,18 +75,19 @@ class GameBoard:
 			return True
 		return False
 
-	def check_piece_fits(self, x, y, piece, override: bool = False) -> bool:
-		is_diagonal = override
+	def check_piece_fits(self, x, y, piece) -> bool:
+		placeable = False
 		for xy_pair in piece.currentCoords:
 			posx = xy_pair[0] + x
 			posy = xy_pair[1] + y
-			if self.positions[posx][posy].color is not None:
+			board_pos = self.positions[posx][posy]
+			if piece.color in board_pos.placeable_by:
+				placeable = True
+			if board_pos.color is not None:
 				return False
 			if self.check_adj_squares(posx, posy, piece.color):
 				return False
-			if self.check_diag_squares(posx, posy, piece.color):
-				is_diagonal = True
-		return is_diagonal
+		return placeable
 
 	def update_placeable_lists(self, players):
 		for x in range(0, len(self.positions)):
@@ -90,8 +100,8 @@ class GameBoard:
 						if self.check_diag_squares(x, y, player.color) and not self.check_adj_squares(x, y, player.color):
 							pos.placeable_by.append(player.color)
 
-	def place_piece(self, x, y, piece, override: bool = False) -> bool:
-		if self.check_piece_fits(x, y, piece, override):
+	def place_piece(self, x, y, piece) -> bool:
+		if self.check_piece_fits(x, y, piece):
 			for xy_pair in piece.currentCoords:
 				pos = self.positions[xy_pair[0] + x][xy_pair[1] + y]
 				pos.color = piece.color
@@ -105,7 +115,7 @@ class GameBoard:
 			for x in range(0, len(self.positions)):
 				pos = self.positions[x][y]
 				if pos.color is not None:
-					print(colored('▣ ', pos.color), end='')
+					print(colored('▩ ', pos.color), end='')
 				elif player.color in pos.placeable_by:
 					print(colored('▢ ', player.color), end='')
 				else:
@@ -122,10 +132,17 @@ class Piece:
 
 	# https://www.tutorialspoint.com/computer_graphics/2d_transformation.htm#:~:text=We%20can%20have%20various%20types,it%20is%20called%202D%20transformation.
 	def rotate(self):
-		return None
+		# Rotate 90deg clockwise about origin
+		rotation_matrix = [[0, 1], [-1, 0]]
+		for i in range(len(self.currentCoords)):
+			self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
 
 	# https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
 	def flip(self):
+		# Flip along y axis
+		reflection_matrix = [[-1, 0], [0, 1]]
+		for i in range(len(self.currentCoords)):
+			self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
 		return None
 
 	def min_xy(self, axis):
@@ -146,7 +163,10 @@ class Piece:
 		for y in range(self.min_xy(1), self.max_xy(1) + 1):
 			for x in range(self.min_xy(0), self.max_xy(0) + 1):
 				if [x, y] in self.currentCoords:
-					print(colored('▩ ', self.color), end='')
+					if x == 0 and y == 0:
+						print(colored('▣ ', self.color), end='')
+					else:
+						print(colored('▩ ', self.color), end='')
 				else:
 					print('  ', end='')
 			print()
