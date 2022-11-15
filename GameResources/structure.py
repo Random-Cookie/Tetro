@@ -1,5 +1,5 @@
 from __future__ import annotations
-import GameResources.Players
+import GameResources as GR
 from dataclasses import dataclass
 from colorama import init
 from termcolor import colored
@@ -34,11 +34,17 @@ class GameBoard:
 			x, y = starting_positions[i]
 			self.positions[x][y].placeable_by.append(players[i].color)
 
-	def is_stalemate(self):
+	def has_placeable(self, player: GR.Players.Player):
 		for y in range(0, len(self.positions[0])):
 			for x in range(0, len(self.positions)):
-				if self.positions[x][y]:
-					return False
+				if player.color in self.positions[x][y].placeable_by:
+					return True
+		return False
+
+	def is_stalemate(self, players: list[GR.Players.Player]):
+		for player in players:
+			if self.has_placeable(player) and not player.has_knocked:
+				return False
 		return True
 
 	def check_adj_squares(self, x, y, color):
@@ -98,7 +104,7 @@ class GameBoard:
 			return True
 		return False
 
-	def print_to_cli(self, player: Players.Player = None):
+	def print_to_cli(self, player: GR.Players.Player = None):
 		# clear console
 		for i in range(30):
 			print()
