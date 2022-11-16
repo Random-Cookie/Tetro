@@ -15,13 +15,11 @@ class Tetros:
 
     def __init__(self,
                  board_size: tuple[int, int] = (20, 20),
-                 player_colors: list[str] = None,
-                 initial_pieces: dict = None):
-        player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
+                 initial_pieces: dict = None,
+                 players: list[Player] = None):
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
-        self.players = []
-        for i in range(0, len(player_colors)):
-            self.players.append(HumanPlayer(player_colors[i], self.initial_pieces[i]))
+        self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces)\
+            if players is None else players
         self.board = GameBoard((board_size[0], board_size[1]), self.players)
 
     def check_win(self):
@@ -51,12 +49,16 @@ class Tetros:
                           ' skipped as they can''t place a piece. Press enter to skip.')
             print('Turn ' + str(turns) + ':')
             self.board.print_to_cli()
+            input('Press enter to continue...')
         winners = self.check_win()
         self.board.print_to_cli()
-        if len(winners) == 1:
+        if len(winners) > 1:
+            print('The winners were: ' + str(winners).strip('[]'))
+        elif len(winners) == 1:
             print('The winner was: ' + str(winners[0]))
         else:
-            print('The winners were: ' + str(winners).strip('[]'))
+            pass
+            # work out what
         self.print_scores_to_cli()
 
     def calculate_player_coverage(self, player: Player) -> tuple[int, int, int, int]:
@@ -123,14 +125,14 @@ class Tetros:
         players_scores = {}
         for player in self.players:
             player_score = {
-                'coverage': round(self.calculate_player_coverage_score(player), 2),  # % coverage of board
-                'density': round(self.calculate_player_density_score(player), 2),
+                'Coverage': round(self.calculate_player_coverage_score(player), 2),  # % coverage of board
+                'Density': round(self.calculate_player_density_score(player), 2),
                 # % of coverage filled with any pieces
-                'territory': self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
-                'hand penalty': player.squares_left()  # Number of squares in players remaining pieces -1 per square
+                'Territory': self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
+                'Penalty': player.squares_left()  # Number of squares in players remaining pieces -1 per square
             }
-            player_score['total'] = player_score['coverage'] + player_score['density'] + player_score['territory'] - \
-                player_score['hand penalty']
+            player_score['Total'] = player_score['Coverage'] + player_score['Density'] + player_score['Territory'] - \
+                player_score['Penalty']
             players_scores[player] = player_score
         # players_scores = sorted(players_scores, key=lambda x:(x['total']))
         # TODO sort players
@@ -140,8 +142,17 @@ class Tetros:
         """
         Print the score to the CLI
         """
-        # scores = self.calculate_player_scores()
-        # TODO
+        scores = self.calculate_player_scores()
+        print('| Player    ', end=' | ')
+        for key in scores[list(scores.keys())[0]]:
+            print(key.ljust(10), end=' | ')
+        print()
+        for key in scores.keys():
+            score = scores[key]
+            print('| ' + key.color.ljust(10), end=' | ')
+            for key in score.keys():
+                print(str(score[key]).rjust(10), end=' | ')
+            print()
 
     @staticmethod
     def get_custom_game_inputs():
@@ -189,7 +200,9 @@ class Tetros:
                     print('Modified', 'green')
         print()
 
+    def display_main_menu(self):
+        pass
 
-game = Tetros((5, 5))
-inputs = Tetros.get_custom_game_inputs()
+
+game = Tetros(players=ObjectFactory.generate_random_players())
 game.play_standard_game()
