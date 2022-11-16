@@ -24,6 +24,9 @@ class Player(ABC):
         self.has_knocked = False
 
     def __str__(self):
+        """
+        :return: the color value for the player
+        """
         return self.color
 
     def print_pieces_names_to_cli(self):
@@ -76,9 +79,10 @@ class Player(ABC):
 
     def take_turn(self, board: GameBoard):
         """
-        Slect then place a piece
+        Select then place a piece if possible
         :param board: The gameboard to analyse
         """
+        # TODO Change this to return true if a piece was placed
         place_params = self.select_piece(board)
         while place_params is not None and not self.place_piece(board, place_params):
             place_params = self.select_piece(board)
@@ -100,9 +104,6 @@ class Player(ABC):
 class HumanPlayer(Player):
     def __init__(self, color, initial_pieces):
         Player.__init__(self, color, initial_pieces)
-
-    def __str__(self):
-        return Player.__str__(self)
 
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
         """
@@ -154,9 +155,6 @@ class RandomPlayer(Player):
     def __init__(self, color, initial_pieces):
         Player.__init__(self, color, initial_pieces)
         self.timeout = 0
-
-    def __str__(self):
-        return Player.__str__(self)
 
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
         placeable_locations = self.get_placeables(board)
