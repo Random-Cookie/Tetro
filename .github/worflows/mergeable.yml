@@ -1,0 +1,19 @@
+version: 2
+mergeable:
+  - when: pull_request.*
+    validate:
+      - do: title
+        must_include:
+          regex: \[[Major|Minor|Patch|NoVersion]\]
+          message: Please include semver tag in the title, see https://semver.org/ for more info.
+        # All todo check boxes must be checked.
+      - do: description
+        must_exclude:
+          regex: \[ \] Have you tested your changees with 100% coverrage
+          message: Please complete testing before merging.
+      - do: approvals
+        min:
+          count: 1
+        or:
+          - required:
+              reviewers: [ random-cookie ]
