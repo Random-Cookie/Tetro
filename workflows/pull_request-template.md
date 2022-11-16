@@ -5,5 +5,5 @@
 ## Changes
 
 ## Checklist
-- [ ] Have you tested your changees with 100% coverrage
+- [ ] Have you tested your changes with 100% coverage
 - [ ] Is this a new Player type?
