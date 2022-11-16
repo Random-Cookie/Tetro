@@ -93,11 +93,11 @@ class HumanPlayer(Player):
         """
         piece_index_input_string = colored(self.color, self.color) + ' player please select a piece: '
         command_input_string = '| r: Rotate | r{int}: Rotate x times | f: Flip | k: Knock | {int},{int}: Place ' + \
-                                colored('▣ ', self.color) + \
-                                'at (x, y), ' + \
-                                colored('▢ ', self.color) + \
-                                'Indicates Placeable position |' + \
-                                '\n'
+            colored('▣ ', self.color) + \
+            'at (x, y), ' + \
+            colored('▢ ', self.color) + \
+            'Indicates Placeable position |' + \
+            '\n'
         board.print_to_cli(self)
         print('Available Pieces:')
         self.print_pieces_names_to_cli()

@@ -130,7 +130,7 @@ class Tetros:
                 'hand penalty': player.squares_left()  # Number of squares in players remaining pieces -1 per square
             }
             player_score['total'] = player_score['coverage'] + player_score['density'] + player_score['territory'] - \
-                                    player_score['hand penalty']
+                player_score['hand penalty']
             players_scores[player] = player_score
         # players_scores = sorted(players_scores, key=lambda x:(x['total']))
         # TODO sort players
@@ -140,7 +140,7 @@ class Tetros:
         """
         Print the score to the CLI
         """
-        scores = self.calculate_player_scores()
+        # scores = self.calculate_player_scores()
         # TODO
 
 
