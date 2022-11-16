@@ -1,15 +1,17 @@
+import re
+
 from termcolor import colored
 
 from GameResources.structure import GameBoard
 from GameResources.ObjectFactory import ObjectFactory
-from GameResources.Players import Player, HumanPlayer
+from GameResources.Players import Player, HumanPlayer, RandomPlayer
 
 
 class Tetros:
     # TODO sort out this config, need players not player colors
     DEFAULT_CONFIG = {
         'board_size': (20, 20),
-        'colors': ['blue', 'green', 'red', 'yellow'],
+        'players': ObjectFactory.generate_human_players(),
         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
         'initial_pieces': ObjectFactory.generate_shapes()
     }
@@ -17,11 +19,12 @@ class Tetros:
     def __init__(self,
                  board_size: tuple[int, int] = (20, 20),
                  initial_pieces: dict = None,
-                 players: list[Player] = None):
+                 players: list[Player] = None,
+                 starting_positions: list[[int, int]] = None):
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces) \
             if players is None else players
-        self.board = GameBoard((board_size[0], board_size[1]), self.players)
+        self.board = GameBoard((board_size[0], board_size[1]), self.players, starting_positions)
 
     def check_win(self):
         """
@@ -59,7 +62,7 @@ class Tetros:
             print('The winner was: ' + str(winners[0]))
         else:
             pass
-            # work out what
+            # TODO work out who won?
         self.print_scores_to_cli()
 
     def calculate_player_coverage(self, player: Player) -> tuple[int, int, int, int]:
@@ -161,29 +164,81 @@ class Tetros:
         logo = logo_file.read()
         logo_file.close()
         cfg = Tetros.DEFAULT_CONFIG
-        input_message = logo + \
-                        '--------------- Tetros: Config Menu ---------------\n' + \
-                        'board  (b) | Input\n' + \
-                        'colour (c) | Add a player with selected color\n' + \
-                        'pos    (p) | Input custom starting positions\n' + \
-                        'write  (w) | Save config to file - UNIMPLEMENTED\n' + \
-                        'start  (s) | Start a game with the selected Parameters\n' + \
-                        'exit   (e) | Exit without starting a game\n'
+        input_message = '--------------- Config Menu ---------------\n' + \
+            'board  (b)  | Input custom board size\n' + \
+            'player (pl) | Add a player with selected color\n' + \
+            'pos    (po) | Input custom starting positions\n' + \
+            'pieces (pi) | Choose Piece Set\n' + \
+            'write  (w)  | Save config to file (UNIMPLEMENTED)\n' + \
+            'load   (l)  | load config from files (UNIMPLEMENTED)\n' + \
+            'start  (s)  | Start a game with the selected Parameters\n' + \
+            'exit   (e)  | Exit without starting a game\n'
         exiting_inputs = ['start', 's', 'exit', 'e']
         input_val = ''
         while input_val not in exiting_inputs:
             if input_val == 'board' or input_val == 'b':
-                # TODO
-                pass
-            if input_val == 'color' or input_val == 'c':
-                # TODO
-                pass
-            if input_val == 'pos' or input_val == 'p':
-                # TODO
-                pass
+                print(logo)
+                print('Input board size in the form: x,y')
+                board_input_val = ''
+                while re.search('[0-9]+,[0-9]+', board_input_val) is None:
+                    print(logo)
+                    board_input_val = input('Input board size in the form: x,y\n')
+                split = board_input_val.split(',')
+                x, y = int(split[0]), int(split[1])
+                cfg['board_size'] = (x, y)
+                cfg['starting_positions'] = [[0, 0], [0, y - 1], [x - 1, 0], [x - 1, y - 1]]
+                input('Custom Board Size Selection Complete, press enter to continue...')
+            if input_val == 'player' or input_val == 'pl':
+                possible_colors = ['grey', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan']
+                custom_colors = []
+                col_input_val = ''
+                while col_input_val != 'exit' and col_input_val != 'e':
+                    print('Possible Colors: ' + str(possible_colors))
+                    print('Current Colors:  ' + str(custom_colors))
+                    col_input_val = input('Please input a color from the allowed list,' +
+                                          ' or exit/e to pick player types\n').lower()
+                    if col_input_val in possible_colors:
+                        custom_colors.append(col_input_val)
+                possible_players = ['human', 'random']
+                custom_players = []
+                for color in custom_colors:
+                    print('Possible Players: ' + str(possible_players))
+                    print('Selected Players: ' + str(custom_players))
+                    col_input_val = input('Select Player Type for ' + colored(color, color) + ':\n').lower()
+                    if col_input_val == 'human':
+                        custom_players.append(HumanPlayer(color, cfg['initial_pieces']))
+                    else:
+                        custom_players.append(RandomPlayer(color, cfg['initial_pieces']))
+                # TODO fix this array printing
+                cfg['players'] = custom_players
+                print('Selected Players: ' + str(custom_players))
+                input('Custom Player Selection Complete, press enter to continue...')
+            if input_val == 'pos' or input_val == 'po':
+                board_size = cfg['board_size']
+                minx, miny, maxx, maxy = 0, 0, board_size[0], board_size[1]
+                starting_positions = []
+                pos_input_val = ''
+                for player in cfg['players']:
+                    # TODO validation
+                    while re.search('[0-9]+,[0-9]+', pos_input_val) is None:
+                        pos_input_val = input('Please input a staring position for ' +
+                                              colored(player.color, player.color) +
+                                              ' in the format x,y:\n').lower()
+                    split = pos_input_val.split(',')
+                    pos_input_val = ''
+                    starting_positions.append([int(split[0]), int(split[1])])
+                cfg['starting_positions'] = starting_positions
+                input('Custom Starting Position Selection Complete, press enter to continue...')
+            if input_val == 'pieces' or input_val == 'l':
+                # TODO when implementing piece sets
+                input('Custom Starting Pieces Selection Complete, press enter to continue...')
             if input_val == 'write' or input_val == 'w':
                 # TODO
-                pass
+                input('Config Written, press enter to continue...')
+            if input_val == 'load' or input_val == 'l':
+                # TODO
+                input('Config Loaded, press enter to continue...')
+            print(logo)
             Tetros.display_config(cfg)
             input_val = input(input_message).lower()
         if input_val == 'start' or input_val == 's':
@@ -192,7 +247,8 @@ class Tetros:
 
     @staticmethod
     def display_config(config: dict):
-        print(colored('Loaded Config:'))
+        # TODO Fix this
+        print(colored('--------------- Loaded Config ---------------'))
         for item in list(config.items()):
             if item[0] != 'initial_pieces':
                 print(item[0].ljust(20) + ' | ' +
@@ -211,18 +267,23 @@ class Tetros:
         logo = logo_file.read()
         logo_file.close()
         menu_string = logo + \
-                      '\n--------------- Main Menu Options---------------\n' + \
-                      'play      (p) | Play a standard Game\n' + \
-                      'random    (r) | Demo game with random bots\n' + \
-                      'config    (c) | Open Configuration Menu\n' + \
-                      'exit      (e) | Exit\n'
+            '\n--------------- Main Menu Options---------------\n' + \
+            'play      (p) | Play a standard Game\n' + \
+            'random    (r) | Demo game with random bots\n' + \
+            'config    (c) | Open Configuration Menu\n' + \
+            'exit      (e) | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
             input_string = input(menu_string).lower()
             if input_string == 'play' or input_string == 'p':
                 return Tetros.DEFAULT_CONFIG, True
             if input_string == 'random' or input_string == 'r':
-                return {}, True
+                return {
+                        'board_size': (20, 20),
+                        'players': ObjectFactory.generate_random_players(),
+                        'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                        'initial_pieces': ObjectFactory.generate_shapes()
+                       }, True
             if input_string == 'config' or input_string == 'c':
                 return Tetros.get_custom_game_inputs()[0], True
         return {}, False
@@ -231,9 +292,11 @@ class Tetros:
 game_params = Tetros.display_main_menu()
 while game_params[1]:
     if game_params[1]:
-        if game_params[0] != {}:
-            config = game_params[0]
-            game_players = ObjectFactory.generate_human_players(config['colors'])
-            game = Tetros(config['board_size'], config['initial_pieces'], game_players)
+        game_config = game_params[0]
+        if game_config != {}:
+            game = Tetros(game_config['board_size'],
+                          game_config['initial_pieces'],
+                          game_config['players'],
+                          game_config['starting_positions'])
             game.play_standard_game()
     game_params = Tetros.display_main_menu()
