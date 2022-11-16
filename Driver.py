@@ -7,13 +7,16 @@ from GameResources.Players import Player, HumanPlayer
 
 class Tetros:
     DEFAULT_CONFIG = {
-            'board_size': '20.20',
-            'colours': ['blue', 'green', 'red', 'yellow'],
-            'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-            'initial_pieces': ObjectFactory.generate_shapes()
-        }
+        'board_size': '20.20',
+        'colours': ['blue', 'green', 'red', 'yellow'],
+        'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+        'initial_pieces': ObjectFactory.generate_shapes()
+    }
 
-    def __init__(self, board_size: tuple[int, int] = (20, 20), player_colors: list[str] = None, initial_pieces: dict = None):
+    def __init__(self,
+                 board_size: tuple[int, int] = (20, 20),
+                 player_colors: list[str] = None,
+                 initial_pieces: dict = None):
         player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         self.players = []
@@ -44,7 +47,8 @@ class Tetros:
                     player.take_turn(self.board)
                     self.board.update_placeable_lists(self.players)
                 else:
-                    input(colored(player.color, player.color) + ' skipped as they can''t place a piece. Press enter to skip.')
+                    input(colored(player.color, player.color) +
+                          ' skipped as they can''t place a piece. Press enter to skip.')
             print('Turn ' + str(turns) + ':')
             self.board.print_to_cli()
         winners = self.check_win()
@@ -120,11 +124,13 @@ class Tetros:
         for player in self.players:
             player_score = {
                 'coverage': round(self.calculate_player_coverage_score(player), 2),  # % coverage of board
-                'density': round(self.calculate_player_density_score(player), 2),  # % of coverage filled with any pieces
+                'density': round(self.calculate_player_density_score(player), 2),
+                # % of coverage filled with any pieces
                 'territory': self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
                 'hand penalty': player.squares_left()  # Number of squares in players remaining pieces -1 per square
             }
-            player_score['total'] = player_score['coverage'] + player_score['density'] + player_score['territory'] - player_score['hand penalty']
+            player_score['total'] = player_score['coverage'] + player_score['density'] + player_score['territory'] - \
+                                    player_score['hand penalty']
             players_scores[player] = player_score
         # players_scores = sorted(players_scores, key=lambda x:(x['total']))
         # TODO sort players
@@ -138,5 +144,5 @@ class Tetros:
         # TODO
 
 
-game = Tetros(board_size=5)
+game = Tetros((5, 5))
 game.play_standard_game()

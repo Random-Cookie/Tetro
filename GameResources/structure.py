@@ -21,7 +21,10 @@ class BoardSquare:
 
 
 class GameBoard:
-    def __init__(self, board_size: tuple[int, int], players: list[GR.Players.Player], starting_positions: list[[int, int]] = None):
+    def __init__(self,
+                 board_size: tuple[int, int],
+                 players: list[GR.Players.Player],
+                 starting_positions: list[[int, int]] = None):
         """ Initialize a board of board_size * board_size
         :param board_size: Size of the board (x,y)
         :param players: Players who are playing
@@ -44,7 +47,8 @@ class GameBoard:
         """
         xmax = len(self.positions) - 1
         ymax = len(self.positions[0]) - 1
-        starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] if starting_positions is None else starting_positions
+        starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
+            if starting_positions is None else starting_positions
         for i in range(len(players)):
             x, y = starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
@@ -147,7 +151,8 @@ class GameBoard:
                     pos.placeable_by = []
                 else:
                     for player in players:
-                        if self.check_diag_squares(x, y, player.color) and not self.check_adj_squares(x, y, player.color):
+                        if self.check_diag_squares(x, y, player.color)\
+                                and not self.check_adj_squares(x, y, player.color):
                             pos.placeable_by.append(player.color)
 
     def place_piece(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
