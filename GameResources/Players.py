@@ -57,7 +57,7 @@ class Player(ABC):
         Abstract method for selecting a piece all subclasses must implement
         If a piece cannot be placed return none
         If you cannot place any pieces, set self.has_knocked = true to indicate you are passing all turns
-        :param board: The game board for analysis
+        :param board: The game board for analysis or printing
         :return: Placement parameters: (piece, piece_index, (x,y))
         """
         self.has_knocked = True
@@ -108,7 +108,7 @@ class HumanPlayer(Player):
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
         """
         Display an interface to allow a player to select, manipulate a piece and enter xy coords
-        :param board: Required for printing
+        :param board: Used for printing
         :return: Placement parameters: (piece, piece_index, (x,y)), None if player knocked
         """
         piece_index_input_string = colored(self.color, self.color) + ' player please select a piece: '
@@ -157,6 +157,11 @@ class RandomPlayer(Player):
         self.timeout = 0
 
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+        """
+        Select a random Piece with random rotations and flip
+        :param board: Used for analysis
+        :return:
+        """
         placeable_locations = self.get_placeables(board)
         if not placeable_locations:
             return None
