@@ -37,9 +37,9 @@ class Tetros:
                 winners.append(player)
         return winners
 
-    def play_standard_game(self):
+    def play_game(self):
         """
-        Play a standard game of Tetros
+        Play a game of Tetros
         """
         turns = 0
         while not self.board.is_stalemate(self.players) and not self.check_win():
@@ -56,6 +56,7 @@ class Tetros:
             input('Press enter to continue...')
         winners = self.check_win()
         self.board.print_to_cli()
+        print('--------------- Final Scores ---------------')
         if len(winners) > 1:
             print('The winners were: ' + str(winners).strip('[]'))
         elif len(winners) == 1:
@@ -64,6 +65,7 @@ class Tetros:
             pass
             # TODO work out who won?
         self.print_scores_to_cli()
+        input('Press enter to return ot the main menu...')
 
     def calculate_player_coverage(self, player: Player) -> tuple[int, int, int, int]:
         """
@@ -154,8 +156,8 @@ class Tetros:
         for key in scores.keys():
             score = scores[key]
             print('| ' + key.color.ljust(10), end=' | ')
-            for key in score.keys():
-                print(str(score[key]).rjust(10), end=' | ')
+            for sub_key in score.keys():
+                print(str(score[sub_key]).rjust(10), end=' | ')
             print()
 
     @staticmethod
@@ -298,5 +300,5 @@ while game_params[1]:
                           game_config['initial_pieces'],
                           game_config['players'],
                           game_config['starting_positions'])
-            game.play_standard_game()
+            game.play_game()
     game_params = Tetros.display_main_menu()
