@@ -10,254 +10,259 @@ init()
 
 @dataclass
 class BoardSquare:
-	"""
-	Dataclass to sore piece data
-	TODO x and y could possibly be removed?
-	"""
-	x: int
-	y: int
-	placeable_by: list[str]
-	color: str = None
+    """
+    Dataclass to sore piece data
+    TODO x and y could possibly be removed?
+    """
+    x: int
+    y: int
+    placeable_by: list[str]
+    color: str = None
 
 
 class GameBoard:
-	def __init__(self, board_size: tuple[int, int], players: list[GR.Players.Player], starting_positions: list[[int, int]] = None):
-		""" Initialize a board of board_size * board_size
-		:param board_size: Size of the board (x,y)
-		:param players: Players who are playing
-		:param starting_positions: Optional starting positions
-		"""
-		self.positions = []
-		for y in range(0, board_size[1]):
-			row = []
-			for x in range(0, board_size[0]):
-				row.append(BoardSquare(x, y, []))
-			self.positions.append(row)
-		self.set_starting_positions(players, starting_positions)
+    def __init__(self,
+                 board_size: tuple[int, int],
+                 players: list[GR.Players.Player],
+                 starting_positions: list[[int, int]] = None):
+        """ Initialize a board of board_size * board_size
+        :param board_size: Size of the board (x,y)
+        :param players: Players who are playing
+        :param starting_positions: Optional starting positions
+        """
+        self.positions = []
+        for y in range(0, board_size[1]):
+            row = []
+            for x in range(0, board_size[0]):
+                row.append(BoardSquare(x, y, []))
+            self.positions.append(row)
+        self.set_starting_positions(players, starting_positions)
 
-	def set_starting_positions(self, players: list[GR.Players.Player], starting_positions: list[list[int, int]] = None):
-		"""
-		Set stating positions for players
-		Make the locations in starting_positions placeable for corresponding players
-		:param players: Players to set starting positions for
-		:param starting_positions: desired starting positions
-		"""
-		xmax = len(self.positions) - 1
-		ymax = len(self.positions[0]) - 1
-		starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] if starting_positions is None else starting_positions
-		for i in range(len(players)):
-			x, y = starting_positions[i]
-			self.positions[x][y].placeable_by.append(players[i].color)
+    def set_starting_positions(self, players: list[GR.Players.Player], starting_positions: list[list[int, int]] = None):
+        """
+        Set stating positions for players
+        Make the locations in starting_positions placeable for corresponding players
+        :param players: Players to set starting positions for
+        :param starting_positions: desired starting positions
+        """
+        xmax = len(self.positions) - 1
+        ymax = len(self.positions[0]) - 1
+        starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
+            if starting_positions is None else starting_positions
+        for i in range(len(players)):
+            x, y = starting_positions[i]
+            self.positions[x][y].placeable_by.append(players[i].color)
 
-	def has_placeable(self, player: GR.Players.Player) -> bool:
-		"""
-		Can the player place a Piece on the board
-		:param player: Player to check
-		:return: bool
-		"""
-		for y in range(0, len(self.positions[0])):
-			for x in range(0, len(self.positions)):
-				if player.color in self.positions[x][y].placeable_by:
-					return True
-		return False
+    def has_placeable(self, player: GR.Players.Player) -> bool:
+        """
+        Can the player place a Piece on the board
+        :param player: Player to check
+        :return: bool
+        """
+        for y in range(0, len(self.positions[0])):
+            for x in range(0, len(self.positions)):
+                if player.color in self.positions[x][y].placeable_by:
+                    return True
+        return False
 
-	def is_stalemate(self, players: list[GR.Players.Player]) -> bool:
-		"""
-		Is the board a stalemate?
-		Either no placeable locations or all players have knocked
-		:param players: List of players
-		:return: bool
-		"""
-		for player in players:
-			if self.has_placeable(player) and not player.has_knocked:
-				return False
-		return True
+    def is_stalemate(self, players: list[GR.Players.Player]) -> bool:
+        """
+        Is the board a stalemate?
+        Either no placeable locations or all players have knocked
+        :param players: List of players
+        :return: bool
+        """
+        for player in players:
+            if self.has_placeable(player) and not player.has_knocked:
+                return False
+        return True
 
-	def check_adj_squares(self, x: int, y: int, color: str) -> bool:
-		"""
-		Check adjacent squares for same colored tiles
-		True if adjacent tiles have same color as player
-		:param x: x coord
-		:param y: y coord
-		:param color: Player color
-		:return: bool
-		"""
-		if x > 0 and self.positions[x - 1][y].color == color:
-			return True
-		if x < len(self.positions) - 1 and self.positions[x + 1][y].color == color:
-			return True
-		if y > 0 and self.positions[x][y - 1].color == color:
-			return True
-		if y < len(self.positions[0]) - 1 and self.positions[x][y + 1].color == color:
-			return True
-		return False
+    def check_adj_squares(self, x: int, y: int, color: str) -> bool:
+        """
+        Check adjacent squares for same colored tiles
+        True if adjacent tiles have same color as player
+        :param x: x coord
+        :param y: y coord
+        :param color: Player color
+        :return: bool
+        """
+        if x > 0 and self.positions[x - 1][y].color == color:
+            return True
+        if x < len(self.positions) - 1 and self.positions[x + 1][y].color == color:
+            return True
+        if y > 0 and self.positions[x][y - 1].color == color:
+            return True
+        if y < len(self.positions[0]) - 1 and self.positions[x][y + 1].color == color:
+            return True
+        return False
 
-	def check_diag_squares(self, x: int, y: int, color: str) -> bool:
-		"""
-		Check diagonal squares for same colored tiles
-		True if diagonal tiles have same color as player
-		:param x: x coord
-		:param y: y coord
-		:param color: Player color
-		:return: bool
-		"""
-		mini = 0
-		maxi = len(self.positions) - 1
-		if x > mini and y > mini and self.positions[x - 1][y - 1].color == color:
-			return True
-		if x > mini and y < maxi and self.positions[x - 1][y + 1].color == color:
-			return True
-		if x < maxi and y > mini and self.positions[x + 1][y - 1].color == color:
-			return True
-		if x < maxi and y < maxi and self.positions[x + 1][y + 1].color == color:
-			return True
-		return False
+    def check_diag_squares(self, x: int, y: int, color: str) -> bool:
+        """
+        Check diagonal squares for same colored tiles
+        True if diagonal tiles have same color as player
+        :param x: x coord
+        :param y: y coord
+        :param color: Player color
+        :return: bool
+        """
+        mini = 0
+        maxi = len(self.positions) - 1
+        if x > mini and y > mini and self.positions[x - 1][y - 1].color == color:
+            return True
+        if x > mini and y < maxi and self.positions[x - 1][y + 1].color == color:
+            return True
+        if x < maxi and y > mini and self.positions[x + 1][y - 1].color == color:
+            return True
+        if x < maxi and y < maxi and self.positions[x + 1][y + 1].color == color:
+            return True
+        return False
 
-	def check_piece_fits(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
-		"""
-		Check if piece will fit at location
-		True if fits
-		:param x: x coord
-		:param y: y coord
-		:param piece: Piece to place
-		:return: bool
-		"""
-		placeable = False
-		for xy_pair in piece.currentCoords:
-			posx = xy_pair[0] + x
-			posy = xy_pair[1] + y
-			board_pos = self.positions[posx][posy]
-			if piece.color in board_pos.placeable_by:
-				placeable = True
-			if board_pos.color is not None:
-				return False
-			if self.check_adj_squares(posx, posy, piece.color):
-				return False
-		return placeable
+    def check_piece_fits(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
+        """
+        Check if piece will fit at location
+        True if fits
+        :param x: x coord
+        :param y: y coord
+        :param piece: Piece to place
+        :return: bool
+        """
+        placeable = False
+        for xy_pair in piece.currentCoords:
+            posx = xy_pair[0] + x
+            posy = xy_pair[1] + y
+            board_pos = self.positions[posx][posy]
+            if piece.color in board_pos.placeable_by:
+                placeable = True
+            if board_pos.color is not None:
+                return False
+            if self.check_adj_squares(posx, posy, piece.color):
+                return False
+        return placeable
 
-	def update_placeable_lists(self, players: list[GR.structure.Piece]):
-		"""
-		Update placeable lists for all location on the board
-		:param players: Players to update
-		"""
-		for x in range(0, len(self.positions)):
-			for y in range(0, len(self.positions[0])):
-				pos = self.positions[x][y]
-				if pos.color is not None:
-					pos.placeable_by = []
-				else:
-					for player in players:
-						if self.check_diag_squares(x, y, player.color) and not self.check_adj_squares(x, y, player.color):
-							pos.placeable_by.append(player.color)
+    def update_placeable_lists(self, players: list[GR.structure.Piece]):
+        """
+        Update placeable lists for all location on the board
+        :param players: Players to update
+        """
+        for x in range(0, len(self.positions)):
+            for y in range(0, len(self.positions[0])):
+                pos = self.positions[x][y]
+                if pos.color is not None:
+                    pos.placeable_by = []
+                else:
+                    for player in players:
+                        if self.check_diag_squares(x, y, player.color)\
+                                and not self.check_adj_squares(x, y, player.color):
+                            pos.placeable_by.append(player.color)
 
-	def place_piece(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
-		"""
-		Place a Piece on the board, does no checks
-		:param x: x coord
-		:param y: ycoord
-		:param piece: Piece to place
-		:return: bool
-		"""
-		if self.check_piece_fits(x, y, piece):
-			for xy_pair in piece.currentCoords:
-				pos = self.positions[xy_pair[0] + x][xy_pair[1] + y]
-				pos.color = piece.color
-			return True
-		return False
+    def place_piece(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
+        """
+        Place a Piece on the board, does no checks
+        :param x: x coord
+        :param y: ycoord
+        :param piece: Piece to place
+        :return: bool
+        """
+        if self.check_piece_fits(x, y, piece):
+            for xy_pair in piece.currentCoords:
+                pos = self.positions[xy_pair[0] + x][xy_pair[1] + y]
+                pos.color = piece.color
+            return True
+        return False
 
-	def print_to_cli(self, player: GR.Players.Player = None):
-		"""
-		Print the board to the cli
-		:param player: If player is specified print the placeable locations for that player
-		"""
-		print('_' * ((2 * len(self.positions)) + 3))
-		for y in range(0, len(self.positions[0])):
-			print('| ', end='')
-			for x in range(0, len(self.positions)):
-				pos = self.positions[x][y]
-				if pos.color is not None:
-					print(colored('▩ ', pos.color), end='')
-				elif player is not None and player.color in pos.placeable_by:
-					print(colored('▢ ', player.color), end='')
-				else:
-					print('▢ ', end='')
-			print('|')
-		print('‾' * ((2 * len(self.positions)) + 3))
+    def print_to_cli(self, player: GR.Players.Player = None):
+        """
+        Print the board to the cli
+        :param player: If player is specified print the placeable locations for that player
+        """
+        print('_' * ((2 * len(self.positions)) + 3))
+        for y in range(0, len(self.positions[0])):
+            print('| ', end='')
+            for x in range(0, len(self.positions)):
+                pos = self.positions[x][y]
+                if pos.color is not None:
+                    print(colored('▩ ', pos.color), end='')
+                elif player is not None and player.color in pos.placeable_by:
+                    print(colored('▢ ', player.color), end='')
+                else:
+                    print('▢ ', end='')
+            print('|')
+        print('‾' * ((2 * len(self.positions)) + 3))
 
 
 class Piece:
-	def __init__(self, name: str, shape: list, color: str):
-		"""
-		Create a Piece
-		:param name: Piece name
-		:param shape: List of relative coordinates
-		:param color: Piece color
-		"""
-		self.name = name
-		self.currentCoords = shape
-		self.color = color
+    def __init__(self, name: str, shape: list, color: str):
+        """
+        Create a Piece
+        :param name: Piece name
+        :param shape: List of relative coordinates
+        :param color: Piece color
+        """
+        self.name = name
+        self.currentCoords = shape
+        self.color = color
 
-	def rotate(self):
-		"""
-		Rotate the piece 90 degrees clockwise
-		Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
-		"""
-		# Rotate 90deg clockwise about origin
-		rotation_matrix = [[0, 1], [-1, 0]]
-		for i in range(len(self.currentCoords)):
-			self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
+    def rotate(self):
+        """
+        Rotate the piece 90 degrees clockwise
+        Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
+        """
+        # Rotate 90deg clockwise about origin
+        rotation_matrix = [[0, 1], [-1, 0]]
+        for i in range(len(self.currentCoords)):
+            self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
 
-	def flip(self):
-		"""
-		Flip Piece about Y axis
-		source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
-		"""
-		reflection_matrix = [[-1, 0], [0, 1]]
-		for i in range(len(self.currentCoords)):
-			self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
-		return None
+    def flip(self):
+        """
+        Flip Piece about Y axis
+        source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
+        """
+        reflection_matrix = [[-1, 0], [0, 1]]
+        for i in range(len(self.currentCoords)):
+            self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
+        return None
 
-	def min_xy(self, axis: int):
-		"""
-		Minimum x or y value
-		:param axis: x or y: x=0, y=1
-		"""
-		if axis < 0:
-			axis = 0
-		if axis > 1:
-			axis = 1
-		min_xy = self.currentCoords[0][axis]
-		for coord in self.currentCoords:
-			if coord[axis] < min_xy:
-				min_xy = coord[axis]
-		return min_xy
+    def min_xy(self, axis: int):
+        """
+        Minimum x or y value
+        :param axis: x or y: x=0, y=1
+        """
+        if axis < 0:
+            axis = 0
+        if axis > 1:
+            axis = 1
+        min_xy = self.currentCoords[0][axis]
+        for coord in self.currentCoords:
+            if coord[axis] < min_xy:
+                min_xy = coord[axis]
+        return min_xy
 
-	def max_xy(self, axis: int):
-		"""
-		Maximum x or y value
-		:param axis: x or y: x=0, y=1
-		"""
-		if axis < 0:
-			axis = 0
-		if axis > 1:
-			axis = 1
-		max_xy = self.currentCoords[0][axis]
-		for coord in self.currentCoords:
-			if coord[axis] > max_xy:
-				max_xy = coord[axis]
-		return max_xy
+    def max_xy(self, axis: int):
+        """
+        Maximum x or y value
+        :param axis: x or y: x=0, y=1
+        """
+        if axis < 0:
+            axis = 0
+        if axis > 1:
+            axis = 1
+        max_xy = self.currentCoords[0][axis]
+        for coord in self.currentCoords:
+            if coord[axis] > max_xy:
+                max_xy = coord[axis]
+        return max_xy
 
-	def print_to_cli(self):
-		"""
-		Print piece to CLI
-		"""
-		for y in range(self.min_xy(1), self.max_xy(1) + 1):
-			for x in range(self.min_xy(0), self.max_xy(0) + 1):
-				if [x, y] in self.currentCoords:
-					if x == 0 and y == 0:
-						print(colored('▣ ', self.color), end='')
-					else:
-						print(colored('▩ ', self.color), end='')
-				else:
-					print('  ', end='')
-			print()
+    def print_to_cli(self):
+        """
+        Print piece to CLI
+        """
+        for y in range(self.min_xy(1), self.max_xy(1) + 1):
+            for x in range(self.min_xy(0), self.max_xy(0) + 1):
+                if [x, y] in self.currentCoords:
+                    if x == 0 and y == 0:
+                        print(colored('▣ ', self.color), end='')
+                    else:
+                        print(colored('▩ ', self.color), end='')
+                else:
+                    print('  ', end='')
+            print()
