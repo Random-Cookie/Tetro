@@ -8,7 +8,6 @@ from GameResources.Players import Player, HumanPlayer, RandomPlayer
 
 
 class Tetros:
-    # TODO sort out this config, need players not player colors
     DEFAULT_CONFIG = {
         'board_size': (20, 20),
         'players': ObjectFactory.generate_human_players(),
