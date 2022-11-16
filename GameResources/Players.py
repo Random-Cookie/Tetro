@@ -185,3 +185,12 @@ class RandomPlayer(Player):
         else:
             self.timeout = 0
         return selected_piece, selected_index, selected_location
+
+
+class ExhaustiveRandomPlayer(RandomPlayer):
+    def __init__(self, color, initial_pieces):
+        RandomPlayer.__init__(self, color, initial_pieces)
+
+    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+        return None
+
