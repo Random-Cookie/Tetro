@@ -168,7 +168,7 @@ class Tetros:
             'board  (b)  | Input custom board size\n' + \
             'player (pl) | Add a player with selected color\n' + \
             'pos    (po) | Input custom starting positions\n' + \
-            'pieces (pi) | Choose Piece Set\n' + \
+            'pieces (pi) | Choose Piece Set (UNIMPLEMENTED)\n' + \
             'write  (w)  | Save config to file (UNIMPLEMENTED)\n' + \
             'load   (l)  | load config from files (UNIMPLEMENTED)\n' + \
             'start  (s)  | Start a game with the selected Parameters\n' + \
