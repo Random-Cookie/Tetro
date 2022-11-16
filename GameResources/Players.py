@@ -33,10 +33,18 @@ class Player(ABC):
         """
         Print players current hand to the CLI
         """
+        # TODO convert to returning a string
         print(end='| ')
         for i in range(len(self.pieces)):
             print(str(i) + ' : ' + self.pieces[i].name, end=' | ')
         print()
+
+    def get_printable_shapes(self) -> str:
+        """
+        :return: A string containing all the shapes in the players hand arranged horizontally
+        """
+        # TODO implement
+        return ''
 
     def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
         """
