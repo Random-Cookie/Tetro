@@ -7,8 +7,8 @@ from GameResources.Players import Player, HumanPlayer
 
 class Tetros:
     DEFAULT_CONFIG = {
-        'board_size': '20.20',
-        'colours': ['blue', 'green', 'red', 'yellow'],
+        'board_size': [20, 20],
+        'colors': ['blue', 'green', 'red', 'yellow'],
         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
         'initial_pieces': ObjectFactory.generate_shapes()
     }
@@ -143,6 +143,53 @@ class Tetros:
         # scores = self.calculate_player_scores()
         # TODO
 
+    @staticmethod
+    def get_custom_game_inputs():
+        config = Tetros.DEFAULT_CONFIG
+        input_message = 'Tetros: Config Menu\n' + \
+                        'board  (b) | Input\n' + \
+                        'colour (c) | Add a player with selected color\n' + \
+                        'pos    (p) | Input custom starting positions\n' + \
+                        'write  (w) | Save config to file - UNIMPLEMENTED\n' + \
+                        'start  (s) | Start a game with the selected Parameters\n' + \
+                        'exit   (e) | Exit without starting a game\n'
+        exiting_inputs = ['start', 's', 'exit', 'e']
+        input_val = ''
+        while input_val not in exiting_inputs:
+            if input_val == 'board' or 'b':
+                # TODO
+                pass
+            if input_val == 'color' or 'c':
+                # TODO
+                pass
+            if input_val == 'pos' or 'p':
+                # TODO
+                pass
+            if input_val == 'write' or 'w':
+                # TODO
+                pass
+            Tetros.display_config(config)
+            input_val = input(input_message).lower()
+        if input_val == 'exit' or 'e':
+            return config, False
+        return config, True
+
+    @staticmethod
+    def display_config(config: dict):
+        print(colored('Loaded Config:'))
+        for item in list(config.items()):
+            if item[0] != 'initial_pieces':
+                print(item[0].ljust(20) + ' | ' +
+                      str(item[1]) if item[1] == Tetros.DEFAULT_CONFIG[item[0]] else colored(str(item[1]), 'green'))
+            else:
+                print(item[0].ljust(20) + ' | ', end='')
+                if item[1] == Tetros.DEFAULT_CONFIG[item[0]]:
+                    print('Default')
+                else:
+                    print('Modified', 'green')
+        print()
+
 
 game = Tetros((5, 5))
+inputs = Tetros.get_custom_game_inputs()
 game.play_standard_game()
