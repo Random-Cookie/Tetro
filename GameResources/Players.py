@@ -1,8 +1,11 @@
 from __future__ import annotations
 import copy
+import random
 import re
 from abc import ABC, abstractmethod
 from termcolor import colored
+
+import GameResources.structure
 import GameResources.structure as GR
 
 
@@ -60,6 +63,19 @@ class Player(ABC):
         Is hand empty
         """
         return len(self.pieces) == 0
+
+    def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
+        """
+        Get a list of placebale locations
+        :param board: The gamebaord
+        :return:
+        """
+        placeables = []
+        for y in range(0, len(board.positions[0])):
+            for x in range(0, len(board.positions)):
+                if self.color in board.positions[x][y].placeable_by:
+                    placeables.append((x, y))
+        return placeables
 
     def squares_left(self):
         count = 0
@@ -129,3 +145,37 @@ class HumanPlayer(Player):
             x, y = command.split(',')
             x, y = int(x), int(y)
             return selected_piece, piece_index, (x, y)
+
+
+class RandomPlayer(Player):
+    def __init__(self, color, initial_pieces):
+        Player.__init__(self, color, initial_pieces)
+        self.timeout = 0
+
+    def __str__(self):
+        return Player.__str__(self)
+
+    def select_piece(self, board: GR.GameBoard) -> tuple[GR.Piece, int, tuple[int, int]]:
+        placeable_locations = self.get_placeables(board)
+        if not placeable_locations:
+                return None
+        selected_location = random.choice(placeable_locations)
+        selected_index = random.randint(0, len(self.pieces) - 1)
+        selected_piece = self.pieces[selected_index]
+        if random.random() < 0.5:
+            selected_piece.flip()
+        rand = random.random()
+        if rand < 0.25:
+            selected_piece.rotate()
+        if rand < 0.5:
+            selected_piece.rotate()
+        if rand < 0.75:
+            selected_piece.rotate()
+        if not board.check_piece_fits(selected_location[0], selected_location[1], selected_piece):
+            self.timeout += 1
+            if self.timeout > 21:
+                self.has_knocked = True
+                return None
+        else:
+            self.timeout = 0
+        return selected_piece, selected_index, selected_location
