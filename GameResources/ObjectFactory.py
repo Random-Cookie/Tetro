@@ -98,8 +98,12 @@ class ObjectFactory:
 		shapes = self.StandardShapes.values() if shapes is None else shapes.values()
 		for color in player_colors:
 			player_shapes = []
+			i = 0
 			for shape in shapes:
 				player_shapes.append(Piece(shape['name'], shape['coords'], color))
+				i += 1
+				if i > 2:
+					break
 			ret.append(player_shapes)
 		return ret
 
