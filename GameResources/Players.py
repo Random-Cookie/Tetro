@@ -192,5 +192,4 @@ class ExhaustiveRandomPlayer(RandomPlayer):
         RandomPlayer.__init__(self, color, initial_pieces)
 
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
-        return None
-
+        return RandomPlayer.select_piece(self, board)
