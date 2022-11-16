@@ -269,10 +269,11 @@ class Tetros:
         logo_file.close()
         menu_string = logo + \
             '\n--------------- Main Menu Options---------------\n' + \
-            'play      (p) | Play a standard Game\n' + \
-            'random    (r) | Demo game with random bots\n' + \
-            'config    (c) | Open Configuration Menu\n' + \
-            'exit      (e) | Exit\n'
+            'play      (p)  | Play a standard Game\n' + \
+            'random    (r)  | Demo game with random bots\n' + \
+            'exrandom  (er) | Demo Game with Exhaustive Random bots\n' + \
+            'config    (c)  | Open Configuration Menu\n' + \
+            'exit      (e)  | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
             input_string = input(menu_string).lower()
@@ -282,6 +283,13 @@ class Tetros:
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_random_players(),
+                        'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                        'initial_pieces': ObjectFactory.generate_shapes()
+                       }, True
+            if input_string == 'exrandom' or input_string == 'er':
+                return {
+                        'board_size': (20, 20),
+                        'players': ObjectFactory.generate_ex_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes()
                        }, True
