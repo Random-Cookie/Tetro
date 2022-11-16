@@ -130,6 +130,9 @@ class GameBoard:
         for xy_pair in piece.currentCoords:
             posx = xy_pair[0] + x
             posy = xy_pair[1] + y
+            # check if position is on board
+            if not (0 <= posx < len(self.positions) and 0 <= posy < len(self.positions[0])):
+                return False
             board_pos = self.positions[posx][posy]
             if piece.color in board_pos.placeable_by:
                 placeable = True

@@ -6,8 +6,9 @@ from GameResources.Players import Player, HumanPlayer
 
 
 class Tetros:
+    # TODO sort out this config, need players not player colors
     DEFAULT_CONFIG = {
-        'board_size': [20, 20],
+        'board_size': (20, 20),
         'colors': ['blue', 'green', 'red', 'yellow'],
         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
         'initial_pieces': ObjectFactory.generate_shapes()
@@ -18,7 +19,7 @@ class Tetros:
                  initial_pieces: dict = None,
                  players: list[Player] = None):
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
-        self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces)\
+        self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces) \
             if players is None else players
         self.board = GameBoard((board_size[0], board_size[1]), self.players)
 
@@ -132,7 +133,7 @@ class Tetros:
                 'Penalty': player.squares_left()  # Number of squares in players remaining pieces -1 per square
             }
             player_score['Total'] = player_score['Coverage'] + player_score['Density'] + player_score['Territory'] - \
-                player_score['Penalty']
+                                    player_score['Penalty']
             players_scores[player] = player_score
         # players_scores = sorted(players_scores, key=lambda x:(x['total']))
         # TODO sort players
@@ -156,8 +157,12 @@ class Tetros:
 
     @staticmethod
     def get_custom_game_inputs():
-        config = Tetros.DEFAULT_CONFIG
-        input_message = 'Tetros: Config Menu\n' + \
+        logo_file = open('GameResources/config.txt')
+        logo = logo_file.read()
+        logo_file.close()
+        cfg = Tetros.DEFAULT_CONFIG
+        input_message = logo + \
+                        '--------------- Tetros: Config Menu ---------------\n' + \
                         'board  (b) | Input\n' + \
                         'colour (c) | Add a player with selected color\n' + \
                         'pos    (p) | Input custom starting positions\n' + \
@@ -167,23 +172,23 @@ class Tetros:
         exiting_inputs = ['start', 's', 'exit', 'e']
         input_val = ''
         while input_val not in exiting_inputs:
-            if input_val == 'board' or 'b':
+            if input_val == 'board' or input_val == 'b':
                 # TODO
                 pass
-            if input_val == 'color' or 'c':
+            if input_val == 'color' or input_val == 'c':
                 # TODO
                 pass
-            if input_val == 'pos' or 'p':
+            if input_val == 'pos' or input_val == 'p':
                 # TODO
                 pass
-            if input_val == 'write' or 'w':
+            if input_val == 'write' or input_val == 'w':
                 # TODO
                 pass
-            Tetros.display_config(config)
+            Tetros.display_config(cfg)
             input_val = input(input_message).lower()
-        if input_val == 'exit' or 'e':
-            return config, False
-        return config, True
+        if input_val == 'start' or input_val == 's':
+            return cfg, False
+        return {}, True
 
     @staticmethod
     def display_config(config: dict):
@@ -200,9 +205,35 @@ class Tetros:
                     print('Modified', 'green')
         print()
 
-    def display_main_menu(self):
-        pass
+    @staticmethod
+    def display_main_menu() -> tuple[dict, bool]:
+        logo_file = open('GameResources/mainMenu.txt')
+        logo = logo_file.read()
+        logo_file.close()
+        menu_string = logo + \
+                      '\n--------------- Main Menu Options---------------\n' + \
+                      'play      (p) | Play a standard Game\n' + \
+                      'random    (r) | Demo game with random bots\n' + \
+                      'config    (c) | Open Configuration Menu\n' + \
+                      'exit      (e) | Exit\n'
+        input_string = ''
+        while not (input_string == 'exit' or input_string == 'e'):
+            input_string = input(menu_string).lower()
+            if input_string == 'play' or input_string == 'p':
+                return Tetros.DEFAULT_CONFIG, True
+            if input_string == 'random' or input_string == 'r':
+                return {}, True
+            if input_string == 'config' or input_string == 'c':
+                return Tetros.get_custom_game_inputs()[0], True
+        return {}, False
 
 
-game = Tetros(players=ObjectFactory.generate_random_players())
-game.play_standard_game()
+game_params = Tetros.display_main_menu()
+while game_params[1]:
+    if game_params[1]:
+        if game_params[0] != {}:
+            config = game_params[0]
+            game_players = ObjectFactory.generate_human_players(config['colors'])
+            game = Tetros(config['board_size'], config['initial_pieces'], game_players)
+            game.play_standard_game()
+    game_params = Tetros.display_main_menu()
