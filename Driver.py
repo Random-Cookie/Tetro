@@ -1,4 +1,4 @@
-import time
+import math
 
 from termcolor import colored
 
@@ -8,15 +8,26 @@ from GameResources.Players import Player, HumanPlayer
 
 
 class Tetros:
-	def __init__(self, board_size: int = 20, player_colors: list[str] = None, initial_pieces: dict = None):
+	DEFAULT_CONFIG = {
+			'board_size': '20.20',
+			'colours': ['blue', 'green', 'red', 'yellow'],
+			'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+			'initial_pieces': ObjectFactory.generate_shapes()
+		}
+
+	def __init__(self, board_size: tuple[int, int] = (20, 20), player_colors: list[str] = None, initial_pieces: dict = None):
 		player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
 		self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
 		self.players = []
 		for i in range(0, len(player_colors)):
 			self.players.append(HumanPlayer(player_colors[i], self.initial_pieces[i]))
-		self.board = GameBoard(board_size, self.players)
+		self.board = GameBoard((board_size[0], board_size[1]), self.players)
 
 	def check_win(self):
+		"""
+		Have any players won?
+		:return: bool
+		"""
 		winners = []
 		for player in self.players:
 			if player.has_won():
@@ -24,6 +35,9 @@ class Tetros:
 		return winners
 
 	def play_standard_game(self):
+		"""
+		Play a standard game of Tetros
+		"""
 		turns = 0
 		while not self.board.is_stalemate(self.players) and not self.check_win():
 			turns += 1
@@ -41,14 +55,19 @@ class Tetros:
 			print('The winner was: ' + str(winners[0]))
 		else:
 			print('The winners were: ' + str(winners).strip('[]'))
+		self.print_scores_to_cli()
 
-	def calculate_player_coverage(self, player):
-		# % of bord covered by player
+	def calculate_player_coverage(self, player: Player) -> tuple[int, int, int, int]:
+		"""
+		Calculate a player's coverage area
+		:param player: Player to analyse
+		:return: (minx, miny, maxx, maxy)
+		"""
 		color = player.color
-		board_size = len(self.board.positions)
-		minx, miny, maxx, maxy = board_size, board_size, 0, 0
-		for y in range(0, board_size):
-			for x in range(0, board_size):
+		bsx, bsy = len(self.board.positions), len(self.board.positions[0])
+		minx, miny, maxx, maxy = bsx, bsy, 0, 0
+		for y in range(0, bsy):
+			for x in range(0, bsx):
 				if self.board.positions[x][y].color == color:
 					if x < minx:
 						minx = x
@@ -60,13 +79,22 @@ class Tetros:
 						maxy = y
 		return minx, miny, maxx, maxy
 
-	def calculate_player_coverage_score(self, player: Player):
+	def calculate_player_coverage_score(self, player: Player) -> float:
+		"""
+		Calculate a player's coverage score (% of board covered by player)
+		:param player: Player to analyse
+		:return: float Coverage score
+		"""
 		minx, miny, maxx, maxy = self.calculate_player_coverage(player)
-		board_size = len(self.board.positions)
-		return ((maxx - minx) * (maxy - miny) / (board_size * board_size)) * 100
+		bsx, bsy = len(self.board.positions), len(self.board.positions[0])
+		return ((maxx - minx) * (maxy - miny) / (bsx * bsy)) * 100
 
-	def calculate_player_density_score(self, player):
-		# % of coverage filled with pieces
+	def calculate_player_density_score(self, player: Player) -> float:
+		"""
+		Calculate a player's density score (% of coverage filled with any pieces)
+		:param player: Player to analyse
+		:return: float Density score
+		"""
 		filled = 0
 		minx, miny, maxx, maxy = self.calculate_player_coverage(player)
 		for y in range(miny, maxy):
@@ -76,26 +104,38 @@ class Tetros:
 		board_size = len(self.board.positions)
 		return (filled / (board_size * board_size)) * 100
 
-	def calculate_player_teritory_bonus(self, player):
-		# calculate largest exclusive area, +1 point per square
+	def calculate_player_teritory_bonus(self, player: Player) -> int:
+		"""
+		Calculate a player's territory bonus (calculate the largest exclusive area, +1 point per square)
+		:param player: Player to analyse
+		:return: int Territory Bonus
+		"""
 		# TODO
 		return 0
 
-	def calculate_player_scores(self):
+	def calculate_player_scores(self) -> dict[Player, dict]:
+		"""
+		Calculate scores for all player at the end of the game
+		:return:
+		"""
 		players_scores = {}
 		for player in self.players:
 			player_score = {
-				'coverage': self.calculate_player_coverage_score(player),  # % coverage of board
-				'density': self.calculate_player_density_score(player),  # % of coverage filled with any pieces
+				'coverage': round(self.calculate_player_coverage_score(player), 2),  # % coverage of board
+				'density': round(self.calculate_player_density_score(player), 2),  # % of coverage filled with any pieces
 				'territory': self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
 				'hand penalty': player.squares_left()  # Number of squares in players remaining pieces -1 per square
 			}
 			player_score['total'] = player_score['coverage'] + player_score['density'] + player_score['territory'] - player_score['hand penalty']
 			players_scores[player] = player_score
-		players_scores = sorted(players_scores, key=lambda x:(x['total']))
+		# players_scores = sorted(players_scores, key=lambda x:(x['total']))
+		# TODO sort players
 		return players_scores
 
 	def print_scores_to_cli(self):
+		"""
+		Print the score to the CLI
+		"""
 		scores = self.calculate_player_scores()
 		# TODO
 

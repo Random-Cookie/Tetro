@@ -5,7 +5,7 @@ from GameResources.Players import HumanPlayer
 
 @dataclass
 class ObjectFactory:
-	StandardShapes = {
+	STANDARD_SHAPES = {
 		1: {
 			'coords': [[0, 0]],
 			'name': '1'
@@ -92,10 +92,11 @@ class ObjectFactory:
 		}
 	}
 
-	def generate_shapes(self, player_colors: list = None, shapes: dict = None):
+	@staticmethod
+	def generate_shapes(player_colors: list = None, shapes: dict = None):
 		ret = []
 		player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
-		shapes = self.StandardShapes.values() if shapes is None else shapes.values()
+		shapes = ObjectFactory.STANDARD_SHAPES.values() if shapes is None else shapes.values()
 		for color in player_colors:
 			player_shapes = []
 			i = 0

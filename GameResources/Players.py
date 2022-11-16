@@ -82,6 +82,9 @@ class HumanPlayer(Player):
 	def __init__(self, color, initial_pieces):
 		Player.__init__(self, color, initial_pieces)
 
+	def __str__(self):
+		return Player.__str__(self)
+
 	def select_piece(self, board: GR.GameBoard) -> tuple[GR.Piece, int, tuple[int, int]]:
 		"""
 		Display an interface to allow a player to select, manipulate a piece and enter xy coords

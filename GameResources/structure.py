@@ -21,16 +21,16 @@ class BoardSquare:
 
 
 class GameBoard:
-	def __init__(self, board_size: int, players: list[GR.Players.Player], starting_positions: list[[int, int]] = None):
+	def __init__(self, board_size: tuple[int, int], players: list[GR.Players.Player], starting_positions: list[[int, int]] = None):
 		""" Initialize a board of board_size * board_size
-		:param board_size: Length of one side of the board
+		:param board_size: Size of the board (x,y)
 		:param players: Players who are playing
 		:param starting_positions: Optional starting positions
 		"""
 		self.positions = []
-		for x in range(0, board_size):
+		for y in range(0, board_size[1]):
 			row = []
-			for y in range(0, board_size):
+			for x in range(0, board_size[0]):
 				row.append(BoardSquare(x, y, []))
 			self.positions.append(row)
 		self.set_starting_positions(players, starting_positions)
@@ -170,9 +170,6 @@ class GameBoard:
 		Print the board to the cli
 		:param player: If player is specified print the placeable locations for that player
 		"""
-		# clear console
-		for i in range(30):
-			print()
 		print('_' * ((2 * len(self.positions)) + 3))
 		for y in range(0, len(self.positions[0])):
 			print('| ', end='')
