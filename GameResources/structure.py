@@ -202,6 +202,9 @@ class Piece:
         self.currentCoords = shape
         self.color = color
 
+    def __str__(self):
+        return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
+
     def rotate(self):
         """
         Rotate the piece 90 degrees clockwise
