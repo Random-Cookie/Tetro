@@ -192,6 +192,11 @@ class ExhaustiveRandomPlayer(RandomPlayer):
         RandomPlayer.__init__(self, color, initial_pieces)
 
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+        """
+        Use Random player algorithm until self.has_knocked
+        :param board:
+        :return:
+        """
         super_result = RandomPlayer.select_piece(self, board)
         if self.has_knocked:
             return super_result
