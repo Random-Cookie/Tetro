@@ -6,14 +6,14 @@ from abc import ABC, abstractmethod
 from termcolor import colored
 
 import GameResources.structure
-import GameResources.structure as GR
+from GameResources.structure import Piece, GameBoard
 
 
 class Player(ABC):
     """
     Abstract class to represent a generic player
     """
-    def __init__(self, color: str, initial_pieces: list[GR.Piece]):
+    def __init__(self, color: str, initial_pieces: list[Piece]):
         """
         Initialise a Player
         :param color: Color for players pieces
@@ -24,6 +24,9 @@ class Player(ABC):
         self.has_knocked = False
 
     def __str__(self):
+        """
+        :return: the color value for the player
+        """
         return self.color
 
     def print_pieces_names_to_cli(self):
@@ -34,35 +37,6 @@ class Player(ABC):
         for i in range(len(self.pieces)):
             print(str(i) + ' : ' + self.pieces[i].name, end=' | ')
         print()
-
-    def take_turn(self, board: GR.GameBoard):
-        """
-        Slect then place a piece
-        :param board: The gameboard to analyse
-        """
-        place_params = self.select_piece(board)
-        while place_params is not None and not self.place_piece(board, place_params):
-            place_params = self.select_piece(board)
-
-    def place_piece(self, board: GR.GameBoard, placement_params: tuple[GR.Piece, int, tuple[int, int]]) -> bool:
-        """
-        Place a piece
-        :param board:
-        :param placement_params:
-        :return: bool, was placed?
-        """
-        piece, index, xy = placement_params
-        x, y = xy
-        if board.place_piece(x, y, piece):
-            self.pieces.remove(self.pieces[index])
-            return True
-        return False
-
-    def has_won(self) -> bool:
-        """
-        Is hand empty
-        """
-        return len(self.pieces) == 0
 
     def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
         """
@@ -77,6 +51,48 @@ class Player(ABC):
                     placeables.append((x, y))
         return placeables
 
+    @abstractmethod
+    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+        """
+        Abstract method for selecting a piece all subclasses must implement
+        If a piece cannot be placed return none
+        If you cannot place any pieces, set self.has_knocked = true to indicate you are passing all turns
+        :param board: The game board for analysis or printing
+        :return: Placement parameters: (piece, piece_index, (x,y))
+        """
+        self.has_knocked = True
+        return None
+
+    def place_piece(self, board: GameBoard, placement_params: tuple[Piece, int, tuple[int, int]]) -> bool:
+        """
+        Place a piece
+        :param board:
+        :param placement_params:
+        :return: bool, was placed?
+        """
+        piece, index, xy = placement_params
+        x, y = xy
+        if board.place_piece(x, y, piece):
+            self.pieces.remove(self.pieces[index])
+            return True
+        return False
+
+    def take_turn(self, board: GameBoard):
+        """
+        Select then place a piece if possible
+        :param board: The gameboard to analyse
+        """
+        # TODO Change this to return true if a piece was placed
+        place_params = self.select_piece(board)
+        while place_params is not None and not self.place_piece(board, place_params):
+            place_params = self.select_piece(board)
+
+    def has_won(self) -> bool:
+        """
+        Is hand empty
+        """
+        return len(self.pieces) == 0
+
     def squares_left(self):
         count = 0
         for piece in self.pieces:
@@ -84,27 +100,15 @@ class Player(ABC):
                 count += 1
         return count
 
-    @abstractmethod
-    def select_piece(self, board: GR.GameBoard) -> tuple[GR.Piece, int, tuple[int, int]]:
-        """
-        Abstract method for selecting a piece all subclasses must implement
-        :param board: The game board for analysis
-        :return: Placement parameters: (piece, piece_index, (x,y))
-        """
-        return GR.Piece('', [], ''), 0, (0, 0)
-
 
 class HumanPlayer(Player):
     def __init__(self, color, initial_pieces):
         Player.__init__(self, color, initial_pieces)
 
-    def __str__(self):
-        return Player.__str__(self)
-
-    def select_piece(self, board: GR.GameBoard) -> tuple[GR.Piece, int, tuple[int, int]]:
+    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
         """
         Display an interface to allow a player to select, manipulate a piece and enter xy coords
-        :param board: Required for printing
+        :param board: Used for printing
         :return: Placement parameters: (piece, piece_index, (x,y)), None if player knocked
         """
         piece_index_input_string = colored(self.color, self.color) + ' player please select a piece: '
@@ -140,7 +144,6 @@ class HumanPlayer(Player):
             command = input(command_input_string).lower()
         if command == 'k':
             self.has_knocked = True
-            # TODO rewrite as None, -1, [-1, -1]
             return None
         else:
             x, y = command.split(',')
@@ -153,13 +156,14 @@ class RandomPlayer(Player):
         Player.__init__(self, color, initial_pieces)
         self.timeout = 0
 
-    def __str__(self):
-        return Player.__str__(self)
-
-    def select_piece(self, board: GR.GameBoard) -> tuple[GR.Piece, int, tuple[int, int]]:
+    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+        """
+        Select a random Piece with random rotations and flip
+        :param board: Used for analysis
+        :return:
+        """
         placeable_locations = self.get_placeables(board)
         if not placeable_locations:
-            # TODO rewrite as None, -1, [-1, -1]
             return None
         selected_location = random.choice(placeable_locations)
         selected_index = random.randint(0, len(self.pieces) - 1)
@@ -177,8 +181,15 @@ class RandomPlayer(Player):
             self.timeout += 1
             if self.timeout > 21:
                 self.has_knocked = True
-                # TODO rewrite as None, -1, [-1, -1]
                 return None
         else:
             self.timeout = 0
         return selected_piece, selected_index, selected_location
+
+
+class ExhaustiveRandomPlayer(RandomPlayer):
+    def __init__(self, color, initial_pieces):
+        RandomPlayer.__init__(self, color, initial_pieces)
+
+    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+        return RandomPlayer.select_piece(self, board)
