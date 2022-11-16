@@ -53,18 +53,6 @@ class GameBoard:
             x, y = starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
-    def has_placeable(self, player: GR.Players.Player) -> bool:
-        """
-        Can the player place a Piece on the board
-        :param player: Player to check
-        :return: bool
-        """
-        for y in range(0, len(self.positions[0])):
-            for x in range(0, len(self.positions)):
-                if player.color in self.positions[x][y].placeable_by:
-                    return True
-        return False
-
     def is_stalemate(self, players: list[GR.Players.Player]) -> bool:
         """
         Is the board a stalemate?
@@ -73,7 +61,7 @@ class GameBoard:
         :return: bool
         """
         for player in players:
-            if self.has_placeable(player) and not player.has_knocked:
+            if player.get_placeables(self) and not player.has_knocked:
                 return False
         return True
 

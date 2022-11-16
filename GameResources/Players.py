@@ -140,6 +140,7 @@ class HumanPlayer(Player):
             command = input(command_input_string).lower()
         if command == 'k':
             self.has_knocked = True
+            # TODO rewrite as None, -1, [-1, -1]
             return None
         else:
             x, y = command.split(',')
@@ -158,7 +159,8 @@ class RandomPlayer(Player):
     def select_piece(self, board: GR.GameBoard) -> tuple[GR.Piece, int, tuple[int, int]]:
         placeable_locations = self.get_placeables(board)
         if not placeable_locations:
-                return None
+            # TODO rewrite as None, -1, [-1, -1]
+            return None
         selected_location = random.choice(placeable_locations)
         selected_index = random.randint(0, len(self.pieces) - 1)
         selected_piece = self.pieces[selected_index]
@@ -175,6 +177,7 @@ class RandomPlayer(Player):
             self.timeout += 1
             if self.timeout > 21:
                 self.has_knocked = True
+                # TODO rewrite as None, -1, [-1, -1]
                 return None
         else:
             self.timeout = 0
