@@ -53,18 +53,6 @@ class GameBoard:
             x, y = starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
-    def has_placeable(self, player: GR.Players.Player) -> bool:
-        """
-        Can the player place a Piece on the board
-        :param player: Player to check
-        :return: bool
-        """
-        for y in range(0, len(self.positions[0])):
-            for x in range(0, len(self.positions)):
-                if player.color in self.positions[x][y].placeable_by:
-                    return True
-        return False
-
     def is_stalemate(self, players: list[GR.Players.Player]) -> bool:
         """
         Is the board a stalemate?
@@ -73,7 +61,7 @@ class GameBoard:
         :return: bool
         """
         for player in players:
-            if self.has_placeable(player) and not player.has_knocked:
+            if player.get_placeables(self) and not player.has_knocked:
                 return False
         return True
 
@@ -130,6 +118,9 @@ class GameBoard:
         for xy_pair in piece.currentCoords:
             posx = xy_pair[0] + x
             posy = xy_pair[1] + y
+            # check if position is on board
+            if not (0 <= posx < len(self.positions) and 0 <= posy < len(self.positions[0])):
+                return False
             board_pos = self.positions[posx][posy]
             if piece.color in board_pos.placeable_by:
                 placeable = True
@@ -201,6 +192,9 @@ class Piece:
         self.name = name
         self.currentCoords = shape
         self.color = color
+
+    def __str__(self):
+        return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
 
     def rotate(self):
         """
