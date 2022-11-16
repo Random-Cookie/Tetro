@@ -203,20 +203,24 @@ class ExhaustiveRandomPlayer(RandomPlayer):
             if placeables:
                 for piece in self.pieces:
                     for location in placeables:
-                        board.print_to_cli()
-                        randomised_rotations = [0, 1, 2, 3]
-                        random.shuffle(randomised_rotations)
-                        for rotation in randomised_rotations:
-                            randomised_flips = [True, False]
-                            random.shuffle(randomised_flips)
-                            for flip in randomised_flips:
-                                selected_piece = copy.deepcopy(piece)
-                                for i in range(0, rotation):
-                                    selected_piece.rotate()
-                                if flip:
-                                    piece.flip()
-                                if board.check_piece_fits(location[0], location[1], selected_piece):
-                                    self.has_knocked = False
-                                    return selected_piece, self.pieces.index(piece), location
+                        for y_offset in range(-1, 1):
+                            for x_offset in range(-1, 1):
+                                # board.print_to_cli()
+                                randomised_rotations = [0, 1, 2, 3]
+                                random.shuffle(randomised_rotations)
+                                for rotation in randomised_rotations:
+                                    randomised_flips = [True, False]
+                                    random.shuffle(randomised_flips)
+                                    for flip in randomised_flips:
+                                        selected_piece = copy.deepcopy(piece)
+                                        for i in range(0, rotation):
+                                            selected_piece.rotate()
+                                        if flip:
+                                            piece.flip()
+                                        if board.check_piece_fits(location[0] + x_offset,
+                                                                  location[1] + y_offset,
+                                                                  selected_piece):
+                                            self.has_knocked = False
+                                            return selected_piece, self.pieces.index(piece), location
             return None
         return super_result
