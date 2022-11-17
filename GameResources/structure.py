@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import random
+
 import GameResources as GR
 from dataclasses import dataclass
 from colorama import init
@@ -8,14 +11,115 @@ from numpy import matmul
 init()
 
 
+class Piece:
+    def __init__(self, name: str, shape: list, color: str):
+        """
+        Create a Piece
+        :param name: Piece name
+        :param shape: List of relative coordinates
+        :param color: Piece color
+        """
+        self.name = name
+        self.currentCoords = shape
+        self.color = color
+
+    def __str__(self):
+        return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
+
+    def min_xy(self, axis: str):
+        """
+        Minimum x or y value
+        :param axis: x or y: x=0, y=1
+        """
+        if axis == 'x':
+            axis = 0
+        else:
+            axis = 1
+        min_xy = self.currentCoords[0][axis]
+        for coord in self.currentCoords:
+            if coord[axis] < min_xy:
+                min_xy = coord[axis]
+        return min_xy
+
+    def max_xy(self, axis: str):
+        """
+        Maximum x or y value
+        :param axis: x or y: x=0, y=1
+        """
+        if axis == 'x':
+            axis = 0
+        else:
+            axis = 1
+        max_xy = self.currentCoords[0][axis]
+        for coord in self.currentCoords:
+            if coord[axis] > max_xy:
+                max_xy = coord[axis]
+        return max_xy
+
+    def get_dimension(self, axis: str):
+        return self.max_xy(axis) - self.min_xy(axis)
+
+    def rotate(self):
+        """
+        Rotate the piece 90 degrees clockwise
+        Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
+        """
+        # Rotate 90deg clockwise about origin
+        rotation_matrix = [[0, 1], [-1, 0]]
+        for i in range(len(self.currentCoords)):
+            self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
+
+    def flip(self):
+        """
+        Flip Piece about Y axis
+        source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
+        """
+        reflection_matrix = [[-1, 0], [0, 1]]
+        for i in range(len(self.currentCoords)):
+            self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
+        return None
+
+    def get_printable_shape(self) -> str:
+        """
+        Return a string with the piece printed as a shape
+        """
+        ret = ''
+        for y in range(self.min_xy('y'), self.max_xy('y') + 1):
+            for x in range(self.min_xy('x'), self.max_xy('x') + 1):
+                if [x, y] in self.currentCoords:
+                    if x == 0 and y == 0:
+                        ret += colored('▣ ', self.color)
+                    else:
+                        ret += colored('▩ ', self.color)
+                else:
+                    ret += '  '
+            ret += '\n'
+        return ret
+
+    def get_printable_shape_lines(self) -> list[str]:
+        """
+        Return a string with the piece printed as a shape
+        """
+        lines = []
+        for y in range(self.min_xy('y'), self.max_xy('y') + 1):
+            line = ''
+            for x in range(self.min_xy('x'), self.max_xy('x') + 1):
+                if [x, y] in self.currentCoords:
+                    if x == 0 and y == 0:
+                        line += colored('▣ ', self.color)
+                    else:
+                        line += colored('▩ ', self.color)
+                else:
+                    line += '  '
+            lines.append(line)
+        return lines
+
+
 @dataclass
 class BoardSquare:
     """
     Dataclass to sore piece data
-    TODO x and y could possibly be removed?
     """
-    x: int
-    y: int
     placeable_by: list[str]
     color: str = None
 
@@ -34,7 +138,7 @@ class GameBoard:
         for y in range(0, board_size[1]):
             row = []
             for x in range(0, board_size[0]):
-                row.append(BoardSquare(x, y, []))
+                row.append(BoardSquare([]))
             self.positions.append(row)
         self.set_starting_positions(players, starting_positions)
 
@@ -49,6 +153,7 @@ class GameBoard:
         ymax = len(self.positions[0]) - 1
         starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
             if starting_positions is None else starting_positions
+        random.shuffle(starting_positions)
         for i in range(len(players)):
             x, y = starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
@@ -161,102 +266,23 @@ class GameBoard:
             return True
         return False
 
-    def print_to_cli(self, player: GR.Players.Player = None):
+    def get_printable_board(self, player: GR.Players.Player = None) -> str:
         """
-        Print the board to the cli
+        Return a printable board
         :param player: If player is specified print the placeable locations for that player
         """
-        print('_' * ((2 * len(self.positions)) + 3))
+        ret = '_' * ((2 * len(self.positions)) + 3)
+        ret += '\n'
         for y in range(0, len(self.positions[0])):
-            print('| ', end='')
+            ret += '| '
             for x in range(0, len(self.positions)):
                 pos = self.positions[x][y]
                 if pos.color is not None:
-                    print(colored('▩ ', pos.color), end='')
+                    ret += colored('▩ ', pos.color)
                 elif player is not None and player.color in pos.placeable_by:
-                    print(colored('▢ ', player.color), end='')
+                    ret += colored('▢ ', player.color)
                 else:
-                    print('▢ ', end='')
-            print('|')
-        print('‾' * ((2 * len(self.positions)) + 3))
-
-
-class Piece:
-    def __init__(self, name: str, shape: list, color: str):
-        """
-        Create a Piece
-        :param name: Piece name
-        :param shape: List of relative coordinates
-        :param color: Piece color
-        """
-        self.name = name
-        self.currentCoords = shape
-        self.color = color
-
-    def __str__(self):
-        return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
-
-    def rotate(self):
-        """
-        Rotate the piece 90 degrees clockwise
-        Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
-        """
-        # Rotate 90deg clockwise about origin
-        rotation_matrix = [[0, 1], [-1, 0]]
-        for i in range(len(self.currentCoords)):
-            self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
-
-    def flip(self):
-        """
-        Flip Piece about Y axis
-        source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
-        """
-        reflection_matrix = [[-1, 0], [0, 1]]
-        for i in range(len(self.currentCoords)):
-            self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
-        return None
-
-    def min_xy(self, axis: int):
-        """
-        Minimum x or y value
-        :param axis: x or y: x=0, y=1
-        """
-        if axis < 0:
-            axis = 0
-        if axis > 1:
-            axis = 1
-        min_xy = self.currentCoords[0][axis]
-        for coord in self.currentCoords:
-            if coord[axis] < min_xy:
-                min_xy = coord[axis]
-        return min_xy
-
-    def max_xy(self, axis: int):
-        """
-        Maximum x or y value
-        :param axis: x or y: x=0, y=1
-        """
-        if axis < 0:
-            axis = 0
-        if axis > 1:
-            axis = 1
-        max_xy = self.currentCoords[0][axis]
-        for coord in self.currentCoords:
-            if coord[axis] > max_xy:
-                max_xy = coord[axis]
-        return max_xy
-
-    def print_to_cli(self):
-        """
-        Print piece to CLI
-        """
-        for y in range(self.min_xy(1), self.max_xy(1) + 1):
-            for x in range(self.min_xy(0), self.max_xy(0) + 1):
-                if [x, y] in self.currentCoords:
-                    if x == 0 and y == 0:
-                        print(colored('▣ ', self.color), end='')
-                    else:
-                        print(colored('▩ ', self.color), end='')
-                else:
-                    print('  ', end='')
-            print()
+                    ret += '▢ '
+            ret += '|\n'
+        ret += '‾' * ((2 * len(self.positions)) + 3)
+        return ret

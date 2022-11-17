@@ -49,30 +49,31 @@ class Tetros:
         while not self.board.is_stalemate(self.players) and not self.check_win():
             turns += 1
             for player in self.players:
-                # TODO Update for take turn return val
-                if player.get_placeables(self.board):
-                    player.take_turn(self.board)
+                if player.get_placeables(self.board) and player.take_turn(self.board):
                     self.board.update_placeable_lists(self.players)
                 else:
                     skip_msg = colored(player.color, player.color) + \
                           ' skipped as they can''t place a piece.'
                     if 'pause' in self.display_modes:
                         input(skip_msg + ' Press enter to skip.')
-                    else:
+                    elif 'skip' in self.display_modes:
                         print(skip_msg)
 
             if 'pause' in self.display_modes:
-                self.board.print_to_cli()
+                print(self.board.get_printable_board())
                 print('Turn ' + str(turns) + ':')
                 input('Press enter to continue...')
             turn_times.append(timer() - turn_timer)
             turn_timer = timer()
-        self.board.print_to_cli()
+        print(self.board.get_printable_board())
         self.print_scores_to_cli()
         if 'times' in self.display_modes:
-            print('Turn No   | Time')
+            top_row, bottom_row = 'Turn No | ', 'Time    | '
             for i in range(len(turn_times)):
-                print('Turn ' + str(i + 1).ljust(4) + ' | ' + str(round(turn_times[i], 2)))
+                top_row += str(i).rjust(6) + ' | '
+                bottom_row += str(round(turn_times[i], 3)).rjust(6) + ' | '
+            print(top_row)
+            print(bottom_row)
         if 'end_pause' in self.display_modes:
             input('Press enter to return ot the main menu...')
 
@@ -125,14 +126,15 @@ class Tetros:
 
     def calculate_player_teritory_bonus(self, player: Player) -> int:
         """
-        Calculate a player's territory bonus (calculate the largest exclusive area, +1 point per square)
+        Calculate a player's territory bonus % board exclusive to player
         :param player: Player to analyse
         :return: int Territory Bonus
         """
-        # TODO
+        # TODO implement territory score
         return 0
 
     def calculate_player_scores(self) -> dict[Player, dict]:
+        # TODO  can probs just remove total coz its kinda useless
         """
         Calculate scores for all player at the end of the game
         :return:
@@ -149,9 +151,11 @@ class Tetros:
             player_score['Total'] = player_score['Coverage'] + player_score['Density'] + player_score['Territory'] - \
                                     player_score['Penalty']
             players_scores[player] = player_score
-        # players_scores = sorted(players_scores, key=lambda x:(x['total']))
-        # TODO sort players
-        return players_scores
+        sorted_scores = sorted(players_scores.items(), key=lambda item: item[1]['Total'], reverse=True)
+        sorted_scores_dict = {}
+        for key, value in sorted_scores:
+            sorted_scores_dict[key] = value
+        return sorted_scores_dict
 
     def print_scores_to_cli(self):
         """
@@ -168,7 +172,7 @@ class Tetros:
         print()
         for key in scores.keys():
             score = scores[key]
-            print('| ' + key.color.ljust(player_name_length_limit), end=' | ')
+            print('| ' + colored(key.color.ljust(player_name_length_limit), key.color), end=' | ')
             for sub_key in score.keys():
                 print(str(score[sub_key]).rjust(10), end=' | ')
             print()
@@ -176,10 +180,10 @@ class Tetros:
         if len(winners) > 1:
             print('The winners were: ' + str(winners).strip('[]'))
         elif len(winners) == 1:
-            print('The winner was: ' + str(winners[0]))
+            print('The winner was: ' + colored(winners[0].color, winners[0].color))
         else:
-            pass
-            # TODO work out who won?
+            winner = list(scores.keys())[0]
+            print('The winner was: ' + colored(winner.color, winner.color))
 
     @staticmethod
     def get_custom_game_inputs():
@@ -270,7 +274,7 @@ class Tetros:
 
     @staticmethod
     def display_config(config: dict):
-        # TODO Fix this
+        # TODO Fix printing of the settings
         print(colored('--------------- Loaded Config ---------------'))
         for item in list(config.items()):
             if item[0] != 'initial_pieces':
@@ -285,7 +289,7 @@ class Tetros:
         print()
 
     @staticmethod
-    def display_main_menu() -> tuple[dict, bool]:
+    def display_main_menu() -> tuple[dict, list[str]]:
         logo_file = open('GameResources/mainMenu.txt')
         logo = logo_file.read()
         logo_file.close()
@@ -293,31 +297,41 @@ class Tetros:
             '\n--------------- Main Menu Options---------------\n' + \
             'play      (p)  | Play a standard Game\n' + \
             'random    (r)  | Demo game with random bots\n' + \
-            'exrandom  (er) | Demo Game with Exhaustive Random bots\n' + \
+            'exrandom  (er) | Simulate Game with Exhaustive Random bots\n' + \
+            'stepexr   (ex) | As above, turn by turn\n' + \
             'config    (c)  | Open Configuration Menu\n' + \
             'exit      (e)  | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
             input_string = input(menu_string).lower()
             if input_string == 'play' or input_string == 'p':
-                return Tetros.DEFAULT_CONFIG, True
+                return Tetros.DEFAULT_CONFIG, ['pause', 'end_pause', 'skip']
             if input_string == 'random' or input_string == 'r':
+                print('Launching game with random players...')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes()
-                       }, True
+                       }, ['end_pause', 'times']
             if input_string == 'exrandom' or input_string == 'er':
+                print('Launching game with exhaustive random players')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_ex_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes()
-                       }, True
+                       }, ['end_pause', 'times']
+            if input_string == 'stepexr' or input_string == 'ex':
+                return {
+                        'board_size': (20, 20),
+                        'players': ObjectFactory.generate_ex_random_players(),
+                        'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                        'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'pause', 'skip']
             if input_string == 'config' or input_string == 'c':
-                return Tetros.get_custom_game_inputs()[0], True
-        return {}, False
+                return Tetros.get_custom_game_inputs()[0], ['main_menu']
+        return {}, []
 
 
 game_params = Tetros.display_main_menu()
@@ -328,6 +342,7 @@ while game_params[1]:
             game = Tetros(game_config['board_size'],
                           game_config['initial_pieces'],
                           game_config['players'],
-                          game_config['starting_positions'])
+                          game_config['starting_positions'],
+                          game_params[1])
             game.play_game()
     game_params = Tetros.display_main_menu()

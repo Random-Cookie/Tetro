@@ -8,6 +8,12 @@ from termcolor import colored
 import GameResources.structure
 from GameResources.structure import Piece, GameBoard
 
+# TODO Player Ideas
+# Sorted pieces random position
+# Sorted Exhaustive random
+# Reverse sorted
+# Abstract Machine Learner
+
 
 class Player(ABC):
     """
@@ -29,22 +35,44 @@ class Player(ABC):
         """
         return self.color
 
-    def print_pieces_names_to_cli(self):
+    def get_printable_indexed_piece_names(self) -> str:
         """
-        Print players current hand to the CLI
+        Return a string containing piece names and their index
         """
-        # TODO convert to returning a string
-        print(end='| ')
+        ret = '| '
         for i in range(len(self.pieces)):
-            print(str(i) + ' : ' + self.pieces[i].name, end=' | ')
-        print()
+            ret += str(i) + ' : ' + self.pieces[i].name
+            ret += ' | '
+        return ret + '\n'
 
     def get_printable_shapes(self) -> str:
         """
         :return: A string containing all the shapes in the players hand arranged horizontally
         """
-        # TODO implement
-        return ''
+        ret = ''
+        max_height = self.pieces[0].get_dimension('y')
+        pieces = []
+        ret += '| '
+        i = -1
+        for piece in self.pieces:
+            i += 1
+            pieces.append(piece.get_printable_shape_lines())
+            if piece.get_dimension('y') > max_height:
+                max_height = piece.get_dimension('y')
+            ret += str(i).ljust(2)
+            ret += '  ' * piece.get_dimension('x')
+            ret += ' | '
+        ret += '\n'
+        for line in range(max_height + 1):
+            ret += '| '
+            for j in range(len(pieces)):
+                if line < len(pieces[j]):
+                    ret += pieces[j][line]
+                else:
+                    ret += '  ' * (self.pieces[j].get_dimension('x') + 1)
+                ret += ' | '
+            ret += '\n'
+        return ret.strip('\n')
 
     def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
         """
@@ -85,15 +113,18 @@ class Player(ABC):
             return True
         return False
 
-    def take_turn(self, board: GameBoard):
+    def take_turn(self, board: GameBoard) -> bool:
         """
         Select then place a piece if possible
         :param board: The gameboard to analyse
+        @:returns True if piece was placed
         """
-        # TODO Change this to return true if a piece was placed
         place_params = self.select_piece(board)
         while place_params is not None and not self.place_piece(board, place_params):
             place_params = self.select_piece(board)
+        if place_params is not None:
+            return True
+        return False
 
     def has_won(self) -> bool:
         """
@@ -126,16 +157,16 @@ class HumanPlayer(Player):
             colored('▢ ', self.color) + \
             'Indicates Placeable position |' + \
             '\n'
-        board.print_to_cli(self)
+        print(board.get_printable_board(self))
         print('Available Pieces:')
-        self.print_pieces_names_to_cli()
+        print(self.get_printable_shapes())
         piece_index = int(input(piece_index_input_string))
         while not 0 <= piece_index < len(self.pieces):
             piece_index = int(input(piece_index_input_string))
         selected_piece = copy.deepcopy(self.pieces[piece_index])
-        board.print_to_cli(self)
+        print(board.get_printable_board(self))
         print('Selected Piece:')
-        selected_piece.print_to_cli()
+        print(selected_piece.get_printable_shape())
         command = input(command_input_string).lower()
         while re.search('[0-9]+,[0-9]+', command) is None and command != 'k':
             if command == 'r':
@@ -146,9 +177,9 @@ class HumanPlayer(Player):
                     selected_piece.rotate()
             if command == 'f':
                 selected_piece.flip()
-            board.print_to_cli(self)
+            print(board.get_printable_board(self))
             print('Selected Piece:')
-            selected_piece.print_to_cli()
+            print(selected_piece.get_printable_shape())
             command = input(command_input_string).lower()
         if command == 'k':
             self.has_knocked = True
@@ -214,7 +245,7 @@ class ExhaustiveRandomPlayer(RandomPlayer):
                     for location in placeables:
                         for y_offset in range(-1, 1):
                             for x_offset in range(-1, 1):
-                                # board.print_to_cli()
+                                # board.get_printable_board()
                                 randomised_rotations = [0, 1, 2, 3]
                                 random.shuffle(randomised_rotations)
                                 for rotation in randomised_rotations:
