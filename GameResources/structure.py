@@ -8,6 +8,87 @@ from numpy import matmul
 init()
 
 
+class Piece:
+    def __init__(self, name: str, shape: list, color: str):
+        """
+        Create a Piece
+        :param name: Piece name
+        :param shape: List of relative coordinates
+        :param color: Piece color
+        """
+        self.name = name
+        self.currentCoords = shape
+        self.color = color
+
+    def __str__(self):
+        return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
+
+    def min_xy(self, axis: int):
+        """
+        Minimum x or y value
+        :param axis: x or y: x=0, y=1
+        """
+        if axis < 0:
+            axis = 0
+        if axis > 1:
+            axis = 1
+        min_xy = self.currentCoords[0][axis]
+        for coord in self.currentCoords:
+            if coord[axis] < min_xy:
+                min_xy = coord[axis]
+        return min_xy
+
+    def max_xy(self, axis: int):
+        """
+        Maximum x or y value
+        :param axis: x or y: x=0, y=1
+        """
+        if axis < 0:
+            axis = 0
+        if axis > 1:
+            axis = 1
+        max_xy = self.currentCoords[0][axis]
+        for coord in self.currentCoords:
+            if coord[axis] > max_xy:
+                max_xy = coord[axis]
+        return max_xy
+
+    def rotate(self):
+        """
+        Rotate the piece 90 degrees clockwise
+        Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
+        """
+        # Rotate 90deg clockwise about origin
+        rotation_matrix = [[0, 1], [-1, 0]]
+        for i in range(len(self.currentCoords)):
+            self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
+
+    def flip(self):
+        """
+        Flip Piece about Y axis
+        source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
+        """
+        reflection_matrix = [[-1, 0], [0, 1]]
+        for i in range(len(self.currentCoords)):
+            self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
+        return None
+
+    def print_to_cli(self):
+        """
+        Print piece to CLI
+        """
+        for y in range(self.min_xy(1), self.max_xy(1) + 1):
+            for x in range(self.min_xy(0), self.max_xy(0) + 1):
+                if [x, y] in self.currentCoords:
+                    if x == 0 and y == 0:
+                        print(colored('▣ ', self.color), end='')
+                    else:
+                        print(colored('▩ ', self.color), end='')
+                else:
+                    print('  ', end='')
+            print()
+
+
 @dataclass
 class BoardSquare:
     """
@@ -176,84 +257,3 @@ class GameBoard:
                     print('▢ ', end='')
             print('|')
         print('‾' * ((2 * len(self.positions)) + 3))
-
-
-class Piece:
-    def __init__(self, name: str, shape: list, color: str):
-        """
-        Create a Piece
-        :param name: Piece name
-        :param shape: List of relative coordinates
-        :param color: Piece color
-        """
-        self.name = name
-        self.currentCoords = shape
-        self.color = color
-
-    def __str__(self):
-        return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
-
-    def rotate(self):
-        """
-        Rotate the piece 90 degrees clockwise
-        Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
-        """
-        # Rotate 90deg clockwise about origin
-        rotation_matrix = [[0, 1], [-1, 0]]
-        for i in range(len(self.currentCoords)):
-            self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
-
-    def flip(self):
-        """
-        Flip Piece about Y axis
-        source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
-        """
-        reflection_matrix = [[-1, 0], [0, 1]]
-        for i in range(len(self.currentCoords)):
-            self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
-        return None
-
-    def min_xy(self, axis: int):
-        """
-        Minimum x or y value
-        :param axis: x or y: x=0, y=1
-        """
-        if axis < 0:
-            axis = 0
-        if axis > 1:
-            axis = 1
-        min_xy = self.currentCoords[0][axis]
-        for coord in self.currentCoords:
-            if coord[axis] < min_xy:
-                min_xy = coord[axis]
-        return min_xy
-
-    def max_xy(self, axis: int):
-        """
-        Maximum x or y value
-        :param axis: x or y: x=0, y=1
-        """
-        if axis < 0:
-            axis = 0
-        if axis > 1:
-            axis = 1
-        max_xy = self.currentCoords[0][axis]
-        for coord in self.currentCoords:
-            if coord[axis] > max_xy:
-                max_xy = coord[axis]
-        return max_xy
-
-    def print_to_cli(self):
-        """
-        Print piece to CLI
-        """
-        for y in range(self.min_xy(1), self.max_xy(1) + 1):
-            for x in range(self.min_xy(0), self.max_xy(0) + 1):
-                if [x, y] in self.currentCoords:
-                    if x == 0 and y == 0:
-                        print(colored('▣ ', self.color), end='')
-                    else:
-                        print(colored('▩ ', self.color), end='')
-                else:
-                    print('  ', end='')
-            print()
