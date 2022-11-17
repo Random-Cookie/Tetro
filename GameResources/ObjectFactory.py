@@ -1,7 +1,7 @@
 import random
 from dataclasses import dataclass
 from GameResources.structure import Piece
-from GameResources.Players import HumanPlayer, RandomPlayer, ExhaustiveRandomPlayer
+from GameResources.SimplePlayers import HumanPlayer, RandomPlayer, ExhaustiveRandomPlayer
 
 
 @dataclass
