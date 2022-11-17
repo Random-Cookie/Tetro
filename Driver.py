@@ -68,9 +68,12 @@ class Tetros:
         print(self.board.get_printable_board())
         self.print_scores_to_cli()
         if 'times' in self.display_modes:
-            print('Turn No   | Time')
+            top_row, bottom_row = 'Turn No | ', 'Time    | '
             for i in range(len(turn_times)):
-                print('Turn ' + str(i + 1).ljust(4) + ' | ' + str(round(turn_times[i], 2)))
+                top_row += str(i).rjust(6) + ' | '
+                bottom_row += str(round(turn_times[i], 3)).rjust(6) + ' | '
+            print(top_row)
+            print(bottom_row)
         if 'end_pause' in self.display_modes:
             input('Press enter to return ot the main menu...')
 
@@ -286,7 +289,7 @@ class Tetros:
         print()
 
     @staticmethod
-    def display_main_menu() -> tuple[dict, bool]:
+    def display_main_menu() -> tuple[dict, list[str]]:
         logo_file = open('GameResources/mainMenu.txt')
         logo = logo_file.read()
         logo_file.close()
@@ -294,31 +297,41 @@ class Tetros:
             '\n--------------- Main Menu Options---------------\n' + \
             'play      (p)  | Play a standard Game\n' + \
             'random    (r)  | Demo game with random bots\n' + \
-            'exrandom  (er) | Demo Game with Exhaustive Random bots\n' + \
+            'exrandom  (er) | Simulate Game with Exhaustive Random bots\n' + \
+            'stepexr   (ex) | As above, turn by turn\n' + \
             'config    (c)  | Open Configuration Menu\n' + \
             'exit      (e)  | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
             input_string = input(menu_string).lower()
             if input_string == 'play' or input_string == 'p':
-                return Tetros.DEFAULT_CONFIG, True
+                return Tetros.DEFAULT_CONFIG, ['pause', 'end_pause', 'skip']
             if input_string == 'random' or input_string == 'r':
+                print('Launching game with random players...')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes()
-                       }, True
+                       }, ['end_pause', 'times']
             if input_string == 'exrandom' or input_string == 'er':
+                print('Launching game with exhaustive random players')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_ex_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes()
-                       }, True
+                       }, ['end_pause', 'times']
+            if input_string == 'stepexr' or input_string == 'ex':
+                return {
+                        'board_size': (20, 20),
+                        'players': ObjectFactory.generate_ex_random_players(),
+                        'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                        'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'pause', 'skip']
             if input_string == 'config' or input_string == 'c':
-                return Tetros.get_custom_game_inputs()[0], True
-        return {}, False
+                return Tetros.get_custom_game_inputs()[0], ['main_menu']
+        return {}, []
 
 
 game_params = Tetros.display_main_menu()
@@ -329,6 +342,7 @@ while game_params[1]:
             game = Tetros(game_config['board_size'],
                           game_config['initial_pieces'],
                           game_config['players'],
-                          game_config['starting_positions'])
+                          game_config['starting_positions'],
+                          game_params[1])
             game.play_game()
     game_params = Tetros.display_main_menu()
