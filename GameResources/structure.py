@@ -4,11 +4,8 @@ import random
 
 import GameResources as GR
 from dataclasses import dataclass
-from colorama import init
 from termcolor import colored
 from numpy import matmul
-
-init()
 
 
 class Piece:
