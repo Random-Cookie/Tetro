@@ -33,10 +33,18 @@ class Player(ABC):
         """
         Print players current hand to the CLI
         """
+        # TODO convert to returning a string
         print(end='| ')
         for i in range(len(self.pieces)):
             print(str(i) + ' : ' + self.pieces[i].name, end=' | ')
         print()
+
+    def get_printable_shapes(self) -> str:
+        """
+        :return: A string containing all the shapes in the players hand arranged horizontally
+        """
+        # TODO implement
+        return ''
 
     def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
         """
@@ -190,6 +198,39 @@ class RandomPlayer(Player):
 class ExhaustiveRandomPlayer(RandomPlayer):
     def __init__(self, color, initial_pieces):
         RandomPlayer.__init__(self, color, initial_pieces)
+        self.exhausted = False
 
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
-        return RandomPlayer.select_piece(self, board)
+        """
+        Use Random player algorithm until self.has_knocked
+        :param board:
+        :return:
+        """
+        super_result = RandomPlayer.select_piece(self, board)
+        if self.has_knocked:
+            placeables = self.get_placeables(board)
+            if placeables and not self.exhausted:
+                for piece in self.pieces:
+                    for location in placeables:
+                        for y_offset in range(-1, 1):
+                            for x_offset in range(-1, 1):
+                                # board.print_to_cli()
+                                randomised_rotations = [0, 1, 2, 3]
+                                random.shuffle(randomised_rotations)
+                                for rotation in randomised_rotations:
+                                    randomised_flips = [True, False]
+                                    random.shuffle(randomised_flips)
+                                    for flip in randomised_flips:
+                                        selected_piece = copy.deepcopy(piece)
+                                        for i in range(0, rotation):
+                                            selected_piece.rotate()
+                                        if flip:
+                                            piece.flip()
+                                        if board.check_piece_fits(location[0] + x_offset,
+                                                                  location[1] + y_offset,
+                                                                  selected_piece):
+                                            self.has_knocked = False
+                                            return selected_piece, self.pieces.index(piece), location
+            self.exhausted = True
+            return None
+        return super_result

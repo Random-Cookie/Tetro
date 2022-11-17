@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from GameResources.structure import Piece
-from GameResources.Players import HumanPlayer, RandomPlayer
+from GameResources.Players import HumanPlayer, RandomPlayer, ExhaustiveRandomPlayer
 
 
 @dataclass
@@ -120,4 +120,13 @@ class ObjectFactory:
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         for i in range(0, len(player_colors)):
             ret.append(RandomPlayer(player_colors[i], initial_pieces[i]))
+        return ret
+
+    @staticmethod
+    def generate_ex_random_players(player_colors: list = None, initial_pieces: dict = None):
+        ret = []
+        player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
+        initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
+        for i in range(0, len(player_colors)):
+            ret.append(ExhaustiveRandomPlayer(player_colors[i], initial_pieces[i]))
         return ret
