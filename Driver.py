@@ -125,14 +125,15 @@ class Tetros:
 
     def calculate_player_teritory_bonus(self, player: Player) -> int:
         """
-        Calculate a player's territory bonus (calculate the largest exclusive area, +1 point per square)
+        Calculate a player's territory bonus % board exclusive to player
         :param player: Player to analyse
         :return: int Territory Bonus
         """
-        # TODO
+        # TODO implement territory score
         return 0
 
     def calculate_player_scores(self) -> dict[Player, dict]:
+        # TODO  can probs just remove total coz its kinda useless
         """
         Calculate scores for all player at the end of the game
         :return:
@@ -149,8 +150,6 @@ class Tetros:
             player_score['Total'] = player_score['Coverage'] + player_score['Density'] + player_score['Territory'] - \
                                     player_score['Penalty']
             players_scores[player] = player_score
-        # players_scores = sorted(players_scores, key=lambda x:(x['total']))
-        # TODO sort players
         sorted_scores = sorted(players_scores.items(), key=lambda item: item[1]['Total'], reverse=True)
         sorted_scores_dict = {}
         for key, value in sorted_scores:
@@ -172,7 +171,7 @@ class Tetros:
         print()
         for key in scores.keys():
             score = scores[key]
-            print('| ' + key.color.ljust(player_name_length_limit), end=' | ')
+            print('| ' + colored(key.color.ljust(player_name_length_limit), key.color), end=' | ')
             for sub_key in score.keys():
                 print(str(score[sub_key]).rjust(10), end=' | ')
             print()
@@ -180,10 +179,10 @@ class Tetros:
         if len(winners) > 1:
             print('The winners were: ' + str(winners).strip('[]'))
         elif len(winners) == 1:
-            print('The winner was: ' + str(winners[0]))
+            print('The winner was: ' + colored(winners[0].color, winners[0].color))
         else:
-            pass
-            # TODO work out who won?
+            winner = list(scores.keys())[0]
+            print('The winner was: ' + colored(winner.color, winner.color))
 
     @staticmethod
     def get_custom_game_inputs():
@@ -274,7 +273,7 @@ class Tetros:
 
     @staticmethod
     def display_config(config: dict):
-        # TODO Fix this
+        # TODO Fix printing of the settings
         print(colored('--------------- Loaded Config ---------------'))
         for item in list(config.items()):
             if item[0] != 'initial_pieces':
