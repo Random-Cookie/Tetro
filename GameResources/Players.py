@@ -135,7 +135,7 @@ class HumanPlayer(Player):
         selected_piece = copy.deepcopy(self.pieces[piece_index])
         board.print_to_cli(self)
         print('Selected Piece:')
-        selected_piece.print_to_cli()
+        print(selected_piece.get_printable_shape())
         command = input(command_input_string).lower()
         while re.search('[0-9]+,[0-9]+', command) is None and command != 'k':
             if command == 'r':
@@ -148,7 +148,7 @@ class HumanPlayer(Player):
                 selected_piece.flip()
             board.print_to_cli(self)
             print('Selected Piece:')
-            selected_piece.print_to_cli()
+            print(selected_piece.get_printable_shape())
             command = input(command_input_string).lower()
         if command == 'k':
             self.has_knocked = True

@@ -73,20 +73,40 @@ class Piece:
             self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
         return None
 
-    def print_to_cli(self):
+    def get_printable_shape(self):
         """
-        Print piece to CLI
+        Return a string with the piece printed as a shape
         """
+        ret = ''
         for y in range(self.min_xy(1), self.max_xy(1) + 1):
             for x in range(self.min_xy(0), self.max_xy(0) + 1):
                 if [x, y] in self.currentCoords:
                     if x == 0 and y == 0:
-                        print(colored('▣ ', self.color), end='')
+                        ret += colored('▣ ', self.color)
                     else:
-                        print(colored('▩ ', self.color), end='')
+                        ret += colored('▩ ', self.color)
                 else:
-                    print('  ', end='')
-            print()
+                    ret += '  '
+            ret += '\n'
+        return ret
+
+    def get_printable_shape_lines(self):
+        """
+        Return a string with the piece printed as a shape
+        """
+        lines = []
+        for y in range(self.min_xy(1), self.max_xy(1) + 1):
+            line = ''
+            for x in range(self.min_xy(0), self.max_xy(0) + 1):
+                if [x, y] in self.currentCoords:
+                    if x == 0 and y == 0:
+                        line += colored('▣ ', self.color)
+                    else:
+                        line += colored('▩ ', self.color)
+                else:
+                    line += '  '
+            lines.append(line)
+        return lines
 
 
 @dataclass
