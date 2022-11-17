@@ -23,14 +23,14 @@ class Piece:
     def __str__(self):
         return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
 
-    def min_xy(self, axis: int):
+    def min_xy(self, axis: str):
         """
         Minimum x or y value
         :param axis: x or y: x=0, y=1
         """
-        if axis < 0:
+        if axis == 'x':
             axis = 0
-        if axis > 1:
+        else:
             axis = 1
         min_xy = self.currentCoords[0][axis]
         for coord in self.currentCoords:
@@ -38,14 +38,14 @@ class Piece:
                 min_xy = coord[axis]
         return min_xy
 
-    def max_xy(self, axis: int):
+    def max_xy(self, axis: str):
         """
         Maximum x or y value
         :param axis: x or y: x=0, y=1
         """
-        if axis < 0:
+        if axis == 'x':
             axis = 0
-        if axis > 1:
+        else:
             axis = 1
         max_xy = self.currentCoords[0][axis]
         for coord in self.currentCoords:
@@ -53,7 +53,7 @@ class Piece:
                 max_xy = coord[axis]
         return max_xy
 
-    def get_dimension(self, axis: int):
+    def get_dimension(self, axis: str):
         return self.max_xy(axis) - self.min_xy(axis)
 
     def rotate(self):
@@ -81,8 +81,8 @@ class Piece:
         Return a string with the piece printed as a shape
         """
         ret = ''
-        for y in range(self.min_xy(1), self.max_xy(1) + 1):
-            for x in range(self.min_xy(0), self.max_xy(0) + 1):
+        for y in range(self.min_xy('y'), self.max_xy('y') + 1):
+            for x in range(self.min_xy('x'), self.max_xy('x') + 1):
                 if [x, y] in self.currentCoords:
                     if x == 0 and y == 0:
                         ret += colored('▣ ', self.color)
@@ -98,9 +98,9 @@ class Piece:
         Return a string with the piece printed as a shape
         """
         lines = []
-        for y in range(self.min_xy(1), self.max_xy(1) + 1):
+        for y in range(self.min_xy('y'), self.max_xy('y') + 1):
             line = ''
-            for x in range(self.min_xy(0), self.max_xy(0) + 1):
+            for x in range(self.min_xy('x'), self.max_xy('x') + 1):
                 if [x, y] in self.currentCoords:
                     if x == 0 and y == 0:
                         line += colored('▣ ', self.color)

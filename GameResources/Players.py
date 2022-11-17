@@ -44,18 +44,17 @@ class Player(ABC):
         :return: A string containing all the shapes in the players hand arranged horizontally
         """
         ret = ''
-        # TODO change this to x/y vs 0/1
-        max_height = self.pieces[0].get_dimension(1)
+        max_height = self.pieces[0].get_dimension('y')
         pieces = []
         ret += '| '
         i = -1
         for piece in self.pieces:
             i += 1
             pieces.append(piece.get_printable_shape_lines())
-            if piece.get_dimension(1) > max_height:
-                max_height = piece.get_dimension(1)
+            if piece.get_dimension('y') > max_height:
+                max_height = piece.get_dimension('y')
             ret += str(i).ljust(2)
-            ret += '  ' * piece.get_dimension(0)
+            ret += '  ' * piece.get_dimension('x')
             ret += ' | '
         ret += '\n'
         for line in range(max_height + 1):
@@ -64,7 +63,7 @@ class Player(ABC):
                 if line < len(pieces[j]):
                     ret += pieces[j][line]
                 else:
-                    ret += '  ' * (self.pieces[j].get_dimension(0) + 1)
+                    ret += '  ' * (self.pieces[j].get_dimension('x') + 1)
                 ret += ' | '
             ret += '\n'
         return ret.strip('\n')
