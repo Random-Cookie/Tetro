@@ -12,7 +12,6 @@ from GameResources.structure import Piece, GameBoard
 # Sorted pieces random position
 # Sorted Exhaustive random
 # Reverse sorted
-# Abstract Machine Learner
 
 
 class Player(ABC):
