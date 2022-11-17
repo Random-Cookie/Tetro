@@ -107,15 +107,18 @@ class Player(ABC):
             return True
         return False
 
-    def take_turn(self, board: GameBoard):
+    def take_turn(self, board: GameBoard) -> bool:
         """
         Select then place a piece if possible
         :param board: The gameboard to analyse
+        @:returns True if piece was placed
         """
-        # TODO Change this to return true if a piece was placed
         place_params = self.select_piece(board)
         while place_params is not None and not self.place_piece(board, place_params):
             place_params = self.select_piece(board)
+        if place_params is not None:
+            return True
+        return False
 
     def has_won(self) -> bool:
         """

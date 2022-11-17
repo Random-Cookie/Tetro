@@ -49,16 +49,14 @@ class Tetros:
         while not self.board.is_stalemate(self.players) and not self.check_win():
             turns += 1
             for player in self.players:
-                # TODO Update for take turn return val
-                if player.get_placeables(self.board):
-                    player.take_turn(self.board)
+                if player.get_placeables(self.board) and player.take_turn(self.board):
                     self.board.update_placeable_lists(self.players)
                 else:
                     skip_msg = colored(player.color, player.color) + \
                           ' skipped as they can''t place a piece.'
                     if 'pause' in self.display_modes:
                         input(skip_msg + ' Press enter to skip.')
-                    else:
+                    elif 'skip' in self.display_modes:
                         print(skip_msg)
 
             if 'pause' in self.display_modes:
