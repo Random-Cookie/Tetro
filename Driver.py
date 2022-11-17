@@ -151,7 +151,11 @@ class Tetros:
             players_scores[player] = player_score
         # players_scores = sorted(players_scores, key=lambda x:(x['total']))
         # TODO sort players
-        return players_scores
+        sorted_scores = sorted(players_scores.items(), key=lambda item: item[1]['Total'], reverse=True)
+        sorted_scores_dict = {}
+        for key, value in sorted_scores:
+            sorted_scores_dict[key] = value
+        return sorted_scores_dict
 
     def print_scores_to_cli(self):
         """
