@@ -29,9 +29,9 @@ class Player(ABC):
         """
         return self.color
 
-    def get_printable_pieces_names(self) -> str:
+    def get_printable_indexed_piece_names(self) -> str:
         """
-        Print players current hand to the CLI
+        Return a string containing piece names and their index
         """
         ret = '| '
         for i in range(len(self.pieces)):
@@ -128,7 +128,7 @@ class HumanPlayer(Player):
             '\n'
         board.print_to_cli(self)
         print('Available Pieces:')
-        print(self.get_printable_pieces_names())
+        print(self.get_printable_indexed_piece_names())
         piece_index = int(input(piece_index_input_string))
         while not 0 <= piece_index < len(self.pieces):
             piece_index = int(input(piece_index_input_string))
