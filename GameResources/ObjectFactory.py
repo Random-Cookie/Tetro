@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass
 from GameResources.structure import Piece
 from GameResources.Players import HumanPlayer, RandomPlayer, ExhaustiveRandomPlayer
@@ -111,6 +112,7 @@ class ObjectFactory:
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         for i in range(0, len(player_colors)):
             ret.append(HumanPlayer(player_colors[i], initial_pieces[i]))
+        random.shuffle(ret)
         return ret
 
     @staticmethod
@@ -120,6 +122,7 @@ class ObjectFactory:
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         for i in range(0, len(player_colors)):
             ret.append(RandomPlayer(player_colors[i], initial_pieces[i]))
+        random.shuffle(ret)
         return ret
 
     @staticmethod
@@ -129,4 +132,5 @@ class ObjectFactory:
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         for i in range(0, len(player_colors)):
             ret.append(ExhaustiveRandomPlayer(player_colors[i], initial_pieces[i]))
+        random.shuffle(ret)
         return ret

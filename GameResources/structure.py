@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import random
+
 import GameResources as GR
 from dataclasses import dataclass
 from colorama import init
@@ -150,6 +153,7 @@ class GameBoard:
         ymax = len(self.positions[0]) - 1
         starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
             if starting_positions is None else starting_positions
+        random.shuffle(starting_positions)
         for i in range(len(players)):
             x, y = starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
