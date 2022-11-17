@@ -62,12 +62,12 @@ class Tetros:
                         print(skip_msg)
 
             if 'pause' in self.display_modes:
-                self.board.print_to_cli()
+                print(self.board.get_printable_board())
                 print('Turn ' + str(turns) + ':')
                 input('Press enter to continue...')
             turn_times.append(timer() - turn_timer)
             turn_timer = timer()
-        self.board.print_to_cli()
+        print(self.board.get_printable_board())
         self.print_scores_to_cli()
         if 'times' in self.display_modes:
             print('Turn No   | Time')

@@ -126,14 +126,14 @@ class HumanPlayer(Player):
             colored('▢ ', self.color) + \
             'Indicates Placeable position |' + \
             '\n'
-        board.print_to_cli(self)
+        print(board.get_printable_board(self))
         print('Available Pieces:')
         print(self.get_printable_indexed_piece_names())
         piece_index = int(input(piece_index_input_string))
         while not 0 <= piece_index < len(self.pieces):
             piece_index = int(input(piece_index_input_string))
         selected_piece = copy.deepcopy(self.pieces[piece_index])
-        board.print_to_cli(self)
+        print(board.get_printable_board(self))
         print('Selected Piece:')
         print(selected_piece.get_printable_shape())
         command = input(command_input_string).lower()
@@ -146,7 +146,7 @@ class HumanPlayer(Player):
                     selected_piece.rotate()
             if command == 'f':
                 selected_piece.flip()
-            board.print_to_cli(self)
+            print(board.get_printable_board(self))
             print('Selected Piece:')
             print(selected_piece.get_printable_shape())
             command = input(command_input_string).lower()
@@ -214,7 +214,7 @@ class ExhaustiveRandomPlayer(RandomPlayer):
                     for location in placeables:
                         for y_offset in range(-1, 1):
                             for x_offset in range(-1, 1):
-                                # board.print_to_cli()
+                                # board.get_printable_board()
                                 randomised_rotations = [0, 1, 2, 3]
                                 random.shuffle(randomised_rotations)
                                 for rotation in randomised_rotations:

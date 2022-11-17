@@ -90,7 +90,7 @@ class Piece:
             ret += '\n'
         return ret
 
-    def get_printable_shape_lines(self) -> str:
+    def get_printable_shape_lines(self) -> list[str]:
         """
         Return a string with the piece printed as a shape
         """
@@ -259,21 +259,23 @@ class GameBoard:
             return True
         return False
 
-    def print_to_cli(self, player: GR.Players.Player = None):
+    def get_printable_board(self, player: GR.Players.Player = None) -> str:
         """
-        Print the board to the cli
+        Return a printable board
         :param player: If player is specified print the placeable locations for that player
         """
-        print('_' * ((2 * len(self.positions)) + 3))
+        ret = '_' * ((2 * len(self.positions)) + 3)
+        ret += '\n'
         for y in range(0, len(self.positions[0])):
-            print('| ', end='')
+            ret += '| '
             for x in range(0, len(self.positions)):
                 pos = self.positions[x][y]
                 if pos.color is not None:
-                    print(colored('▩ ', pos.color), end='')
+                    ret += colored('▩ ', pos.color)
                 elif player is not None and player.color in pos.placeable_by:
-                    print(colored('▢ ', player.color), end='')
+                    ret += colored('▢ ', player.color)
                 else:
-                    print('▢ ', end='')
-            print('|')
-        print('‾' * ((2 * len(self.positions)) + 3))
+                    ret += '▢ '
+            ret += '|\n'
+        ret += '‾' * ((2 * len(self.positions)) + 3)
+        return ret
