@@ -127,7 +127,7 @@ class BoardSquare:
 class GameBoard:
     def __init__(self,
                  board_size: tuple[int, int],
-                 players: list[GR.Players.Player],
+                 players: list[GR.SimplePlayers.Player],
                  starting_positions: list[[int, int]] = None):
         """ Initialize a board of board_size * board_size
         :param board_size: Size of the board (x,y)
@@ -142,7 +142,7 @@ class GameBoard:
             self.positions.append(row)
         self.set_starting_positions(players, starting_positions)
 
-    def set_starting_positions(self, players: list[GR.Players.Player], starting_positions: list[list[int, int]] = None):
+    def set_starting_positions(self, players: list[GR.SimplePlayers.Player], starting_positions: list[list[int, int]] = None):
         """
         Set stating positions for players
         Make the locations in starting_positions placeable for corresponding players
@@ -158,7 +158,7 @@ class GameBoard:
             x, y = starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
-    def is_stalemate(self, players: list[GR.Players.Player]) -> bool:
+    def is_stalemate(self, players: list[GR.SimplePlayers.Player]) -> bool:
         """
         Is the board a stalemate?
         Either no placeable locations or all players have knocked
@@ -266,7 +266,7 @@ class GameBoard:
             return True
         return False
 
-    def get_printable_board(self, player: GR.Players.Player = None) -> str:
+    def get_printable_board(self, player: GR.SimplePlayers.Player = None) -> str:
         """
         Return a printable board
         :param player: If player is specified print the placeable locations for that player
