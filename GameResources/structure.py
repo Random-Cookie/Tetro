@@ -139,7 +139,8 @@ class GameBoard:
             self.positions.append(row)
         self.set_starting_positions(players, starting_positions)
 
-    def set_starting_positions(self, players: list[GR.SimplePlayers.Player], starting_positions: list[list[int, int]] = None):
+    def set_starting_positions(self, players: list[GR.SimplePlayers.Player],
+                               starting_positions: list[list[int, int]] = None):
         """
         Set stating positions for players
         Make the locations in starting_positions placeable for corresponding players
