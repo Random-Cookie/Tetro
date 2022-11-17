@@ -307,7 +307,7 @@ class Tetros:
             if input_string == 'play' or input_string == 'p':
                 return Tetros.DEFAULT_CONFIG, ['pause', 'end_pause', 'skip']
             if input_string == 'random' or input_string == 'r':
-                print('Launching game with random players...')
+                print('Simulating game with random players...')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_random_players(),
@@ -315,7 +315,7 @@ class Tetros:
                         'initial_pieces': ObjectFactory.generate_shapes()
                        }, ['end_pause', 'times']
             if input_string == 'exrandom' or input_string == 'er':
-                print('Launching game with exhaustive random players')
+                print('Simulating game with exhaustive random players...')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_ex_random_players(),
