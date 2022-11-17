@@ -198,6 +198,7 @@ class RandomPlayer(Player):
 class ExhaustiveRandomPlayer(RandomPlayer):
     def __init__(self, color, initial_pieces):
         RandomPlayer.__init__(self, color, initial_pieces)
+        self.exhausted = False
 
     def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
         """
@@ -208,7 +209,7 @@ class ExhaustiveRandomPlayer(RandomPlayer):
         super_result = RandomPlayer.select_piece(self, board)
         if self.has_knocked:
             placeables = self.get_placeables(board)
-            if placeables:
+            if placeables and not self.exhausted:
                 for piece in self.pieces:
                     for location in placeables:
                         for y_offset in range(-1, 1):
@@ -230,5 +231,6 @@ class ExhaustiveRandomPlayer(RandomPlayer):
                                                                   selected_piece):
                                             self.has_knocked = False
                                             return selected_piece, self.pieces.index(piece), location
+            self.exhausted = True
             return None
         return super_result
