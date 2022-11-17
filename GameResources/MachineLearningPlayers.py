@@ -3,16 +3,7 @@ from dataclasses import dataclass
 
 from GameResources.SimplePlayers import Player
 from GameResources.structure import Piece, GameBoard
-
-
-@dataclass
-class Move:
-    """
-    A dataclass to represent a move.
-    """
-    piece: Piece
-    index: int
-    position: tuple[int, int]
+from SimplePlayers import Move
 
 
 @dataclass

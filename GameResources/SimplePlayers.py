@@ -3,6 +3,8 @@ import copy
 import random
 import re
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
 from termcolor import colored
 
 import GameResources.structure
@@ -12,6 +14,16 @@ from GameResources.structure import Piece, GameBoard
 # Sorted pieces random position
 # Sorted Exhaustive random
 # Reverse sorted
+
+
+@dataclass
+class Move:
+    """
+    A dataclass to represent a move.
+    """
+    piece: Piece
+    piece_index: int
+    position: tuple[int, int]
 
 
 class Player(ABC):
@@ -87,7 +99,7 @@ class Player(ABC):
         return placeables
 
     @abstractmethod
-    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+    def select_piece(self, board: GameBoard) -> Move | None:
         """
         Abstract method for selecting a piece all subclasses must implement
         If a piece cannot be placed return none
@@ -98,17 +110,16 @@ class Player(ABC):
         self.has_knocked = True
         return None
 
-    def place_piece(self, board: GameBoard, placement_params: tuple[Piece, int, tuple[int, int]]) -> bool:
+    def place_piece(self, board: GameBoard, move: Move) -> bool:
         """
         Place a piece
-        :param board:
-        :param placement_params:
+        :param move: The move to make
+        :param board: The board to place the piece on
         :return: bool, was placed?
         """
-        piece, index, xy = placement_params
-        x, y = xy
-        if board.place_piece(x, y, piece):
-            self.pieces.remove(self.pieces[index])
+        x, y = move.position
+        if board.place_piece(x, y, move.piece):
+            self.pieces.remove(self.pieces[move.piece_index])
             return True
         return False
 
@@ -143,7 +154,7 @@ class HumanPlayer(Player):
     def __init__(self, color, initial_pieces):
         Player.__init__(self, color, initial_pieces)
 
-    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+    def select_piece(self, board: GameBoard) -> Move | None:
         """
         Display an interface to allow a player to select, manipulate a piece and enter xy coords
         :param board: Used for printing
@@ -186,7 +197,7 @@ class HumanPlayer(Player):
         else:
             x, y = command.split(',')
             x, y = int(x), int(y)
-            return selected_piece, piece_index, (x, y)
+            return Move(selected_piece, piece_index, (x, y))
 
 
 class RandomPlayer(Player):
@@ -194,7 +205,7 @@ class RandomPlayer(Player):
         Player.__init__(self, color, initial_pieces)
         self.timeout = 0
 
-    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+    def select_piece(self, board: GameBoard) -> Move | None:
         """
         Select a random Piece with random rotations and flip
         :param board: Used for analysis
@@ -222,7 +233,7 @@ class RandomPlayer(Player):
                 return None
         else:
             self.timeout = 0
-        return selected_piece, selected_index, selected_location
+        return Move(selected_piece, selected_index, selected_location)
 
 
 class ExhaustiveRandomPlayer(RandomPlayer):
@@ -230,7 +241,7 @@ class ExhaustiveRandomPlayer(RandomPlayer):
         RandomPlayer.__init__(self, color, initial_pieces)
         self.exhausted = False
 
-    def select_piece(self, board: GameBoard) -> tuple[Piece, int, tuple[int, int]] | None:
+    def select_piece(self, board: GameBoard) -> Move | None:
         """
         Use Random player algorithm until self.has_knocked
         :param board:
@@ -260,7 +271,7 @@ class ExhaustiveRandomPlayer(RandomPlayer):
                                                                   location[1] + y_offset,
                                                                   selected_piece):
                                             self.has_knocked = False
-                                            return selected_piece, self.pieces.index(piece), location
+                                            return Move(selected_piece, self.pieces.index(piece), location)
             self.exhausted = True
             return None
         return super_result
