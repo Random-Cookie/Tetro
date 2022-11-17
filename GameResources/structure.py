@@ -12,10 +12,7 @@ init()
 class BoardSquare:
     """
     Dataclass to sore piece data
-    TODO x and y could possibly be removed?
     """
-    x: int
-    y: int
     placeable_by: list[str]
     color: str = None
 
@@ -34,7 +31,7 @@ class GameBoard:
         for y in range(0, board_size[1]):
             row = []
             for x in range(0, board_size[0]):
-                row.append(BoardSquare(x, y, []))
+                row.append(BoardSquare([]))
             self.positions.append(row)
         self.set_starting_positions(players, starting_positions)
 
