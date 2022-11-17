@@ -8,6 +8,12 @@ from termcolor import colored
 import GameResources.structure
 from GameResources.structure import Piece, GameBoard
 
+# TODO Player Ideas
+# Sorted pieces random position
+# Sorted Exhaustive random
+# Reverse sorted
+# Abstract Machine Learner
+
 
 class Player(ABC):
     """
