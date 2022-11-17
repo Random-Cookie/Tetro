@@ -53,6 +53,9 @@ class Piece:
                 max_xy = coord[axis]
         return max_xy
 
+    def get_dimension(self, axis: int):
+        return self.max_xy(axis) - self.min_xy(axis)
+
     def rotate(self):
         """
         Rotate the piece 90 degrees clockwise
