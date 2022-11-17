@@ -29,15 +29,15 @@ class Player(ABC):
         """
         return self.color
 
-    def print_pieces_names_to_cli(self):
+    def get_printable_pieces_names(self) -> str:
         """
         Print players current hand to the CLI
         """
-        # TODO convert to returning a string
-        print(end='| ')
+        ret = '| '
         for i in range(len(self.pieces)):
-            print(str(i) + ' : ' + self.pieces[i].name, end=' | ')
-        print()
+            ret += str(i) + ' : ' + self.pieces[i].name
+            ret += ' | '
+        return ret + '\n'
 
     def get_printable_shapes(self) -> str:
         """
@@ -128,7 +128,7 @@ class HumanPlayer(Player):
             '\n'
         board.print_to_cli(self)
         print('Available Pieces:')
-        self.print_pieces_names_to_cli()
+        print(self.get_printable_pieces_names())
         piece_index = int(input(piece_index_input_string))
         while not 0 <= piece_index < len(self.pieces):
             piece_index = int(input(piece_index_input_string))
