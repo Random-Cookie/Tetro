@@ -73,7 +73,7 @@ class Piece:
             self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
         return None
 
-    def get_printable_shape(self):
+    def get_printable_shape(self) -> str:
         """
         Return a string with the piece printed as a shape
         """
@@ -90,7 +90,7 @@ class Piece:
             ret += '\n'
         return ret
 
-    def get_printable_shape_lines(self):
+    def get_printable_shape_lines(self) -> str:
         """
         Return a string with the piece printed as a shape
         """
