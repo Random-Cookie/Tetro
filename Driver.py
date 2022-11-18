@@ -1,5 +1,6 @@
 import pickle
 import re
+import copy
 
 from termcolor import colored
 
@@ -191,7 +192,7 @@ class Tetros:
         logo_file = open('GameResources/config.txt')
         logo = logo_file.read()
         logo_file.close()
-        cfg = Tetros.DEFAULT_CONFIG
+        cfg = copy.deepcopy(Tetros.DEFAULT_CONFIG)
         input_message = '--------------- Config Menu ---------------\n' + \
             'board  (b)  | Input custom board size\n' + \
             'player (pl) | Add a player with selected color\n' + \
@@ -264,16 +265,22 @@ class Tetros:
                 filename = ''
                 while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
                     filename = input('Please input a filename, excluding any file extension.')
-                # TODO Error Handling
-                pickle.dump(cfg, open(filename + '.p', 'wb'))
-                input('Config Written, press enter to continue...')
+                try:
+                    pickle.dump(cfg, open(filename + '.p', 'wb'))
+                    input('Config Written, press enter to continue...')
+                except Exception as e:
+                    print(e)
+                    input('Error writing Config, press enter to continue...')
             if input_val == 'load' or input_val == 'l':
                 filename = ''
                 while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
                     filename = input('Please input a filename, excluding any file extension.')
-                # TODO Error Handling
-                cfg = pickle.load(open(filename + '.p', 'rb'))
-                input('Config Loaded, press enter to continue...')
+                try:
+                    cfg = pickle.load(open(filename + '.p', 'rb'))
+                    input('Config Loaded, press enter to continue...')
+                except Exception as e:
+                    print(e)
+                    input('Error reading Config, press enter to continue...')
             print(logo)
             Tetros.display_config(cfg)
             input_val = input(input_message).lower()
