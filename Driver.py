@@ -255,13 +255,13 @@ class Tetros:
                     starting_positions.append([int(split[0]), int(split[1])])
                 cfg['starting_positions'] = starting_positions
                 input('Custom Starting Position Selection Complete, press enter to continue...')
-            if input_val == 'pieces' or input_val == 'l':
+            if input_val == 'pieces' or input_val == 'pi':
                 # TODO when implementing piece sets
                 input('Custom Starting Pieces Selection Complete, press enter to continue...')
             if input_val == 'write' or input_val == 'w':
                 filename = ''
                 while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
-                    filename = input('Please input a filename, excluding any file extension.')
+                    filename = input('Please input a filename, excluding any file extension.\n')
                 try:
                     pickle.dump(cfg, open(filename + '.p', 'wb'))
                     input('Config Written, press enter to continue...')
@@ -271,7 +271,7 @@ class Tetros:
             if input_val == 'load' or input_val == 'l':
                 filename = ''
                 while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
-                    filename = input('Please input a filename, excluding any file extension.')
+                    filename = input('Please input a filename, excluding any file extension.\n')
                 try:
                     cfg = pickle.load(open(filename + '.p', 'rb'))
                     input('Config Loaded, press enter to continue...')
