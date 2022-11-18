@@ -198,8 +198,8 @@ class Tetros:
             'player (pl) | Add a player with selected color\n' + \
             'pos    (po) | Input custom starting positions\n' + \
             'pieces (pi) | Choose Piece Set (UNIMPLEMENTED)\n' + \
-            'write  (w)  | Save config to file (UNIMPLEMENTED)\n' + \
-            'load   (l)  | load config from files (UNIMPLEMENTED)\n' + \
+            'write  (w)  | Save config to file\n' + \
+            'load   (l)  | load config from file\n' + \
             'start  (s)  | Start a game with the selected Parameters\n' + \
             'exit   (e)  | Exit without starting a game\n'
         exiting_inputs = ['start', 's', 'exit', 'e']
