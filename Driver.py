@@ -206,11 +206,8 @@ class Tetros:
         input_val = ''
         while input_val not in exiting_inputs:
             if input_val == 'board' or input_val == 'b':
-                print(logo)
-                print('Input board size in the form: x,y')
                 board_input_val = ''
                 while re.search('[0-9]+,[0-9]+', board_input_val) is None:
-                    print(logo)
                     board_input_val = input('Input board size in the form: x,y\n')
                 split = board_input_val.split(',')
                 x, y = int(split[0]), int(split[1])
@@ -295,13 +292,14 @@ class Tetros:
         for item in list(config.items()):
             if item[0] != 'initial_pieces':
                 print(item[0].ljust(20) + ' | ' +
-                      str(item[1]) if item[1] == Tetros.DEFAULT_CONFIG[item[0]] else colored(str(item[1]), 'green'))
+                      (str(item[1]) if item[1] == Tetros.DEFAULT_CONFIG[item[0]] else colored(str(item[1]), 'green')))
             else:
                 print(item[0].ljust(20) + ' | ', end='')
                 if item[1] == Tetros.DEFAULT_CONFIG[item[0]]:
                     print('Default')
                 else:
-                    print('Modified', 'green')
+                    # TODO Implement piece set class to fix this?
+                    print(colored('Modified', 'green'))
         print()
 
     @staticmethod
