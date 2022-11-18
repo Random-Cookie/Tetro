@@ -1,3 +1,4 @@
+import pickle
 import re
 
 from termcolor import colored
@@ -260,10 +261,18 @@ class Tetros:
                 # TODO when implementing piece sets
                 input('Custom Starting Pieces Selection Complete, press enter to continue...')
             if input_val == 'write' or input_val == 'w':
-                # TODO
+                filename = ''
+                while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
+                    filename = input('Please input a filename, excluding any file extension.')
+                # TODO Error Handling
+                pickle.dump(cfg, open(filename + '.p', 'wb'))
                 input('Config Written, press enter to continue...')
             if input_val == 'load' or input_val == 'l':
-                # TODO
+                filename = ''
+                while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
+                    filename = input('Please input a filename, excluding any file extension.')
+                # TODO Error Handling
+                cfg = pickle.load(open(filename + '.p', 'rb'))
                 input('Config Loaded, press enter to continue...')
             print(logo)
             Tetros.display_config(cfg)
