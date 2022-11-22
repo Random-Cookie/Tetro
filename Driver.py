@@ -4,7 +4,7 @@ import copy
 
 from termcolor import colored
 
-from GameResources.structure import GameBoard
+from GameResources.Structure import SquareGameBoard
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import Player, HumanPlayer, RandomPlayer
 from timeit import default_timer as timer
@@ -27,7 +27,7 @@ class Tetros:
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces) \
             if players is None else players
-        self.board = GameBoard((board_size[0], board_size[1]), self.players, starting_positions)
+        self.board = SquareGameBoard((board_size[0], board_size[1]), self.players, starting_positions)
         self.display_modes = display_modes if display_modes is not None else ['end_pause']
 
     def check_win(self):
