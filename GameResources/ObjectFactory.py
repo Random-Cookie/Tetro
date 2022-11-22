@@ -1,6 +1,6 @@
 import random
 from dataclasses import dataclass
-from GameResources.structure import Piece
+from GameResources.Structure import SquarePiece
 from GameResources.SimplePlayers import HumanPlayer, RandomPlayer, ExhaustiveRandomPlayer
 
 
@@ -101,7 +101,7 @@ class ObjectFactory:
         for color in player_colors:
             player_shapes = []
             for shape in shapes:
-                player_shapes.append(Piece(shape['name'], shape['coords'], color))
+                player_shapes.append(SquarePiece(shape['name'], shape['coords'], color))
             ret.append(player_shapes)
         return ret
 

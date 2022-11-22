@@ -7,8 +7,8 @@ from dataclasses import dataclass
 
 from termcolor import colored
 
-import GameResources.structure
-from GameResources.structure import Piece, GameBoard
+import GameResources.Structure
+from GameResources.Structure import SquarePiece, SquareGameBoard
 
 # TODO Player Ideas
 # Sorted pieces random position
@@ -21,7 +21,7 @@ class Move:
     """
     A dataclass to represent a move.
     """
-    piece: Piece
+    piece: SquarePiece
     piece_index: int
     position: tuple[int, int]
 
@@ -30,7 +30,7 @@ class Player(ABC):
     """
     Abstract class to represent a generic player
     """
-    def __init__(self, color: str, initial_pieces: list[Piece]):
+    def __init__(self, color: str, initial_pieces: list[SquarePiece]):
         """
         Initialise a Player
         :param color: Color for players pieces
@@ -85,7 +85,7 @@ class Player(ABC):
             ret += '\n'
         return ret.strip('\n')
 
-    def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
+    def get_placeables(self, board: GameResources.structure.SquareGameBoard) -> list[tuple[int, int]]:
         """
         Get a list of placebale locations
         :param board: The gamebaord
@@ -99,7 +99,7 @@ class Player(ABC):
         return placeables
 
     @abstractmethod
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_piece(self, board: SquareGameBoard) -> Move | None:
         """
         Abstract method for selecting a piece all subclasses must implement
         If a piece cannot be placed return none
@@ -110,7 +110,7 @@ class Player(ABC):
         self.has_knocked = True
         return None
 
-    def place_piece(self, board: GameBoard, move: Move) -> bool:
+    def place_piece(self, board: SquareGameBoard, move: Move) -> bool:
         """
         Place a piece
         :param move: The move to make
@@ -123,7 +123,7 @@ class Player(ABC):
             return True
         return False
 
-    def take_turn(self, board: GameBoard) -> bool:
+    def take_turn(self, board: SquareGameBoard) -> bool:
         """
         Select then place a piece if possible
         :param board: The gameboard to analyse
@@ -154,7 +154,7 @@ class HumanPlayer(Player):
     def __init__(self, color, initial_pieces):
         Player.__init__(self, color, initial_pieces)
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_piece(self, board: SquareGameBoard) -> Move | None:
         """
         Display an interface to allow a player to select, manipulate a piece and enter xy coords
         :param board: Used for printing
@@ -205,7 +205,7 @@ class RandomPlayer(Player):
         Player.__init__(self, color, initial_pieces)
         self.timeout = 0
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_piece(self, board: SquareGameBoard) -> Move | None:
         """
         Select a random Piece with random rotations and flip
         :param board: Used for analysis
@@ -241,7 +241,7 @@ class ExhaustiveRandomPlayer(RandomPlayer):
         RandomPlayer.__init__(self, color, initial_pieces)
         self.exhausted = False
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_piece(self, board: SquareGameBoard) -> Move | None:
         """
         Use Random player algorithm until self.has_knocked
         :param board:

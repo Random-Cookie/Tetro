@@ -8,7 +8,7 @@ from termcolor import colored
 from numpy import matmul
 
 
-class Piece:
+class SquarePiece:
     def __init__(self, name: str, shape: list, color: str):
         """
         Create a Piece
@@ -121,7 +121,7 @@ class BoardSquare:
     color: str = None
 
 
-class GameBoard:
+class SquareGameBoard:
     def __init__(self,
                  board_size: tuple[int, int],
                  players: list[GR.SimplePlayers.Player],
@@ -208,7 +208,7 @@ class GameBoard:
             return True
         return False
 
-    def check_piece_fits(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
+    def check_piece_fits(self, x: int, y: int, piece: GR.Structure.SquarePiece) -> bool:
         """
         Check if piece will fit at location
         True if fits
@@ -233,7 +233,7 @@ class GameBoard:
                 return False
         return placeable
 
-    def update_placeable_lists(self, players: list[GR.structure.Piece]):
+    def update_placeable_lists(self, players: list[GR.Structure.SquarePiece]):
         """
         Update placeable lists for all location on the board
         :param players: Players to update
@@ -249,7 +249,7 @@ class GameBoard:
                                 and not self.check_adj_squares(x, y, player.color):
                             pos.placeable_by.append(player.color)
 
-    def place_piece(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
+    def place_piece(self, x: int, y: int, piece: GR.Structure.SquarePiece) -> bool:
         """
         Place a Piece on the board, does no checks
         :param x: x coord

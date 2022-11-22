@@ -2,7 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 
 from GameResources.SimplePlayers import Player
-from GameResources.structure import Piece, GameBoard
+from GameResources.Structure import SquarePiece, SquareGameBoard
 from SimplePlayers import Move
 
 
@@ -17,11 +17,11 @@ class MachineLearningPlayer(Player):
     """
     An abstract class for machine learning players
     """
-    def __init__(self, color: str, initial_pieces: list[Piece], initial_state):
+    def __init__(self, color: str, initial_pieces: list[SquarePiece], initial_state):
         Player.__init__(self, color, initial_pieces)
         self.initial_state = initial_state
 
-    def get_possible_moves(self, board: GameBoard) -> list[Move]:
+    def get_possible_moves(self, board: SquareGameBoard) -> list[Move]:
         return []
 
     @abstractmethod
