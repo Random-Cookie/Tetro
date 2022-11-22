@@ -121,6 +121,11 @@ class BoardSquare:
     color: str = None
 
 
+@dataclass
+class BoardTri(BoardSquare):
+    inverted: bool = False
+
+
 class SquareGameBoard:
     def __init__(self,
                  board_size: tuple[int, int],
