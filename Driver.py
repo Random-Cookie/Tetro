@@ -1,4 +1,6 @@
+import pickle
 import re
+import copy
 
 from termcolor import colored
 
@@ -190,25 +192,22 @@ class Tetros:
         logo_file = open('GameResources/config.txt')
         logo = logo_file.read()
         logo_file.close()
-        cfg = Tetros.DEFAULT_CONFIG
+        cfg = copy.deepcopy(Tetros.DEFAULT_CONFIG)
         input_message = '--------------- Config Menu ---------------\n' + \
             'board  (b)  | Input custom board size\n' + \
             'player (pl) | Add a player with selected color\n' + \
             'pos    (po) | Input custom starting positions\n' + \
             'pieces (pi) | Choose Piece Set (UNIMPLEMENTED)\n' + \
-            'write  (w)  | Save config to file (UNIMPLEMENTED)\n' + \
-            'load   (l)  | load config from files (UNIMPLEMENTED)\n' + \
+            'write  (w)  | Save config to file\n' + \
+            'load   (l)  | load config from file\n' + \
             'start  (s)  | Start a game with the selected Parameters\n' + \
             'exit   (e)  | Exit without starting a game\n'
         exiting_inputs = ['start', 's', 'exit', 'e']
         input_val = ''
         while input_val not in exiting_inputs:
             if input_val == 'board' or input_val == 'b':
-                print(logo)
-                print('Input board size in the form: x,y')
                 board_input_val = ''
                 while re.search('[0-9]+,[0-9]+', board_input_val) is None:
-                    print(logo)
                     board_input_val = input('Input board size in the form: x,y\n')
                 split = board_input_val.split(',')
                 x, y = int(split[0]), int(split[1])
@@ -256,15 +255,29 @@ class Tetros:
                     starting_positions.append([int(split[0]), int(split[1])])
                 cfg['starting_positions'] = starting_positions
                 input('Custom Starting Position Selection Complete, press enter to continue...')
-            if input_val == 'pieces' or input_val == 'l':
+            if input_val == 'pieces' or input_val == 'pi':
                 # TODO when implementing piece sets
                 input('Custom Starting Pieces Selection Complete, press enter to continue...')
             if input_val == 'write' or input_val == 'w':
-                # TODO
-                input('Config Written, press enter to continue...')
+                filename = ''
+                while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
+                    filename = input('Please input a filename, excluding any file extension.\n')
+                try:
+                    pickle.dump(cfg, open(filename + '.p', 'wb'))
+                    input('Config Written, press enter to continue...')
+                except Exception as e:
+                    print(e)
+                    input('Error writing Config, press enter to continue...')
             if input_val == 'load' or input_val == 'l':
-                # TODO
-                input('Config Loaded, press enter to continue...')
+                filename = ''
+                while re.search('[a-zA-Z]+([a-zA-Z]|[0-9])+', filename) is None:
+                    filename = input('Please input a filename, excluding any file extension.\n')
+                try:
+                    cfg = pickle.load(open(filename + '.p', 'rb'))
+                    input('Config Loaded, press enter to continue...')
+                except Exception as e:
+                    print(e)
+                    input('Error reading Config, press enter to continue...')
             print(logo)
             Tetros.display_config(cfg)
             input_val = input(input_message).lower()
@@ -279,13 +292,14 @@ class Tetros:
         for item in list(config.items()):
             if item[0] != 'initial_pieces':
                 print(item[0].ljust(20) + ' | ' +
-                      str(item[1]) if item[1] == Tetros.DEFAULT_CONFIG[item[0]] else colored(str(item[1]), 'green'))
+                      (str(item[1]) if item[1] == Tetros.DEFAULT_CONFIG[item[0]] else colored(str(item[1]), 'green')))
             else:
                 print(item[0].ljust(20) + ' | ', end='')
                 if item[1] == Tetros.DEFAULT_CONFIG[item[0]]:
                     print('Default')
                 else:
-                    print('Modified', 'green')
+                    # TODO Implement piece set class to fix this?
+                    print(colored('Modified', 'green'))
         print()
 
     @staticmethod
