@@ -289,3 +289,15 @@ class SquareGameBoard:
             ret += '|\n'
         ret += '‾' * ((2 * len(self.positions)) + 3)
         return ret
+
+
+class TriGameBoard:
+    def __init__(self, players: list[GR.SimplePlayers.Player] = None, board_size: tuple[int, int] = (35, 18)):
+        self.positions = []
+        for y in range(0, board_size[1]):
+            row = []
+            for x in range(0, board_size[0]):
+                row.append(BoardSquare([]))
+            self.positions.append(row)
+        # self.set_starting_positions(players, starting_positions)
+
