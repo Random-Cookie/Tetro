@@ -85,7 +85,7 @@ class Player(ABC):
             ret += '\n'
         return ret.strip('\n')
 
-    def get_placeables(self, board: GameResources.structure.SquareGameBoard) -> list[tuple[int, int]]:
+    def get_placeables(self, board: GameResources.Structure.SquareGameBoard) -> list[tuple[int, int]]:
         """
         Get a list of placebale locations
         :param board: The gamebaord

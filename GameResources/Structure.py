@@ -112,6 +112,19 @@ class SquarePiece:
         return lines
 
 
+class TriPiece:
+    def __init__(self, name: str, shape: dict[tuple[int, int], bool], color: str):
+        """
+        Create a Piece
+        :param name: Piece name
+        :param shape: List of relative coordinates
+        :param color: Piece color
+        """
+        self.name = name
+        self.shape = shape
+        self.color = color
+
+
 @dataclass
 class BoardSquare:
     """
@@ -301,3 +314,22 @@ class TriGameBoard:
             self.positions.append(row)
         # self.set_starting_positions(players, starting_positions)
 
+    def set_starting_positions(self, players: list[GR.SimplePlayers.Player],
+                               starting_positions: list[list[int, int]] = None):
+        """
+        Set stating positions for players
+        Make the locations in starting_positions placeable for corresponding players
+        :param players: Players to set starting positions for
+        :param starting_positions: desired starting positions
+        """
+        random.shuffle(starting_positions)
+        if starting_positions is None:
+            possible_starting_positions = [[9, 7], [9, 12], [17, 4], [17, 15], [25, 7], [25, 12]]
+            starting_positions = []
+            for player in players:
+                chosen_pos = player.choose_start_pos()
+                starting_positions.append(chosen_pos)
+                possible_starting_positions.pop(chosen_pos)
+        for i in range(len(players)):
+            x, y = starting_positions[i]
+            self.positions[x][y].placeable_by.append(players[i].color)
