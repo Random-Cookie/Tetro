@@ -3,7 +3,7 @@ import re
 import copy
 
 from termcolor import colored
-from GameResources.structure import GameBoard
+from GameResources.Structure import GameBoard
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import Player, HumanPlayer, RandomPlayer
 from timeit import default_timer as timer

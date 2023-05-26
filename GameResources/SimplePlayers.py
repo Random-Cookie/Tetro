@@ -6,9 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from termcolor import colored
-
-import GameResources.structure
-from GameResources.structure import Piece, GameBoard
+from GameResources.Structure import Piece, GameBoard
 
 # TODO Player Ideas
 # Sorted pieces random position
@@ -85,7 +83,7 @@ class Player(ABC):
             ret += '\n'
         return ret.strip('\n')
 
-    def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
+    def get_placeables(self, board: GameBoard) -> list[tuple[int, int]]:
         """
         Get a list of placebale locations
         :param board: The gamebaord
