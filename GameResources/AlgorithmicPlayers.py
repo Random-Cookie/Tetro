@@ -48,6 +48,9 @@ class StaticHeatmapPlayer(Player):
     def score_move(self, board: GameBoard, move: Move) -> int:
         """
         Score an individual move by scanning the board for any empty spaces and adding the weight from the heatmap
+        Higher priority squares have a higher value on the heatmap
+        The move is then made on the board, score is calculated by adding all values in the heat map that remain empty
+        Therefore when optimising for the "best move" you should minimise this score
         :param board: The game board
         :param move: The move to be scores
         :return: The move score
@@ -57,7 +60,7 @@ class StaticHeatmapPlayer(Player):
         score = 0
         for x in range(len(board.positions)):
             for y in range(len(board.positions[0])):
-                if board.positions[x][y].color is None:
+                if temp_board.positions[x][y].color is None:
                     score += int(self.current_heatmap[x][y])
         return score
 
@@ -142,7 +145,7 @@ class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
                                 ittr_move = Move(selected_piece, self.pieces.index(piece), location)
                                 move_scores[self.score_move(board, ittr_move)].append(ittr_move)
             if len(move_scores.keys()) > 0:
-                best_score = max(move_scores.keys())
+                best_score = min(move_scores.keys())
                 best_moves = move_scores[best_score]
                 if len(best_moves) == 1:
                     return best_moves[0]
