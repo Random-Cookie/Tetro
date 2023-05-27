@@ -4,16 +4,17 @@ import random
 from GameResources.SimplePlayers import Player, Move
 from GameResources.Structure import Piece, GameBoard
 from abc import abstractmethod
+from collections import defaultdict
 
 
 class StaticHeatmapPlayer(Player):
     """
     Abstract player with a static heatmap
     """
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: int):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int]):
         Player.__init__(self, color, initial_pieces)
         self.board_size = board_size
-        self.current_heatmap = [[0]*self.board_size for i in range(self.board_size)]
+        self.current_heatmap = [[0]*self.board_size[1] for i in range(self.board_size[0])]
 
     def load_heatmap(self, filepath: str) -> None:
         """
@@ -32,16 +33,16 @@ class StaticHeatmapPlayer(Player):
                 col.append(map_lines[y][x])
             self.current_heatmap.append(col)
 
-    def score_moves(self, board: GameBoard, moves: list[Move]) -> dict[Move, int]:
+    def score_moves(self, board: GameBoard, moves: list[Move]) -> defaultdict[int, list[Move]]:
         """
         Score a set of moves
         :param board: The game board
         :param moves: The moves to be scores
         :return: dict{move, score} Scores in a dict
         """
-        move_scores = {}
+        move_scores = defaultdict(list)
         for move in moves:
-            move_scores[move] = self.score_move(board, move)
+            move_scores[self.score_move(board, move)].append(move)
         return move_scores
 
     def score_move(self, board: GameBoard, move: Move) -> int:
@@ -54,10 +55,10 @@ class StaticHeatmapPlayer(Player):
         temp_board = copy.deepcopy(board)
         temp_board.place_piece(move.position[0], move.position[1], move.piece)
         score = 0
-        for x in range(board.positions):
-            for y in range(board.positions[0]):
+        for x in range(len(board.positions)):
+            for y in range(len(board.positions[0])):
                 if board.positions[x][y].color is None:
-                    score += self.current_heatmap[x][y]
+                    score += int(self.current_heatmap[x][y])
         return score
 
     @abstractmethod
@@ -71,7 +72,7 @@ class StaticHeatmapPlayer(Player):
 
 
 class DynamicHeatmapPlayer(StaticHeatmapPlayer):
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: int):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int]):
         StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
 
     @abstractmethod
@@ -110,10 +111,10 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
 
 
 class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: int, heatmap_mode: str = 'flat', heatmap_filepath: str = None):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmap_mode: str = 'flat', heatmap_filepath: str = None):
         StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
         if heatmap_mode == 'flat':
-            self.current_heatmap = [[1]*board_size for i in range(board_size)]
+            self.current_heatmap = [[1]*self.board_size[1] for i in range(self.board_size[0])]
         if heatmap_mode == 'file':
             self.load_heatmap(heatmap_filepath)
 
@@ -124,8 +125,8 @@ class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
         :return:
         """
         placeables = self.get_placeables(board)
-        move_scores = {}
-        if placeables:
+        if placeables and not self.has_knocked:
+            move_scores = defaultdict(list)
             for piece in self.pieces:
                 for location in placeables:
                     for rotation in [0, 1, 2, 3]:
@@ -139,16 +140,9 @@ class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
                                                       location[1],
                                                       selected_piece):
                                 ittr_move = Move(selected_piece, self.pieces.index(piece), location)
-                                move_scores[ittr_move] = self.score_move(board, ittr_move)
-            best_score = move_scores[list(move_scores.keys())[0]]
-            best_moves = []
-            for key in move_scores.keys():
-                move_score = move_scores[key]
-                if move_score < best_score:
-                    best_score = move_score
-                    best_moves = [key]
-                elif move_score == best_score:
-                    best_moves.append(key)
+                                move_scores[self.score_move(board, ittr_move)].append(ittr_move)
+            best_score = max(move_scores.keys())
+            best_moves = move_scores[best_score]
             if len(best_moves) == 1:
                 return best_moves[0]
             elif len(best_moves) > 1:
@@ -169,7 +163,7 @@ class BigFirstSeekerDHM(DynamicHeatmapPlayer):
     """
     Large Piece First Seeking Dynamic Heat Map
     """
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: int,
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int],
                  y_off: int = 5, sel_grad: float = (1/3),
                  adj_weight: int = 1,  diag_weight: int = 2):
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
@@ -185,7 +179,7 @@ class BigFirstSeekerDHM(DynamicHeatmapPlayer):
         :param board: Current Gameboard
         :return: None
         """
-        self.current_heatmap = [[0]*self.board_size for i in range(self.board_size)]
+        self.current_heatmap = [[0]*self.board_size[1] for i in range(self.board_size[0])]
         for x in range(len(board.positions)):
             for y in range(len(board.positions)):
                 for color in board.player_colors:
