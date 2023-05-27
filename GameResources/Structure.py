@@ -61,7 +61,6 @@ class Piece:
         Rotate the piece 90 degrees clockwise
         Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
         """
-        # Rotate 90deg clockwise about origin
         rotation_matrix = [[0, 1], [-1, 0]]
         for i in range(len(self.currentCoords)):
             self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
