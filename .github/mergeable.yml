@@ -6,7 +6,7 @@ mergeable:
       - do: title
         must_include:
           regex: \[(Major|Minor|Patch|NoVersion)\]
-          message: 'Please include semver tag in the title, see https://semver.org/ for more info.'
+          message: 'Please include semver tag in the title, see semver.org for more info.'
       - do: description
         must_exclude:
           regex: \[ \] Have you tested your changes with 100% coverage
