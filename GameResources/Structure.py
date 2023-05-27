@@ -137,6 +137,9 @@ class GameBoard:
                 row.append(BoardSquare([]))
             self.positions.append(row)
         self.set_starting_positions(players, starting_positions)
+        self.player_colors = []
+        for player in players:
+            self.player_colors.append(player.color)
 
     def set_starting_positions(self, players: list[GR.SimplePlayers.Player],
                                starting_positions: list[list[int, int]] = None):
