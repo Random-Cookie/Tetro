@@ -1,7 +1,4 @@
-import random
-from dataclasses import dataclass
-from GameResources.Structure import Piece, GameBoard
-from GameResources.SimplePlayers import HumanPlayer, RandomPlayer, ExhaustiveRandomPlayer
+from GameResources.SimplePlayers import *
 from GameResources.AlgorithmicPlayers import ExhaustiveStaticHeatmapPlayer
 
 
@@ -107,7 +104,7 @@ class ObjectFactory:
         return ret
 
     @staticmethod
-    def generate_human_players(player_colors: list = None, initial_pieces: dict = None):
+    def generate_human_players(player_colors: list = None, initial_pieces: dict = None) -> list[HumanPlayer]:
         ret = []
         player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
@@ -117,7 +114,7 @@ class ObjectFactory:
         return ret
 
     @staticmethod
-    def generate_random_players(player_colors: list = None, initial_pieces: dict = None):
+    def generate_random_players(player_colors: list = None, initial_pieces: dict = None) -> list[RandomPlayer]:
         ret = []
         player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
@@ -127,7 +124,7 @@ class ObjectFactory:
         return ret
 
     @staticmethod
-    def generate_ex_random_players(player_colors: list = None, initial_pieces: dict = None):
+    def generate_ex_random_players(player_colors: list = None, initial_pieces: dict = None) -> list[ExhaustiveRandomPlayer]:
         ret = []
         player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
@@ -137,11 +134,24 @@ class ObjectFactory:
         return ret
 
     @staticmethod
-    def generate_shm_players(board_size: tuple[int, int], player_colors: list = None, initial_pieces: dict = None):
+    def generate_shm_players(board_size: tuple[int, int], player_colors: list = None, initial_pieces: dict = None) -> list[ExhaustiveStaticHeatmapPlayer]:
         ret = []
         player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         for i in range(0, len(player_colors)):
             ret.append(ExhaustiveStaticHeatmapPlayer(player_colors[i], initial_pieces[i], board_size, 'file', 'GameResources/heatmaps/agressive.txt'))
+        random.shuffle(ret)
+        return ret
+
+    @staticmethod
+    def generate_smh_v_random(board_size: tuple[int, int]) -> list[Player]:
+        ret = []
+        initial_pieces = ObjectFactory().generate_shapes()
+        ret.append(ExhaustiveStaticHeatmapPlayer('blue', initial_pieces[0], board_size, 'file',
+                                                 'GameResources/heatmaps/bullseye.txt'))
+        ret.append(ExhaustiveStaticHeatmapPlayer('green', initial_pieces[1], board_size, 'file',
+                                                 'GameResources/heatmaps/bullseye.txt'))
+        ret.append(ExhaustiveRandomPlayer('red', initial_pieces[2]))
+        ret.append(ExhaustiveRandomPlayer('yellow', initial_pieces[3]))
         random.shuffle(ret)
         return ret

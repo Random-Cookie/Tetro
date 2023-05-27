@@ -312,14 +312,16 @@ class Tetros:
         logo_file.close()
         menu_string = logo + \
             '\n--------------- Main Menu Options---------------\n' + \
-            'play      (p)  | Play a standard Game\n' + \
-            'random    (r)  | Demo game with random bots\n' + \
-            'exrandom  (er) | Simulate Game with Exhaustive Random bots\n' + \
-            'stepexr   (ex) | As above, turn by turn\n' + \
-            'ESH       (eh) | Game with ExhaustiveStaticHeatmapPlayer\n' + \
-            'stepESH   (es) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
-            'config    (c)  | Open Configuration Menu\n' + \
-            'exit      (e)  | Exit\n'
+            'play       (p)   | Play a standard Game\n' + \
+            'random     (r)   | Demo game with random bots\n' + \
+            'exrandom   (er)  | Simulate Game with Exhaustive Random bots\n' + \
+            'stepexr    (ex)  | As above, turn by turn\n' + \
+            'ESH        (eh)  | Game with ExhaustiveStaticHeatmapPlayer\n' + \
+            'stepESH    (es)  | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
+            'ESHvRand   (evr) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
+            'ESHvRandSt (evs) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
+            'config     (c)   | Open Configuration Menu\n' + \
+            'exit       (e)   | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
             input_string = input(menu_string).lower()
@@ -351,7 +353,7 @@ class Tetros:
             if input_string.lower() == 'esh' or input_string == 'eh':
                 board_size = (20, 20)
                 return {
-                           'board_size': (20, 20),
+                           'board_size': board_size,
                            'players': ObjectFactory.generate_shm_players(board_size),
                            'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                            'initial_pieces': ObjectFactory.generate_shapes()
@@ -359,8 +361,24 @@ class Tetros:
             if input_string.lower() == 'stepesh' or input_string == 'es':
                 board_size = (20, 20)
                 return {
-                           'board_size': (20, 20),
+                           'board_size': board_size,
                            'players': ObjectFactory.generate_shm_players(board_size),
+                           'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                           'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'pause', 'skip']
+            if input_string.lower() == 'eshvrand' or input_string == 'evr':
+                board_size = (20, 20)
+                return {
+                           'board_size': board_size,
+                           'players': ObjectFactory.generate_smh_v_random(board_size),
+                           'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                           'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'skip', 'times']
+            if input_string.lower() == 'eshvrandst' or input_string == 'evs':
+                board_size = (20, 20)
+                return {
+                           'board_size': board_size,
+                           'players': ObjectFactory.generate_smh_v_random(board_size),
                            'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                            'initial_pieces': ObjectFactory.generate_shapes()
                        }, ['end_pause', 'pause', 'skip']
