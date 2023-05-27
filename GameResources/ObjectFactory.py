@@ -148,9 +148,9 @@ class ObjectFactory:
         ret = []
         initial_pieces = ObjectFactory().generate_shapes()
         ret.append(ExhaustiveStaticHeatmapPlayer('blue', initial_pieces[0], board_size, 'file',
-                                                 'GameResources/heatmaps/bullseye.txt'))
+                                                 'GameResources/res/heatmaps/bullseye.txt'))
         ret.append(ExhaustiveStaticHeatmapPlayer('green', initial_pieces[1], board_size, 'file',
-                                                 'GameResources/heatmaps/bullseye.txt'))
+                                                 'GameResources/res/heatmaps/bullseye.txt'))
         ret.append(ExhaustiveRandomPlayer('red', initial_pieces[2]))
         ret.append(ExhaustiveRandomPlayer('yellow', initial_pieces[3]))
         random.shuffle(ret)
