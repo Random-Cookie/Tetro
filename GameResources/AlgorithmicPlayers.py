@@ -141,12 +141,13 @@ class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
                                                       selected_piece):
                                 ittr_move = Move(selected_piece, self.pieces.index(piece), location)
                                 move_scores[self.score_move(board, ittr_move)].append(ittr_move)
-            best_score = max(move_scores.keys())
-            best_moves = move_scores[best_score]
-            if len(best_moves) == 1:
-                return best_moves[0]
-            elif len(best_moves) > 1:
-                return self.tiebreak_moves(best_moves)
+            if len(move_scores.keys()) > 0:
+                best_score = max(move_scores.keys())
+                best_moves = move_scores[best_score]
+                if len(best_moves) == 1:
+                    return best_moves[0]
+                elif len(best_moves) > 1:
+                    return self.tiebreak_moves(best_moves)
         self.has_knocked = True
         return None
 
