@@ -1,4 +1,5 @@
 ---
+version: 2
 mergeable:
   - when: pull_request.*
     validate:
@@ -8,5 +9,5 @@ mergeable:
           message: 'Please include semver tag in the title, see https://semver.org/ for more info.'
       - do: description
         must_exclude:
-          regex: \[ \] Have you tested your changes with 100% coverrage
+          regex: \[ \] Have you tested your changes with 100% coverage
           message: 'Please complete testing before merging.'
