@@ -253,7 +253,6 @@ class ExhaustiveRandomPlayer(RandomPlayer):
                     for location in placeables:
                         for y_offset in range(-1, 1):
                             for x_offset in range(-1, 1):
-                                # board.get_printable_board()
                                 randomised_rotations = [0, 1, 2, 3]
                                 random.shuffle(randomised_rotations)
                                 for rotation in randomised_rotations:
