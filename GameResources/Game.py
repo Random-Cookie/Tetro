@@ -192,7 +192,7 @@ class Tetros:
         Sub menu to edit the game config
         :return:
         """
-        logo_file = open('GameResources/config.txt')
+        logo_file = open('GameResources/res/config.txt')
         logo = logo_file.read()
         logo_file.close()
         cfg = copy.deepcopy(Tetros.DEFAULT_CONFIG)
@@ -307,7 +307,7 @@ class Tetros:
 
     @staticmethod
     def display_main_menu() -> tuple[dict, list[str]]:
-        logo_file = open('GameResources/mainMenu.txt')
+        logo_file = open('GameResources/res/mainMenu.txt')
         logo = logo_file.read()
         logo_file.close()
         menu_string = logo + \
