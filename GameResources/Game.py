@@ -316,6 +316,7 @@ class Tetros:
             'random    (r)  | Demo game with random bots\n' + \
             'exrandom  (er) | Simulate Game with Exhaustive Random bots\n' + \
             'stepexr   (ex) | As above, turn by turn\n' + \
+            'stepESH   (es) | Turn by turn ExhaustiveStaticHeatmapPlayer' + \
             'config    (c)  | Open Configuration Menu\n' + \
             'exit      (e)  | Exit\n'
         input_string = ''
@@ -345,6 +346,14 @@ class Tetros:
                         'players': ObjectFactory.generate_ex_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'pause', 'skip']
+            if input_string.lower() == 'stepesh' or input_string == 'es':
+                board_size = (20,20)
+                return {
+                           'board_size': (20, 20),
+                           'players': ObjectFactory.generate_shm_players(board_size),
+                           'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                           'initial_pieces': ObjectFactory.generate_shapes()
                        }, ['end_pause', 'pause', 'skip']
             if input_string == 'config' or input_string == 'c':
                 return Tetros.get_custom_game_inputs()[0], ['main_menu']

@@ -1,7 +1,8 @@
 import random
 from dataclasses import dataclass
-from GameResources.Structure import Piece
+from GameResources.Structure import Piece, GameBoard
 from GameResources.SimplePlayers import HumanPlayer, RandomPlayer, ExhaustiveRandomPlayer
+from GameResources.AlgorithmicPlayers import ExhaustiveStaticHeatmapPlayer
 
 
 @dataclass
@@ -132,5 +133,15 @@ class ObjectFactory:
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         for i in range(0, len(player_colors)):
             ret.append(ExhaustiveRandomPlayer(player_colors[i], initial_pieces[i]))
+        random.shuffle(ret)
+        return ret
+
+    @staticmethod
+    def generate_shm_players(board_size: tuple[int, int], player_colors: list = None, initial_pieces: dict = None):
+        ret = []
+        player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
+        initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
+        for i in range(0, len(player_colors)):
+            ret.append(ExhaustiveStaticHeatmapPlayer(player_colors[i], initial_pieces[i], board_size, 'file', 'GameResources/heatmaps/agressive.txt'))
         random.shuffle(ret)
         return ret
