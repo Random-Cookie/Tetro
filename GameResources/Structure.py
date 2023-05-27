@@ -141,7 +141,11 @@ class GameBoard:
         for player in players:
             self.player_colors.append(player.color)
 
-    def get_size(self):
+    def get_size(self) -> tuple[int, int]:
+        """
+        Get xy size of the board
+        :return: tuple[x, y] x and y sizes
+        """
         return len(self.positions), len(self.positions[0])
 
     def set_starting_positions(self, players: list[GR.SimplePlayers.Player],
