@@ -2,8 +2,8 @@ import pickle
 import re
 import copy
 
-from termcolor import colored
-from GameResources.structure import GameBoard
+from termcolor2 import colored
+from GameResources.Structure import GameBoard
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import Player, HumanPlayer, RandomPlayer
 from timeit import default_timer as timer
@@ -76,7 +76,7 @@ class Tetros:
             print(top_row)
             print(bottom_row)
         if 'end_pause' in self.display_modes:
-            input('Press enter to return ot the main menu...')
+            input('Press enter to return to the main menu...')
 
     def calculate_player_coverage(self, player: Player) -> tuple[int, int, int, int]:
         """
@@ -192,7 +192,7 @@ class Tetros:
         Sub menu to edit the game config
         :return:
         """
-        logo_file = open('GameResources/config.txt')
+        logo_file = open('GameResources/res/config.txt')
         logo = logo_file.read()
         logo_file.close()
         cfg = copy.deepcopy(Tetros.DEFAULT_CONFIG)
@@ -307,17 +307,21 @@ class Tetros:
 
     @staticmethod
     def display_main_menu() -> tuple[dict, list[str]]:
-        logo_file = open('GameResources/mainMenu.txt')
+        logo_file = open('GameResources/res/mainMenu.txt')
         logo = logo_file.read()
         logo_file.close()
         menu_string = logo + \
             '\n--------------- Main Menu Options---------------\n' + \
-            'play      (p)  | Play a standard Game\n' + \
-            'random    (r)  | Demo game with random bots\n' + \
-            'exrandom  (er) | Simulate Game with Exhaustive Random bots\n' + \
-            'stepexr   (ex) | As above, turn by turn\n' + \
-            'config    (c)  | Open Configuration Menu\n' + \
-            'exit      (e)  | Exit\n'
+            'play       (p)   | Play a standard Game\n' + \
+            'random     (r)   | Demo game with random bots\n' + \
+            'exrandom   (er)  | Simulate Game with Exhaustive Random bots\n' + \
+            'stepexr    (ex)  | As above, turn by turn\n' + \
+            'ESH        (eh)  | Game with ExhaustiveStaticHeatmapPlayer\n' + \
+            'stepESH    (es)  | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
+            'ESHvRand   (evr) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
+            'ESHvRandSt (evs) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
+            'config     (c)   | Open Configuration Menu\n' + \
+            'exit       (e)   | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
             input_string = input(menu_string).lower()
@@ -346,6 +350,37 @@ class Tetros:
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes()
                        }, ['end_pause', 'pause', 'skip']
+            if input_string.lower() == 'esh' or input_string == 'eh':
+                board_size = (20, 20)
+                return {
+                           'board_size': board_size,
+                           'players': ObjectFactory.generate_shm_players(board_size),
+                           'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                           'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'skip', 'times']
+            if input_string.lower() == 'stepesh' or input_string == 'es':
+                board_size = (20, 20)
+                return {
+                           'board_size': board_size,
+                           'players': ObjectFactory.generate_shm_players(board_size),
+                           'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                           'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'pause', 'skip']
+            if input_string.lower() == 'eshvrand' or input_string == 'evr':
+                board_size = (20, 20)
+                return {
+                           'board_size': board_size,
+                           'players': ObjectFactory.generate_smh_v_random(board_size),
+                           'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                           'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'skip', 'times']
+            if input_string.lower() == 'eshvrandst' or input_string == 'evs':
+                board_size = (20, 20)
+                return {
+                           'board_size': board_size,
+                           'players': ObjectFactory.generate_smh_v_random(board_size),
+                           'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
+                           'initial_pieces': ObjectFactory.generate_shapes()
+                       }, ['end_pause', 'pause', 'skip']
             if input_string == 'config' or input_string == 'c':
                 return Tetros.get_custom_game_inputs()[0], ['main_menu']
-        return {}, []

@@ -5,10 +5,8 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from termcolor import colored
-
-import GameResources.structure
-from GameResources.structure import Piece, GameBoard
+from termcolor2 import colored
+from GameResources.Structure import Piece, GameBoard
 
 # TODO Player Ideas
 # Sorted pieces random position
@@ -85,7 +83,7 @@ class Player(ABC):
             ret += '\n'
         return ret.strip('\n')
 
-    def get_placeables(self, board: GameResources.structure.GameBoard) -> list[tuple[int, int]]:
+    def get_placeables(self, board: GameBoard) -> list[tuple[int, int]]:
         """
         Get a list of placebale locations
         :param board: The gamebaord
@@ -255,7 +253,6 @@ class ExhaustiveRandomPlayer(RandomPlayer):
                     for location in placeables:
                         for y_offset in range(-1, 1):
                             for x_offset in range(-1, 1):
-                                # board.get_printable_board()
                                 randomised_rotations = [0, 1, 2, 3]
                                 random.shuffle(randomised_rotations)
                                 for rotation in randomised_rotations:

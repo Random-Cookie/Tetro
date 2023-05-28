@@ -1,7 +1,7 @@
 from GameResources.Game import Tetros
 
 game_params = Tetros.display_main_menu()
-while game_params[1]:
+while game_params is not None:
     if game_params[1]:
         game_config = game_params[0]
         if game_config != {}:

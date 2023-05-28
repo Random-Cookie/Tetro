@@ -4,7 +4,7 @@ import random
 
 import GameResources as GR
 from dataclasses import dataclass
-from termcolor import colored
+from termcolor2 import colored
 from numpy import matmul
 
 
@@ -61,7 +61,6 @@ class Piece:
         Rotate the piece 90 degrees clockwise
         Source: https://en.wikipedia.org/wiki/Rotations_and_reflections_in_two_dimensions
         """
-        # Rotate 90deg clockwise about origin
         rotation_matrix = [[0, 1], [-1, 0]]
         for i in range(len(self.currentCoords)):
             self.currentCoords[i] = list(matmul(self.currentCoords[i], rotation_matrix))
@@ -138,6 +137,16 @@ class GameBoard:
                 row.append(BoardSquare([]))
             self.positions.append(row)
         self.set_starting_positions(players, starting_positions)
+        self.player_colors = []
+        for player in players:
+            self.player_colors.append(player.color)
+
+    def get_size(self) -> tuple[int, int]:
+        """
+        Get xy size of the board
+        :return: tuple[x, y] x and y sizes
+        """
+        return len(self.positions), len(self.positions[0])
 
     def set_starting_positions(self, players: list[GR.SimplePlayers.Player],
                                starting_positions: list[list[int, int]] = None):
@@ -208,7 +217,7 @@ class GameBoard:
             return True
         return False
 
-    def check_piece_fits(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
+    def check_piece_fits(self, x: int, y: int, piece: GR.Structure.Piece) -> bool:
         """
         Check if piece will fit at location
         True if fits
@@ -233,7 +242,7 @@ class GameBoard:
                 return False
         return placeable
 
-    def update_placeable_lists(self, players: list[GR.structure.Piece]):
+    def update_placeable_lists(self, players: list[GR.Structure.Piece]):
         """
         Update placeable lists for all location on the board
         :param players: Players to update
@@ -249,7 +258,7 @@ class GameBoard:
                                 and not self.check_adj_squares(x, y, player.color):
                             pos.placeable_by.append(player.color)
 
-    def place_piece(self, x: int, y: int, piece: GR.structure.Piece) -> bool:
+    def place_piece(self, x: int, y: int, piece: GR.Structure.Piece) -> bool:
         """
         Place a Piece on the board, does no checks
         :param x: x coord
