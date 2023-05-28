@@ -14,7 +14,8 @@ class Tetros:
         'board_size': (20, 20),
         'players': ObjectFactory.generate_human_players(),
         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-        'initial_pieces': ObjectFactory.generate_shapes()
+        'initial_pieces': ObjectFactory.generate_shapes(),
+        'display_modes': ['pause', 'end_pause', 'skip']
     }
 
     def __init__(self,
@@ -66,13 +67,19 @@ class Tetros:
                 input('Press enter to continue...')
             turn_times.append(timer() - turn_timer)
             turn_timer = timer()
-        print(self.board.get_printable_board())
-        self.print_scores_to_cli()
+        final_board = self.board.get_printable_board()
+        if 'final_board' in self.display_modes:
+            print(final_board)
+        if 'scores' in self.display_modes:
+            self.print_scores_to_cli()
         if 'times' in self.display_modes:
-            top_row, bottom_row = 'Turn No | ', 'Time    | '
+            top_row, bottom_row, total = 'Turn No | ', 'Time    | ', 0
             for i in range(len(turn_times)):
                 top_row += str(i).rjust(6) + ' | '
                 bottom_row += str(round(turn_times[i], 3)).rjust(6) + ' | '
+                total += turn_times[i]
+            top_row += 'Total'.ljust(8) + ' | '
+            bottom_row += str(round(total, 3)).rjust(8) + ' | '
             print(top_row)
             print(bottom_row)
         if 'end_pause' in self.display_modes:
@@ -285,8 +292,8 @@ class Tetros:
             Tetros.display_config(cfg)
             input_val = input(input_message).lower()
         if input_val == 'start' or input_val == 's':
-            return cfg, False
-        return {}, True
+            return cfg, True
+        return {}, False
 
     @staticmethod
     def display_config(config: dict):
@@ -306,7 +313,7 @@ class Tetros:
         print()
 
     @staticmethod
-    def display_main_menu() -> tuple[dict, list[str]]:
+    def display_main_menu() -> dict | None:
         logo_file = open('GameResources/res/mainMenu.txt')
         logo = logo_file.read()
         logo_file.close()
@@ -326,61 +333,73 @@ class Tetros:
         while not (input_string == 'exit' or input_string == 'e'):
             input_string = input(menu_string).lower()
             if input_string == 'play' or input_string == 'p':
-                return Tetros.DEFAULT_CONFIG, ['pause', 'end_pause', 'skip']
+                return Tetros.DEFAULT_CONFIG
             if input_string == 'random' or input_string == 'r':
                 print('Simulating game with random players...')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-                        'initial_pieces': ObjectFactory.generate_shapes()
-                       }, ['end_pause', 'times']
+                        'initial_pieces': ObjectFactory.generate_shapes(),
+                        'display_modes': ['final_board', 'scores', 'end_pause', 'times']
+                       }
             if input_string == 'exrandom' or input_string == 'er':
                 print('Simulating game with exhaustive random players...')
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_ex_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-                        'initial_pieces': ObjectFactory.generate_shapes()
-                       }, ['end_pause', 'times']
+                        'initial_pieces': ObjectFactory.generate_shapes(),
+                        'display_modes': ['final_board', 'scores', 'end_pause', 'times']
+                       }
             if input_string == 'stepexr' or input_string == 'ex':
                 return {
                         'board_size': (20, 20),
                         'players': ObjectFactory.generate_ex_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-                        'initial_pieces': ObjectFactory.generate_shapes()
-                       }, ['end_pause', 'pause', 'skip']
+                        'initial_pieces': ObjectFactory.generate_shapes(),
+                        'display_modes': ['final_board', 'scores', 'end_pause', 'pause', 'skip']
+                       }
             if input_string.lower() == 'esh' or input_string == 'eh':
                 board_size = (20, 20)
                 return {
                            'board_size': board_size,
                            'players': ObjectFactory.generate_shm_players(board_size),
                            'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-                           'initial_pieces': ObjectFactory.generate_shapes()
-                       }, ['end_pause', 'skip', 'times']
+                           'initial_pieces': ObjectFactory.generate_shapes(),
+                           'display_modes': ['final_board', 'scores', 'end_pause', 'skip', 'times']
+                       }
             if input_string.lower() == 'stepesh' or input_string == 'es':
                 board_size = (20, 20)
                 return {
                            'board_size': board_size,
                            'players': ObjectFactory.generate_shm_players(board_size),
                            'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-                           'initial_pieces': ObjectFactory.generate_shapes()
-                       }, ['end_pause', 'pause', 'skip']
+                           'initial_pieces': ObjectFactory.generate_shapes(),
+                           'display_modes': ['final_board', 'scores', 'end_pause', 'pause', 'skip']
+                       }
             if input_string.lower() == 'eshvrand' or input_string == 'evr':
                 board_size = (20, 20)
                 return {
                            'board_size': board_size,
                            'players': ObjectFactory.generate_smh_v_random(board_size),
                            'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-                           'initial_pieces': ObjectFactory.generate_shapes()
-                       }, ['end_pause', 'skip', 'times']
+                           'initial_pieces': ObjectFactory.generate_shapes(),
+                           'display_modes': ['final_board', 'scores', 'end_pause', 'skip', 'times']
+                       }
             if input_string.lower() == 'eshvrandst' or input_string == 'evs':
                 board_size = (20, 20)
                 return {
                            'board_size': board_size,
                            'players': ObjectFactory.generate_smh_v_random(board_size),
                            'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
-                           'initial_pieces': ObjectFactory.generate_shapes()
-                       }, ['end_pause', 'pause', 'skip']
+                           'initial_pieces': ObjectFactory.generate_shapes(),
+                           'display_modes': ['final_board', 'scores', 'end_pause', 'pause', 'skip']
+                       }
             if input_string == 'config' or input_string == 'c':
-                return Tetros.get_custom_game_inputs()[0], ['main_menu']
+                config_ret = Tetros.get_custom_game_inputs()
+                if config_ret[1]:
+                    config = config_ret[0]
+                    config['display_modes'] = ['final_board', 'scores', 'end_pause', 'skip', 'times']
+                    return config
+        return None
