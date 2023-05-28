@@ -4,7 +4,7 @@ import random
 
 import GameResources as GR
 from dataclasses import dataclass
-from termcolor import colored
+from termcolor2 import colored
 from numpy import matmul
 
 

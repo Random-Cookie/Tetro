@@ -2,7 +2,7 @@ import pickle
 import re
 import copy
 
-from termcolor import colored
+from termcolor2 import colored
 from GameResources.Structure import GameBoard
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import Player, HumanPlayer, RandomPlayer

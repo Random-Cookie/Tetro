@@ -5,7 +5,7 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from termcolor import colored
+from termcolor2 import colored
 from GameResources.Structure import Piece, GameBoard
 
 # TODO Player Ideas
