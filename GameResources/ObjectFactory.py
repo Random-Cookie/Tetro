@@ -139,7 +139,7 @@ class ObjectFactory:
         player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
         initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         for i in range(0, len(player_colors)):
-            ret.append(ExhaustiveStaticHeatmapPlayer(player_colors[i], initial_pieces[i], board_size, 'file', 'GameResources/heatmaps/agressive.txt'))
+            ret.append(ExhaustiveStaticHeatmapPlayer(player_colors[i], initial_pieces[i], board_size, 'file', 'GameResources/heatmaps/aggressive.txt'))
         random.shuffle(ret)
         return ret
 
