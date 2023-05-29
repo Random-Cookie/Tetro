@@ -38,7 +38,7 @@ class Tetros:
         """
         winners = []
         for player in self.players:
-            if player.has_won():
+            if player.out_of_pieces():
                 winners.append(player)
         return winners
 
@@ -156,7 +156,7 @@ class Tetros:
                 'Territory': 'TODO',  # self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
                 'Squares Left': player.squares_left(),
                 'Points': player.squares_left() * -1,  # Number of squares in players remaining pieces -1 per square
-                'Win': 1 if player.has_won() else 0
+                'Win': 1 if player.out_of_pieces() else 0
             }
             if player.squares_left() == 0:
                 player_score['Points'] += 15

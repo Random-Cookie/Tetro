@@ -138,7 +138,7 @@ class Player(ABC):
             return True
         return False
 
-    def has_won(self) -> bool:
+    def out_of_pieces(self) -> bool:
         """
         Is hand empty
         """
