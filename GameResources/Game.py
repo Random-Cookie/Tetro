@@ -142,7 +142,6 @@ class Tetros:
         return 0
 
     def calculate_player_scores(self) -> dict[str, dict]:
-        # TODO  can probs just remove total coz its kinda useless
         """
         Calculate scores for all player at the end of the game
         :return:
@@ -151,9 +150,9 @@ class Tetros:
         for player in self.players:
             player_score = {
                 'Coverage': round(self.calculate_player_coverage_score(player), 2),  # % coverage of board
-                'Density': round(self.calculate_player_density_score(player), 2),
-                # % of coverage filled with any pieces
-                'Territory': 'TODO',  # self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
+                'Density': round(self.calculate_player_density_score(player), 2),  # % of coverage filled with any pieces
+                # TODO
+                'Territory': self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
                 'Squares Left': player.squares_left(),
                 'Points': player.squares_left() * -1,  # Number of squares in players remaining pieces -1 per square
                 'Win': 1 if player.out_of_pieces() else 0
@@ -190,7 +189,7 @@ class Tetros:
         player_name_length_limit = 11
         column_width = 12
         title = ' Final Scores '
-        h_pad = '-' * round((69 + player_name_length_limit - len(title)) / 2)
+        h_pad = '-' * round((93 + player_name_length_limit - len(title)) / 2)
         scores = self.calculate_player_scores()
         print(h_pad + title + h_pad)
         print('| ' + 'Player'.ljust(player_name_length_limit), end=' | ')
@@ -203,14 +202,11 @@ class Tetros:
             for sub_key in score.keys():
                 print(str(score[sub_key]).rjust(column_width), end=' | ')
             print()
-        winners = self.check_win()
+        winners = self.find_winner(scores)
         if len(winners) > 1:
             print('The winners were: ' + str(winners).strip('[]'))
-        elif len(winners) == 1:
-            print('The winner was: ' + colored(winners[0].color, winners[0].color))
         else:
-            winner = list(scores.keys())[0]
-            print('The winner was: ' + colored(winner, winner))
+            print('The winner was: ' + colored(winners[0].color, winners[0].color))
 
     @staticmethod
     def get_custom_game_inputs():

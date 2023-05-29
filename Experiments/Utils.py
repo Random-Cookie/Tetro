@@ -9,9 +9,11 @@ from GameResources.SimplePlayers import Player
 PLAYER_SCORE_TEMPLATE = {
                 'Coverage': 0,
                 'Density': 0,
+                # TODO
                 'Territory': 0,
-                'Penalty': 0,
-                'Total': 0
+                'Squares Left': 0,
+                'Points': 0,
+                'Win': 0
             }
 
 
@@ -45,8 +47,8 @@ def simulate_games(game_params: dict, no_games: int):
                 log_obj['turn_times'] = make_loggable_turn_times(game.turn_times)
             if 'total_scores' in game_params['logging_modes'] or 'average_scores' in game_params['logging_modes']:
                 for player in game.players:
-                    for key in game_scores[player]:
-                        total_scores[player.color][key] += game_scores[player][key]
+                    for key in game_scores[player.color]:
+                        total_scores[player.color][key] += game_scores[player.color][key]
             if 'total_times' in game_params['logging_modes'] or 'average_times' in game_params['logging_modes']:
                 game_times = game.turn_times
                 for j in range(len(game_times) - len(total_times)):
@@ -72,8 +74,8 @@ def simulate_games(game_params: dict, no_games: int):
             avg_times = []
             for total_time in total_times:
                 avg_times.append(total_time / no_games)
-            log_obj['average_times'] = avg_times
-        log_filename = 'Aggregate' + logfile_date + '.json'
+            log_obj['average_turn_times'] = make_loggable_turn_times(avg_times)
+        log_filename = 'Logs/Aggregate' + logfile_date + '.json'
         if log_obj != {}:
             with open(log_filename, 'w') as write_file:
                 write_file.write(json.dumps(log_obj, indent=4))
