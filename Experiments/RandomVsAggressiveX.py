@@ -16,6 +16,6 @@ GAME_PARAMS = {'board_size': BOARD_SIZE,
                'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                'initial_pieces': ObjectFactory.generate_shapes(),
                'display_modes': ['final_board', 'scores', 'times'],
-               'logging_modes': ['total_scores', 'average_scores', 'total_times', 'average_times', 'players']}
+               'logging_modes': ['game_replay']}
 
-simulate_games(GAME_PARAMS, 2)
+simulate_games(GAME_PARAMS, 1)

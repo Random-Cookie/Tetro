@@ -26,11 +26,12 @@ def simulate_games(sim_params: dict, no_games: int):
     game = Tetros()
     for i in range(no_games):
         print('Playing Game ' + str(i))
-        game = Tetros(copy.deepcopy(sim_params['board_size']),
+        game = Tetros(sim_params['board_size'],
                       copy.deepcopy(sim_params['initial_pieces']),
                       copy.deepcopy(sim_params['players']),
-                      copy.deepcopy(sim_params['starting_positions']),
-                      copy.deepcopy(sim_params['display_modes']))
+                      sim_params['starting_positions'],
+                      sim_params['display_modes'],
+                      sim_params['logging_modes'])
         game.play_game()
         # Single Game Logging
         if sim_params['logging_modes']:
@@ -105,3 +106,14 @@ def make_loggable_turn_times(turn_times: list[float]):
     turn_times_dict['total'] = total_time
     return turn_times_dict
 
+
+def replay_game(filename: str, display_modes: list[str]):
+    read_file = open(filename)
+    data = json.load(read_file)
+    print('Players: ' + str(data['players']))
+    for key in data:
+        if key != 'players':
+            print('Turn ' + str(key) + ':')
+            print(data[key])
+            if 'pause' in display_modes:
+                input('Press Enter to Continue...')
