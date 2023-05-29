@@ -54,7 +54,7 @@ def simulate_games(sim_params: dict, no_games: int):
                     total_times.append(0)
                 for j in range(len(game_times)):
                     total_times[j] += game_times[j]
-            log_filename = 'Game' + str(i) + 'Scores' + logfile_date + '.json'
+            log_filename = 'Logs/Game' + str(i) + 'Scores' + logfile_date + '.json'
             if log_obj != {}:
                 with open(log_filename, 'w') as write_file:
                     write_file.write(json.dumps(log_obj, indent=4))
