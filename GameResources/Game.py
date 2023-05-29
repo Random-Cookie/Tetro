@@ -28,7 +28,8 @@ class Tetros:
         self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces) \
             if players is None else players
         self.board = GameBoard((board_size[0], board_size[1]), self.players, starting_positions)
-        self.display_modes = display_modes if display_modes is not None else ['end_pause']
+        self.display_modes = display_modes if display_modes is not None else ['final_board', 'scores', 'end_pause']
+        self.turn_times = []
 
     def check_win(self):
         """
@@ -47,7 +48,7 @@ class Tetros:
         """
         turns = 0
         turn_timer = timer()
-        turn_times = []
+        self.turn_times = []
         while not self.board.is_stalemate(self.players) and not self.check_win():
             turns += 1
             for player in self.players:
@@ -65,19 +66,18 @@ class Tetros:
                 print(self.board.get_printable_board())
                 print('Turn ' + str(turns) + ':')
                 input('Press enter to continue...')
-            turn_times.append(timer() - turn_timer)
+            self.turn_times.append(timer() - turn_timer)
             turn_timer = timer()
-        final_board = self.board.get_printable_board()
         if 'final_board' in self.display_modes:
-            print(final_board)
+            print(self.board.get_printable_board())
         if 'scores' in self.display_modes:
             self.print_scores_to_cli()
         if 'times' in self.display_modes:
             top_row, bottom_row, total = 'Turn No | ', 'Time    | ', 0
-            for i in range(len(turn_times)):
+            for i in range(len(self.turn_times)):
                 top_row += str(i).rjust(6) + ' | '
-                bottom_row += str(round(turn_times[i], 3)).rjust(6) + ' | '
-                total += turn_times[i]
+                bottom_row += str(round(self.turn_times[i], 3)).rjust(6) + ' | '
+                total += self.turn_times[i]
             top_row += 'Total'.ljust(8) + ' | '
             bottom_row += str(round(total, 3)).rjust(8) + ' | '
             print(top_row)
