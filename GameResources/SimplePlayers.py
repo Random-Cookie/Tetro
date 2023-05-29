@@ -37,6 +37,7 @@ class Player(ABC):
         self.color = color
         self.pieces = initial_pieces
         self.has_knocked = False
+        self.final_piece = None
 
     def __str__(self):
         """
@@ -116,7 +117,10 @@ class Player(ABC):
         :return: bool, was placed?
         """
         x, y = move.position
+
         if board.place_piece(x, y, move.piece):
+            if len(self.pieces) == 1:
+                self.final_piece = move.piece
             self.pieces.remove(self.pieces[move.piece_index])
             return True
         return False
