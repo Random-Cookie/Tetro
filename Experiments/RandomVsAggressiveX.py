@@ -1,4 +1,4 @@
-from Experiments.Utils import simulate_games
+from Experiments.SimUtils import simulate_games
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import ExhaustiveRandomPlayer
 from GameResources.AlgorithmicPlayers import ExhaustiveStaticHeatmapPlayer
