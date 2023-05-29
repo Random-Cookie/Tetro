@@ -1,4 +1,4 @@
-from Experiments.Utils import play_games
+from Experiments.Utils import simulate_games
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import ExhaustiveRandomPlayer
 from GameResources.AlgorithmicPlayers import ExhaustiveStaticHeatmapPlayer
@@ -16,6 +16,6 @@ GAME_PARAMS = {'board_size': BOARD_SIZE,
                'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                'initial_pieces': ObjectFactory.generate_shapes(),
                'display_modes': ['final_board', 'scores', 'times'],
-               'logging_modes': ['total_scores', 'average_scores']}
+               'logging_modes': ['total_scores', 'average_scores', 'total_times', 'players']}
 
-play_games(GAME_PARAMS, 2)
+simulate_games(GAME_PARAMS, 2)
