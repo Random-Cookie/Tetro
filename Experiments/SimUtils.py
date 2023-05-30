@@ -1,3 +1,4 @@
+import concurrent.futures
 import copy
 import json
 
@@ -14,6 +15,13 @@ PLAYER_SCORE_TEMPLATE = {
                 'Points': 0,
                 'Win': 0
             }
+
+
+def simulate_concurrent_games(sim_params: dict, total_threads: int, games_per_thread: int, max_concurrent_threads: int = 8):
+    sim_params_list = [sim_params] * total_threads
+    games_per_thread_list = [games_per_thread] * total_threads
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent_threads) as executor:
+        executor.map(simulate_games, sim_params_list, games_per_thread_list)
 
 
 def simulate_games(sim_params: dict, no_games: int):
