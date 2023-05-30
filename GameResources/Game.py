@@ -1,12 +1,15 @@
 import pickle
+import random
 import re
 import copy
+import json
 
 from termcolor2 import colored
 from GameResources.Structure import GameBoard
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import Player, HumanPlayer, RandomPlayer
 from timeit import default_timer as timer
+from datetime import datetime
 
 
 class Tetros:
@@ -23,12 +26,15 @@ class Tetros:
                  initial_pieces: dict = None,
                  players: list[Player] = None,
                  starting_positions: list[[int, int]] = None,
-                 display_modes: list[str] = None):
+                 display_modes: list[str] = None,
+                 logging_modes: list[str] = None):
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces) \
             if players is None else players
+        random.shuffle(self.players)
         self.board = GameBoard((board_size[0], board_size[1]), self.players, starting_positions)
         self.display_modes = display_modes if display_modes is not None else ['final_board', 'scores', 'end_pause']
+        self.logging_modes = logging_modes if logging_modes is not None else []
         self.turn_times = []
 
     def check_win(self):
@@ -49,6 +55,7 @@ class Tetros:
         turns = 0
         turn_timer = timer()
         self.turn_times = []
+        game_replay_data = {}
         while not self.board.is_stalemate(self.players) and not self.check_win():
             turns += 1
             for player in self.players:
@@ -61,11 +68,12 @@ class Tetros:
                         input(skip_msg + ' Press enter to skip.')
                     elif 'skip' in self.display_modes:
                         print(skip_msg)
-
             if 'pause' in self.display_modes:
                 print(self.board.get_printable_board())
                 print('Turn ' + str(turns) + ':')
                 input('Press enter to continue...')
+            if 'game_replay' in self.logging_modes:
+                game_replay_data[turns] = self.board.get_printable_board()
             self.turn_times.append(timer() - turn_timer)
             turn_timer = timer()
         if 'final_board' in self.display_modes:
@@ -82,6 +90,14 @@ class Tetros:
             bottom_row += str(round(total, 3)).rjust(8) + ' | '
             print(top_row)
             print(bottom_row)
+        if 'game_replay' in self.logging_modes:
+            player_dict = {}
+            for player in self.players:
+                player_dict[player.color] = type(player).__name__
+            game_replay_data['players'] = player_dict
+            log_filename = 'Logs/GameReplay' + datetime.now().strftime("%m-%d-%Y-%H-%M-%S") + '.json'
+            with open(log_filename, 'w') as write_file:
+                write_file.write(json.dumps(game_replay_data, indent=4))
         if 'end_pause' in self.display_modes:
             input('Press enter to return to the main menu...')
 
