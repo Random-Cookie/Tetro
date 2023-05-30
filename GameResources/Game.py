@@ -1,4 +1,5 @@
 import pickle
+import random
 import re
 import copy
 import json
@@ -30,6 +31,7 @@ class Tetros:
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces) \
             if players is None else players
+        random.shuffle(self.players)
         self.board = GameBoard((board_size[0], board_size[1]), self.players, starting_positions)
         self.display_modes = display_modes if display_modes is not None else ['final_board', 'scores', 'end_pause']
         self.logging_modes = logging_modes if logging_modes is not None else []
