@@ -17,4 +17,4 @@ SIM_PARAMS = {'board_size': BOARD_SIZE,
                'display_modes': [],
                'logging_modes': ['game_replay']}
 
-simulate_concurrent_games(SIM_PARAMS, 2, 2, 2)
+simulate_concurrent_games(SIM_PARAMS, 8, 50, 8)
