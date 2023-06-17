@@ -187,9 +187,9 @@ class BigFirstSeekerDHM(DynamicHeatmapPlayer):
         for x in range(len(board.positions)):
             for y in range(len(board.positions)):
                 for color in board.player_colors:
-                    if board.check_adj_squares(x, y, color):
+                    if board.check_adjacent_squares(x, y, color):
                         self.current_heatmap[x][y] += self.adjacent_weight
-                    if board.check_diag_squares(x, y, color):
+                    if board.check_diagonal_squares(x, y, color):
                         self.current_heatmap[x][y] += self.diagonal_weight
         min_score, max_score = self.heatmap_min_max()
         if min_score == 0:

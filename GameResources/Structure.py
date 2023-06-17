@@ -23,10 +23,11 @@ class Piece:
     def __str__(self):
         return '[' + self.name + ', ' + str(self.currentCoords) + ', ' + self.color + ']'
 
-    def min_xy(self, axis: str):
+    def min_xy(self, axis: str) -> int:
         """
         Minimum x or y value
         :param axis: x or y: x=0, y=1
+        :return: Min of either x or y
         """
         if axis == 'x':
             axis = 0
@@ -38,10 +39,11 @@ class Piece:
                 min_xy = coord[axis]
         return min_xy
 
-    def max_xy(self, axis: str):
+    def max_xy(self, axis: str) -> int:
         """
         Maximum x or y value
         :param axis: x or y: x=0, y=1
+        :return: Max of either x or y
         """
         if axis == 'x':
             axis = 0
@@ -53,7 +55,7 @@ class Piece:
                 max_xy = coord[axis]
         return max_xy
 
-    def get_dimension(self, axis: str):
+    def get_dimension(self, axis: str) -> int:
         return self.max_xy(axis) - self.min_xy(axis)
 
     def rotate(self):
@@ -73,11 +75,11 @@ class Piece:
         reflection_matrix = [[-1, 0], [0, 1]]
         for i in range(len(self.currentCoords)):
             self.currentCoords[i] = list(matmul(self.currentCoords[i], reflection_matrix))
-        return None
 
     def get_printable_shape(self) -> str:
         """
         Return a string with the piece printed as a shape
+        :return: A string with a representation of the shape to be printed to cli
         """
         ret = ''
         for y in range(self.min_xy('y'), self.max_xy('y') + 1):
@@ -94,7 +96,8 @@ class Piece:
 
     def get_printable_shape_lines(self) -> list[str]:
         """
-        Return a string with the piece printed as a shape
+        Return a string with the pieces printed as a shapes
+        :return: A String with all the shapes printed horizontally
         """
         lines = []
         for y in range(self.min_xy('y'), self.max_xy('y') + 1):
@@ -177,7 +180,7 @@ class GameBoard:
                 return False
         return True
 
-    def check_adj_squares(self, x: int, y: int, color: str) -> bool:
+    def check_adjacent_squares(self, x: int, y: int, color: str) -> bool:
         """
         Check adjacent squares for same colored tiles
         True if adjacent tiles have same color as player
@@ -196,7 +199,7 @@ class GameBoard:
             return True
         return False
 
-    def check_diag_squares(self, x: int, y: int, color: str) -> bool:
+    def check_diagonal_squares(self, x: int, y: int, color: str) -> bool:
         """
         Check diagonal squares for same colored tiles
         True if diagonal tiles have same color as player
@@ -238,7 +241,7 @@ class GameBoard:
                 placeable = True
             if board_pos.color is not None:
                 return False
-            if self.check_adj_squares(posx, posy, piece.color):
+            if self.check_adjacent_squares(posx, posy, piece.color):
                 return False
         return placeable
 
@@ -254,8 +257,8 @@ class GameBoard:
                     pos.placeable_by = []
                 else:
                     for player in players:
-                        if self.check_diag_squares(x, y, player.color)\
-                                and not self.check_adj_squares(x, y, player.color):
+                        if self.check_diagonal_squares(x, y, player.color)\
+                                and not self.check_adjacent_squares(x, y, player.color):
                             pos.placeable_by.append(player.color)
 
     def place_piece(self, x: int, y: int, piece: GR.Structure.Piece) -> bool:
@@ -277,6 +280,7 @@ class GameBoard:
         """
         Return a printable board
         :param player: If player is specified print the placeable locations for that player
+        :return: A Printable representation of the board
         """
         ret = '_' * ((2 * len(self.positions)) + 3)
         ret += '\n'
