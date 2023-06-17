@@ -99,7 +99,7 @@ class Player(ABC):
         return placeables
 
     @abstractmethod
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Abstract method for selecting a piece all subclasses must implement
         If a piece cannot be placed return none
@@ -132,9 +132,9 @@ class Player(ABC):
         :param board: The gameboard to analyse
         @:returns True if piece was placed
         """
-        place_params = self.select_piece(board)
+        place_params = self.select_move(board)
         while place_params is not None and not self.place_piece(board, place_params):
-            place_params = self.select_piece(board)
+            place_params = self.select_move(board)
         if place_params is not None:
             return True
         return False
@@ -163,7 +163,7 @@ class HumanPlayer(Player):
     def __init__(self, color, initial_pieces):
         Player.__init__(self, color, initial_pieces)
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Display an interface to allow a player to select, manipulate a piece and enter xy coords
         :param board: Used for printing
@@ -214,7 +214,7 @@ class RandomPlayer(Player):
         Player.__init__(self, color, initial_pieces)
         self.timeout = 0
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Select a random Piece with random rotations and flip
         :param board: Used for analysis
@@ -250,13 +250,13 @@ class ExhaustiveRandomPlayer(RandomPlayer):
         RandomPlayer.__init__(self, color, initial_pieces)
         self.exhausted = False
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Use Random player algorithm until self.has_knocked
         :param board:
         :return:
         """
-        super_result = RandomPlayer.select_piece(self, board)
+        super_result = RandomPlayer.select_move(self, board)
         if self.has_knocked:
             placeables = self.get_placeables(board)
             if placeables and not self.exhausted:
