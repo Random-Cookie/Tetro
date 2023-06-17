@@ -41,13 +41,14 @@ class Player(ABC):
 
     def __str__(self):
         """
-        :return: the color value for the player
+        :return: The color value for the player
         """
         return self.color
 
     def get_printable_indexed_piece_names(self) -> str:
         """
         Return a string containing piece names and their index
+        :return: A string with the piece names to eb printed ot the board
         """
         ret = '| '
         for i in range(len(self.pieces)):
@@ -88,7 +89,7 @@ class Player(ABC):
         """
         Get a list of placebale locations
         :param board: The gamebaord
-        :return:
+        :return: All placeable locations on the board
         """
         placeables = []
         for y in range(0, len(board.positions[0])):
@@ -98,13 +99,13 @@ class Player(ABC):
         return placeables
 
     @abstractmethod
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Abstract method for selecting a piece all subclasses must implement
         If a piece cannot be placed return none
         If you cannot place any pieces, set self.has_knocked = true to indicate you are passing all turns
         :param board: The game board for analysis or printing
-        :return: Placement parameters: (piece, piece_index, (x,y))
+        :return: Placement parameters: (piece, piece_index, (x,y)), None if a piece cannot be placed
         """
         self.has_knocked = True
         return None
@@ -114,7 +115,7 @@ class Player(ABC):
         Place a piece
         :param move: The move to make
         :param board: The board to place the piece on
-        :return: bool, was placed?
+        :return: Was the piece placed?
         """
         x, y = move.position
 
@@ -131,9 +132,9 @@ class Player(ABC):
         :param board: The gameboard to analyse
         @:returns True if piece was placed
         """
-        place_params = self.select_piece(board)
+        place_params = self.select_move(board)
         while place_params is not None and not self.place_piece(board, place_params):
-            place_params = self.select_piece(board)
+            place_params = self.select_move(board)
         if place_params is not None:
             return True
         return False
@@ -141,10 +142,16 @@ class Player(ABC):
     def out_of_pieces(self) -> bool:
         """
         Is hand empty
+        :return: True if hand has no pieces
         """
         return len(self.pieces) == 0
 
     def squares_left(self):
+        """
+        Return the number of squares the player has left
+        Mostly just used for working out score
+        :return: Number of squares left in the pieces in the players hand
+        """
         count = 0
         for piece in self.pieces:
             for i in range(len(piece.currentCoords)):
@@ -156,11 +163,11 @@ class HumanPlayer(Player):
     def __init__(self, color, initial_pieces):
         Player.__init__(self, color, initial_pieces)
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Display an interface to allow a player to select, manipulate a piece and enter xy coords
         :param board: Used for printing
-        :return: Placement parameters: (piece, piece_index, (x,y)), None if player knocked
+        :return: Move to make
         """
         piece_index_input_string = colored(self.color, self.color) + ' player please select a piece: '
         command_input_string = '| r: Rotate | r{int}: Rotate x times | f: Flip | k: Knock | {int},{int}: Place ' + \
@@ -207,7 +214,7 @@ class RandomPlayer(Player):
         Player.__init__(self, color, initial_pieces)
         self.timeout = 0
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Select a random Piece with random rotations and flip
         :param board: Used for analysis
@@ -243,13 +250,13 @@ class ExhaustiveRandomPlayer(RandomPlayer):
         RandomPlayer.__init__(self, color, initial_pieces)
         self.exhausted = False
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Use Random player algorithm until self.has_knocked
         :param board:
         :return:
         """
-        super_result = RandomPlayer.select_piece(self, board)
+        super_result = RandomPlayer.select_move(self, board)
         if self.has_knocked:
             placeables = self.get_placeables(board)
             if placeables and not self.exhausted:

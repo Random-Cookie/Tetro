@@ -18,6 +18,7 @@ class StaticHeatmapPlayer(Player):
 
     def load_heatmap(self, filepath: str) -> None:
         """
+        TODO: rewrite as a return, to help with dynamic heatmap loading
         Load a heatmap from a file
         :param filepath: File path to load from
         :return: None
@@ -74,6 +75,55 @@ class StaticHeatmapPlayer(Player):
         return random.choice(moves)
 
 
+class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmap_mode: str = 'flat', heatmap_filepath: str = None):
+        StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
+        if heatmap_mode == 'flat':
+            self.current_heatmap = [[1]*self.board_size[1] for i in range(self.board_size[0])]
+        if heatmap_mode == 'file':
+            self.load_heatmap(heatmap_filepath)
+
+    def select_move(self, board: GameBoard) -> Move | None:
+        """
+        Use score all possible moves and
+        :param board:
+        :return:
+        """
+        placeables = self.get_placeables(board)
+        if placeables and not self.has_knocked:
+            move_scores = defaultdict(list)
+            for piece in self.pieces:
+                for location in placeables:
+                    for rotation in [0, 1, 2, 3]:
+                        for flip in [True, False]:
+                            selected_piece = copy.deepcopy(piece)
+                            for i in range(0, rotation):
+                                selected_piece.rotate()
+                            if flip:
+                                piece.flip()
+                            if board.check_piece_fits(location[0],
+                                                      location[1],
+                                                      selected_piece):
+                                ittr_move = Move(selected_piece, self.pieces.index(piece), location)
+                                move_scores[self.score_move(board, ittr_move)].append(ittr_move)
+            if len(move_scores.keys()) > 0:
+                best_score = min(move_scores.keys())
+                best_moves = move_scores[best_score]
+                if len(best_moves) == 1:
+                    return best_moves[0]
+                elif len(best_moves) > 1:
+                    return self.tiebreak_moves(best_moves)
+        self.has_knocked = True
+        return None
+
+    def tiebreak_moves(self, moves: list[Move]) -> Move:
+        """
+        Default implementation
+        """
+        return StaticHeatmapPlayer.tiebreak_moves(self, moves)
+
+
+# DHM = Dynamic Heat map
 class DynamicHeatmapPlayer(StaticHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int]):
         StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
@@ -113,56 +163,6 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
                 self.current_heatmap[x][y] += amount
 
 
-class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmap_mode: str = 'flat', heatmap_filepath: str = None):
-        StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
-        if heatmap_mode == 'flat':
-            self.current_heatmap = [[1]*self.board_size[1] for i in range(self.board_size[0])]
-        if heatmap_mode == 'file':
-            self.load_heatmap(heatmap_filepath)
-
-    def select_piece(self, board: GameBoard) -> Move | None:
-        """
-        Use score all possible moves and
-        :param board:
-        :return:
-        """
-        placeables = self.get_placeables(board)
-        if placeables and not self.has_knocked:
-            move_scores = defaultdict(list)
-            for piece in self.pieces:
-                for location in placeables:
-                    for rotation in [0, 1, 2, 3]:
-                        for flip in [True, False]:
-                            selected_piece = copy.deepcopy(piece)
-                            for i in range(0, rotation):
-                                selected_piece.rotate()
-                            if flip:
-                                piece.flip()
-                            if board.check_piece_fits(location[0],
-                                                      location[1],
-                                                      selected_piece):
-                                ittr_move = Move(selected_piece, self.pieces.index(piece), location)
-                                move_scores[self.score_move(board, ittr_move)].append(ittr_move)
-            if len(move_scores.keys()) > 0:
-                best_score = min(move_scores.keys())
-                best_moves = move_scores[best_score]
-                if len(best_moves) == 1:
-                    return best_moves[0]
-                elif len(best_moves) > 1:
-                    return self.tiebreak_moves(best_moves)
-        self.has_knocked = True
-        return None
-
-    def tiebreak_moves(self, moves: list[Move]) -> Move:
-        """
-        Default implementation
-        """
-        return StaticHeatmapPlayer.tiebreak_moves(self, moves)
-
-# DHM = Dynamic Heat map
-
-
 class BigFirstSeekerDHM(DynamicHeatmapPlayer):
     """
     Large Piece First Seeking Dynamic Heat Map
@@ -187,15 +187,15 @@ class BigFirstSeekerDHM(DynamicHeatmapPlayer):
         for x in range(len(board.positions)):
             for y in range(len(board.positions)):
                 for color in board.player_colors:
-                    if board.check_adj_squares(x, y, color):
+                    if board.check_adjacent_squares(x, y, color):
                         self.current_heatmap[x][y] += self.adjacent_weight
-                    if board.check_diag_squares(x, y, color):
+                    if board.check_diagonal_squares(x, y, color):
                         self.current_heatmap[x][y] += self.diagonal_weight
         min_score, max_score = self.heatmap_min_max()
         if min_score == 0:
             self.increment_heatmap()
 
-    def select_piece(self, board: GameBoard) -> Move | None:
+    def select_move(self, board: GameBoard) -> Move | None:
         """
         Update heatmap, cull small pieces using gradient to save processing
         Score all possible moves, select the best, tie-break if necessary
