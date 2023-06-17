@@ -28,6 +28,15 @@ class Tetros:
                  starting_positions: list[[int, int]] = None,
                  display_modes: list[str] = None,
                  logging_modes: list[str] = None):
+        """
+        Declare a game object
+        :param board_size: (x,y) Size of the board
+        :param initial_pieces: Initial pieces for each player
+        :param players: Player who will play the game
+        :param starting_positions: Starting positions for each player
+        :param display_modes: List of strings to control output to the console
+        :param logging_modes: List of strings to control logging
+        """
         self.initial_pieces = ObjectFactory().generate_shapes() if initial_pieces is None else initial_pieces
         self.players = ObjectFactory.generate_human_players(initial_pieces=initial_pieces) \
             if players is None else players
@@ -37,7 +46,7 @@ class Tetros:
         self.logging_modes = logging_modes if logging_modes is not None else []
         self.turn_times = []
 
-    def check_win(self):
+    def check_any_player_win(self):
         """
         Have any players won?
         :return: bool
@@ -56,7 +65,7 @@ class Tetros:
         turn_timer = timer()
         self.turn_times = []
         game_replay_data = {}
-        while not self.board.is_stalemate(self.players) and not self.check_win():
+        while not self.board.is_stalemate(self.players) and not self.check_any_player_win():
             turns += 1
             for player in self.players:
                 if player.get_placeables(self.board) and player.take_turn(self.board):
@@ -157,10 +166,10 @@ class Tetros:
         # TODO implement territory score
         return 0
 
-    def calculate_player_scores(self) -> dict[str, dict]:
+    def calculate_player_scores(self) -> dict[str, dict[str, float]]:
         """
         Calculate scores for all player at the end of the game
-        :return:
+        :return: dict[player color, scores] The scores for each player
         """
         players_scores = {}
         for player in self.players:
@@ -187,7 +196,12 @@ class Tetros:
             sorted_scores_dict[key] = value
         return sorted_scores_dict
 
-    def find_winner(self, scores) -> list[Player]:
+    def find_winner(self, scores: dict[str, dict[str, float]]) -> list[Player]:
+        """
+        Find the winner from the players
+        :param scores: the player scores
+        :return: A list with winners (only more than one if there is a tie)
+        """
         winners = []
         best_score = -999
         for player in self.players:
@@ -225,10 +239,11 @@ class Tetros:
             print('The winner was: ' + colored(winners[0].color, winners[0].color))
 
     @staticmethod
-    def get_custom_game_inputs():
+    def display_cli_config_menu():
         """
         Sub menu to edit the game config
-        :return:
+        TODO: simplify this logic
+        :return: tuple[game config, play game] The config with a true false to play a game or not
         """
         logo_file = open('GameResources/res/config.txt')
         logo = logo_file.read()
@@ -320,14 +335,19 @@ class Tetros:
                     print(e)
                     input('Error reading Config, press enter to continue...')
             print(logo)
-            Tetros.display_config(cfg)
+            Tetros.display_config_to_cli(cfg)
             input_val = input(input_message).lower()
         if input_val == 'start' or input_val == 's':
             return cfg, True
         return {}, False
 
     @staticmethod
-    def display_config(config: dict):
+    def display_config_to_cli(config: dict):
+        """
+        Display the given config to CLI
+        :param config:
+        :return: None
+        """
         # TODO Fix printing of the settings
         print(colored('--------------- Loaded Config ---------------'))
         for item in list(config.items()):
@@ -344,7 +364,11 @@ class Tetros:
         print()
 
     @staticmethod
-    def display_main_menu() -> dict | None:
+    def display_cli_main_menu() -> dict | None:
+        """
+        Display the cli main menu
+        :return:
+        """
         logo_file = open('GameResources/res/mainMenu.txt')
         logo = logo_file.read()
         logo_file.close()
@@ -428,7 +452,7 @@ class Tetros:
                            'display_modes': ['final_board', 'scores', 'end_pause', 'pause', 'skip']
                        }
             if input_string == 'config' or input_string == 'c':
-                config_ret = Tetros.get_custom_game_inputs()
+                config_ret = Tetros.display_cli_config_menu()
                 if config_ret[1]:
                     config = config_ret[0]
                     config['display_modes'] = ['final_board', 'scores', 'end_pause', 'skip', 'times']
