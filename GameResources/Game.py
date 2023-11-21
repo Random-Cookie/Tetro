@@ -65,12 +65,14 @@ class Tetros:
         turn_timer = timer()
         self.turn_times = []
         game_replay_data = {}
-        while not self.board.is_stalemate(self.players) and not self.check_any_player_win():
+        while not (self.board.is_stalemate(self.players) or self.check_any_player_win()):
             turns += 1
             for player in self.players:
-                if player.get_placeables(self.board) and player.take_turn(self.board):
+                if not player.has_knocked and player.take_turn(self.board):
+                    # Player has placed a piece
                     self.board.update_placeable_lists(self.players)
                 else:
+                    # Player skips their turn
                     skip_msg = colored(player.color, player.color) + \
                           ' skipped as they can''t place a piece.'
                     if 'pause' in self.display_modes:
@@ -338,8 +340,8 @@ class Tetros:
             Tetros.display_config_to_cli(cfg)
             input_val = input(input_message).lower()
         if input_val == 'start' or input_val == 's':
-            return cfg, True
-        return {}, False
+            return True, cfg
+        return False, cfg
 
     @staticmethod
     def display_config_to_cli(config: dict):
@@ -376,13 +378,14 @@ class Tetros:
             '\n--------------- Main Menu Options---------------\n' + \
             'play       (p)   | Play a standard Game\n' + \
             'random     (r)   | Demo game with random bots\n' + \
-            'exrandom   (er)  | Simulate Game with Exhaustive Random bots\n' + \
+            'exrandom   (er)  | Simulate game with Exhaustive Random bots\n' + \
             'stepexr    (ex)  | As above, turn by turn\n' + \
             'ESH        (eh)  | Game with ExhaustiveStaticHeatmapPlayer\n' + \
             'stepESH    (es)  | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
             'ESHvRand   (evr) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
             'ESHvRandSt (evs) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
-            'config     (c)   | Open Configuration Menu\n' + \
+            'replay     (rep) | Replay a recorded game\n' + \
+            'config     (c)   | Open configuration menu\n' + \
             'exit       (e)   | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
@@ -451,10 +454,39 @@ class Tetros:
                            'initial_pieces': ObjectFactory.generate_shapes(),
                            'display_modes': ['final_board', 'scores', 'end_pause', 'pause', 'skip']
                        }
+            if input_string == 'replay' or input_string == 'rep':
+                game_to_replay = input('Input file name of game replay: (e to exit)\n')
+                turn_pause = ''
+                if game_to_replay != 'e':
+                    turn_pause = input('Pause after each turn? (y/n)\n')
+                try:
+                    replay_params = ['game_replay']
+                    if turn_pause.lower() == 'y':
+                        replay_params.append('pause')
+                    Tetros.replay_game('Experiments/Logs/' + game_to_replay, replay_params)
+                except Exception as e:
+                    print('ERROR' + str(e))
+                return {'display_modes': 'main_menu'}
             if input_string == 'config' or input_string == 'c':
                 config_ret = Tetros.display_cli_config_menu()
-                if config_ret[1]:
-                    config = config_ret[0]
+                config = config_ret[1]
+                if config_ret[0]:
                     config['display_modes'] = ['final_board', 'scores', 'end_pause', 'skip', 'times']
                     return config
+                else:
+                    return {'display_modes': 'main_menu'}
         return None
+
+    @staticmethod
+    def replay_game(filename: str, display_modes: list[str]):
+        read_file = open(filename)
+        data = json.load(read_file)
+        print('Players: ' + str(data['players']))
+        for key in data:
+            if key != 'players':
+                print('Turn ' + str(key) + ':')
+                print(data[key])
+                if 'pause' in display_modes:
+                    input('Press Enter to Continue...')
+        # TODO: print scores
+        input('Replay Complete, press enter to return to the main menu...')

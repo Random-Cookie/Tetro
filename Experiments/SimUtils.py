@@ -113,15 +113,3 @@ def make_loggable_turn_times(turn_times: list[float]):
         total_time += turn_times[i]
     turn_times_dict['total'] = total_time
     return turn_times_dict
-
-
-def replay_game(filename: str, display_modes: list[str]):
-    read_file = open(filename)
-    data = json.load(read_file)
-    print('Players: ' + str(data['players']))
-    for key in data:
-        if key != 'players':
-            print('Turn ' + str(key) + ':')
-            print(data[key])
-            if 'pause' in display_modes:
-                input('Press Enter to Continue...')

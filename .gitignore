@@ -2,3 +2,4 @@
 /.idea/
 /GameResources/__pycache__/
 /Experiments/Logs/
+Experiments/__pycache__/SimUtils.cpython-311.pyc

@@ -36,7 +36,9 @@ class Player(ABC):
         """
         self.color = color
         self.pieces = initial_pieces
+        # self.has_knocked must be set to true if the player cannot make any more moves
         self.has_knocked = False
+        # self. final piece is used to detect if the final piece placed was the "one" piece, this grants 5 bonus points
         self.final_piece = None
 
     def __str__(self):
@@ -154,8 +156,7 @@ class Player(ABC):
         """
         count = 0
         for piece in self.pieces:
-            for i in range(len(piece.currentCoords)):
-                count += 1
+            count += len(piece.currentCoords)
         return count
 
 
