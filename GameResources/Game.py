@@ -68,7 +68,7 @@ class Tetros:
         while not (self.board.is_stalemate(self.players) or self.check_any_player_win()):
             turns += 1
             for player in self.players:
-                if player.get_placeables(self.board) and player.take_turn(self.board):
+                if not player.has_knocked and player.take_turn(self.board):
                     # Player has placed a piece
                     self.board.update_placeable_lists(self.players)
                 else:
