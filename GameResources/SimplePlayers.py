@@ -36,6 +36,7 @@ class Player(ABC):
         """
         self.color = color
         self.pieces = initial_pieces
+        # self.has_knocked must be set to true if the player cannot make any more moves
         self.has_knocked = False
         self.final_piece = None
 

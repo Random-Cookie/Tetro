@@ -69,8 +69,10 @@ class Tetros:
             turns += 1
             for player in self.players:
                 if player.get_placeables(self.board) and player.take_turn(self.board):
+                    # Player has placed a piece
                     self.board.update_placeable_lists(self.players)
                 else:
+                    # Player skips their turn
                     skip_msg = colored(player.color, player.color) + \
                           ' skipped as they can''t place a piece.'
                     if 'pause' in self.display_modes:

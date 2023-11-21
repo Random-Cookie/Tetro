@@ -263,7 +263,7 @@ class GameBoard:
 
     def place_piece(self, x: int, y: int, piece: GR.Structure.Piece) -> bool:
         """
-        Place a Piece on the board, does no checks
+        Place a Piece on the board
         :param x: x coord
         :param y: ycoord
         :param piece: Piece to place
