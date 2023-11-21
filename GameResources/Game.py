@@ -454,6 +454,19 @@ class Tetros:
                            'initial_pieces': ObjectFactory.generate_shapes(),
                            'display_modes': ['final_board', 'scores', 'end_pause', 'pause', 'skip']
                        }
+            if input_string == 'replay' or input_string == 'rep':
+                game_to_replay = input('Input file name of game replay: (e to exit)\n')
+                turn_pause = ''
+                if game_to_replay != 'e':
+                    turn_pause = input('Pause after each turn? (y/n)\n')
+                try:
+                    replay_params = ['game_replay']
+                    if turn_pause.lower() == 'y':
+                        replay_params.append('pause')
+                    Tetros.replay_game('Experiments/Logs/' + game_to_replay, replay_params)
+                except Exception as e:
+                    print('ERROR' + str(e))
+                return {'display_modes': 'main_menu'}
             if input_string == 'config' or input_string == 'c':
                 config_ret = Tetros.display_cli_config_menu()
                 config = config_ret[1]
@@ -463,3 +476,17 @@ class Tetros:
                 else:
                     return {'display_modes': 'main_menu'}
         return None
+
+    @staticmethod
+    def replay_game(filename: str, display_modes: list[str]):
+        read_file = open(filename)
+        data = json.load(read_file)
+        print('Players: ' + str(data['players']))
+        for key in data:
+            if key != 'players':
+                print('Turn ' + str(key) + ':')
+                print(data[key])
+                if 'pause' in display_modes:
+                    input('Press Enter to Continue...')
+        # TODO: print scores
+        input('Replay Complete, press enter to return to the main menu...')
