@@ -65,7 +65,7 @@ class Tetros:
         turn_timer = timer()
         self.turn_times = []
         game_replay_data = {}
-        while not self.board.is_stalemate(self.players) and not self.check_any_player_win():
+        while not (self.board.is_stalemate(self.players) or self.check_any_player_win()):
             turns += 1
             for player in self.players:
                 if player.get_placeables(self.board) and player.take_turn(self.board):
