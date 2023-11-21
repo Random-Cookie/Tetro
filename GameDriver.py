@@ -2,7 +2,7 @@ from GameResources.Game import Tetros
 
 game_params = Tetros.display_cli_main_menu()
 while game_params is not None:
-    if 'main_menu' not in game_params['display_modes']:
+    if game_params['display_modes'] != 'main_menu':
         game = Tetros(game_params['board_size'],
                       game_params['initial_pieces'],
                       game_params['players'],

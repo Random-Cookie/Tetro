@@ -340,8 +340,8 @@ class Tetros:
             Tetros.display_config_to_cli(cfg)
             input_val = input(input_message).lower()
         if input_val == 'start' or input_val == 's':
-            return cfg, True
-        return {}, False
+            return True, cfg
+        return False, cfg
 
     @staticmethod
     def display_config_to_cli(config: dict):
@@ -378,13 +378,14 @@ class Tetros:
             '\n--------------- Main Menu Options---------------\n' + \
             'play       (p)   | Play a standard Game\n' + \
             'random     (r)   | Demo game with random bots\n' + \
-            'exrandom   (er)  | Simulate Game with Exhaustive Random bots\n' + \
+            'exrandom   (er)  | Simulate game with Exhaustive Random bots\n' + \
             'stepexr    (ex)  | As above, turn by turn\n' + \
             'ESH        (eh)  | Game with ExhaustiveStaticHeatmapPlayer\n' + \
             'stepESH    (es)  | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
             'ESHvRand   (evr) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
             'ESHvRandSt (evs) | Turn by turn ExhaustiveStaticHeatmapPlayer\n' + \
-            'config     (c)   | Open Configuration Menu\n' + \
+            'replay     (rep) | Replay a recorded game\n' + \
+            'config     (c)   | Open configuration menu\n' + \
             'exit       (e)   | Exit\n'
         input_string = ''
         while not (input_string == 'exit' or input_string == 'e'):
@@ -455,8 +456,10 @@ class Tetros:
                        }
             if input_string == 'config' or input_string == 'c':
                 config_ret = Tetros.display_cli_config_menu()
-                if config_ret[1]:
-                    config = config_ret[0]
+                config = config_ret[1]
+                if config_ret[0]:
                     config['display_modes'] = ['final_board', 'scores', 'end_pause', 'skip', 'times']
                     return config
+                else:
+                    return {'display_modes': 'main_menu'}
         return None
