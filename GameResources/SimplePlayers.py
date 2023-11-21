@@ -155,8 +155,7 @@ class Player(ABC):
         """
         count = 0
         for piece in self.pieces:
-            for i in range(len(piece.currentCoords)):
-                count += 1
+            count += len(piece.currentCoords)
         return count
 
 
