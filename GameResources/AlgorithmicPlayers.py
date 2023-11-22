@@ -131,6 +131,11 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
         """
         pass
 
+    @abstractmethod
+    def select_move(self, board: GameBoard) -> Move | None:
+        self.update_heatmap(board)
+        return Player.select_move(self, board)
+
     def heatmap_min_max(self) -> tuple[int, int]:
         """
         Get min and max values in heatmap
@@ -170,8 +175,8 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
 class HeatmapSwitcher(DynamicHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: dict[int, str] = None):
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
-        self.heatmaps = heatmaps if heatmaps is not None else {0: 'agressiveX.txt', 6: 'sidewinder.txt'}
-        self.current_heatmap = self.load_heatmap(heatmaps[0])
+        self.heatmaps = heatmaps if heatmaps is not None else {0: 'GameResources/res/heatmaps/aggressiveX.txt', 6: 'GameResources/res/heatmaps/sidewinder.txt'}
+        self.current_heatmap = self.load_heatmap(self.heatmaps[0])
 
     def update_heatmap(self, board: GameBoard) -> None:
         for threshold in self.heatmaps.keys():
@@ -184,6 +189,7 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         :param board:
         :return:
         """
+        self.update_heatmap(board)
         placeables = self.get_placeables(board)
         if placeables and not self.has_knocked:
             move_scores = self.score_all_moves(board)
