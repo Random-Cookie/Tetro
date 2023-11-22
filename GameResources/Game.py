@@ -90,7 +90,7 @@ class Tetros:
         if 'final_board' in self.display_modes:
             print(self.board.get_printable_board())
         if 'scores' in self.display_modes:
-            self.print_scores_to_cli()
+            print(self.get_printable_scores())
         if 'times' in self.display_modes:
             top_row, bottom_row, total = 'Turn No | ', 'Time    | ', 0
             for i in range(len(self.turn_times)):
@@ -105,6 +105,7 @@ class Tetros:
             player_dict = {}
             for player in self.players:
                 player_dict[player.color] = type(player).__name__
+            game_replay_data['scores'] = self.get_printable_scores()
             game_replay_data['players'] = player_dict
             log_filename = 'GameReplays/GameReplay-' + str(uuid.uuid4()) + '.json'
             with open(log_filename, 'w') as write_file:
@@ -214,7 +215,7 @@ class Tetros:
                 winners.append(player)
         return winners
 
-    def print_scores_to_cli(self):
+    def get_printable_scores(self):
         """
         Print the score to the CLI
         """
@@ -223,22 +224,30 @@ class Tetros:
         title = ' Final Scores '
         h_pad = '-' * round((93 + player_name_length_limit - len(title)) / 2)
         scores = self.calculate_player_scores()
-        print(h_pad + title + h_pad)
-        print('| ' + 'Player'.ljust(player_name_length_limit), end=' | ')
+        printable_scores = h_pad + title + h_pad
+        printable_scores += '\n| '
+        printable_scores += 'Player'.ljust(player_name_length_limit)
+        printable_scores += ' | '
         for key in scores[list(scores.keys())[0]]:
-            print(key.ljust(column_width), end=' | ')
-        print()
+            printable_scores += key.ljust(column_width)
+            printable_scores += ' | '
+        printable_scores += '\n'
         for key in scores.keys():
             score = scores[key]
-            print('| ' + colored(key.ljust(player_name_length_limit), key), end=' | ')
+            printable_scores += '| '
+            printable_scores += colored(key.ljust(player_name_length_limit), key)
+            printable_scores += ' | '
             for sub_key in score.keys():
-                print(str(score[sub_key]).rjust(column_width), end=' | ')
-            print()
+                printable_scores += str(score[sub_key]).rjust(column_width)
+                printable_scores += ' | '
+            printable_scores += '\n'
         winners = self.find_winner(scores)
         if len(winners) > 1:
-            print('The winners were: ' + str(winners).strip('[]'))
+            printable_scores += 'The winners were: ' + str(winners).strip('[]')
         else:
-            print('The winner was: ' + colored(winners[0].color, winners[0].color))
+            printable_scores += 'The winner was: ' + colored(winners[0].color, winners[0].color)
+        printable_scores += '\n'
+        return printable_scores
 
     @staticmethod
     def display_cli_config_menu():
