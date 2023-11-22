@@ -3,13 +3,13 @@ import random
 import re
 import copy
 import json
+import uuid
 
 from termcolor2 import colored
 from GameResources.Structure import GameBoard
 from GameResources.ObjectFactory import ObjectFactory
 from GameResources.SimplePlayers import Player, HumanPlayer, RandomPlayer
 from timeit import default_timer as timer
-from datetime import datetime
 
 
 class Tetros:
@@ -106,7 +106,7 @@ class Tetros:
             for player in self.players:
                 player_dict[player.color] = type(player).__name__
             game_replay_data['players'] = player_dict
-            log_filename = 'Experiments/Logs/GameReplay' + datetime.now().strftime("%m-%d-%Y-%H-%M-%S") + '.json'
+            log_filename = 'GameReplays/GameReplay-' + str(uuid.uuid4()) + '.json'
             with open(log_filename, 'w') as write_file:
                 write_file.write(json.dumps(game_replay_data, indent=4))
         if 'end_pause' in self.display_modes:
