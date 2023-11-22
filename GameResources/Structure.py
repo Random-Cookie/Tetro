@@ -139,7 +139,8 @@ class GameBoard:
             for x in range(0, board_size[0]):
                 row.append(BoardSquare([]))
             self.positions.append(row)
-        self.set_starting_positions(players, starting_positions)
+        self.starting_positions = starting_positions
+        self.set_starting_positions(players)
         self.player_colors = []
         for player in players:
             self.player_colors.append(player.color)
@@ -151,8 +152,7 @@ class GameBoard:
         """
         return len(self.positions), len(self.positions[0])
 
-    def set_starting_positions(self, players: list[GR.SimplePlayers.Player],
-                               starting_positions: list[list[int, int]] = None):
+    def set_starting_positions(self, players: list[GR.SimplePlayers.Player]):
         """
         Set stating positions for players
         Make the locations in starting_positions placeable for corresponding players
@@ -161,11 +161,11 @@ class GameBoard:
         """
         xmax = len(self.positions) - 1
         ymax = len(self.positions[0]) - 1
-        starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
-            if starting_positions is None else starting_positions
-        random.shuffle(starting_positions)
+        self.starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
+            if self.starting_positions is None else self.starting_positions
+        random.shuffle(self.starting_positions)
         for i in range(len(players)):
-            x, y = starting_positions[i]
+            x, y = self.starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
     def is_stalemate(self, players: list[GR.SimplePlayers.Player]) -> bool:
@@ -252,14 +252,12 @@ class GameBoard:
         """
         for x in range(0, len(self.positions)):
             for y in range(0, len(self.positions[0])):
-                pos = self.positions[x][y]
-                if pos.color is not None:
-                    pos.placeable_by = []
-                else:
+                if [x, y] not in self.starting_positions:
+                    self.positions[x][y].placeable_by = []
+                if self.positions[x][y].color is None:
                     for player in players:
-                        if self.check_diagonal_squares(x, y, player.color)\
-                                and not self.check_adjacent_squares(x, y, player.color):
-                            pos.placeable_by.append(player.color)
+                        if self.check_diagonal_squares(x, y, player.color) and not self.check_adjacent_squares(x, y, player.color):
+                            self.positions[x][y].placeable_by.append(player.color)
 
     def place_piece(self, x: int, y: int, piece: GR.Structure.Piece) -> bool:
         """
@@ -282,18 +280,26 @@ class GameBoard:
         :param player: If player is specified print the placeable locations for that player
         :return: A Printable representation of the board
         """
-        ret = '_' * ((2 * len(self.positions)) + 3)
+        ret = '     '
+        for col in range(len(self.positions)):
+            ret += f'{col:02} '
+        ret += '\n   '
+        ret += '_' * ((3 * len(self.positions)) + 3)
         ret += '\n'
-        for y in range(0, len(self.positions[0])):
-            ret += '| '
+        for row in range(0, len(self.positions[0])):
+            ret += f'{row:02} | '
             for x in range(0, len(self.positions)):
-                pos = self.positions[x][y]
+                pos = self.positions[x][row]
                 if pos.color is not None:
-                    ret += colored('▩ ', pos.color)
+                    ret += colored('▩  ', pos.color)
                 elif player is not None and player.color in pos.placeable_by:
-                    ret += colored('▢ ', player.color)
+                    ret += colored('▢  ', player.color)
                 else:
-                    ret += '▢ '
-            ret += '|\n'
-        ret += '‾' * ((2 * len(self.positions)) + 3)
+                    ret += '▢  '
+            ret += f'| {row:02}\n'
+        ret += '   '
+        ret += '‾' * ((3 * len(self.positions)) + 3)
+        ret += '\n     '
+        for col in range(len(self.positions)):
+            ret += f'{col:02} '
         return ret
