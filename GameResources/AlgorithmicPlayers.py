@@ -166,21 +166,40 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
             for y in range(len(self.current_heatmap[0])):
                 self.current_heatmap[x][y] *= mul
 
+
+class HeatmapSwitcher(DynamicHeatmapPlayer):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: list[str]= None, threshold: int = 6):
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
+        self.heatmaps = heatmaps if heatmaps is not None else {0: 'agressiveX.txt', 6: 'sidewinder.txt'}
+        self.current_heatmap = self.load_heatmap(heatmaps[0])
 
     def update_heatmap(self, board: GameBoard) -> None:
+        for threshold in self.heatmaps.keys():
+            if self.turn_count == threshold:
+                self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
 
     def select_move(self, board: GameBoard) -> Move | None:
         """
+        Use score all possible moves and
         :param board:
         :return:
         """
         placeables = self.get_placeables(board)
         if placeables and not self.has_knocked:
+            move_scores = self.score_all_moves(board)
+            if len(move_scores.keys()) > 0:
+                best_score = max(move_scores.keys())
+                best_moves = move_scores[best_score]
+                if len(best_moves) == 1:
+                    return best_moves[0]
+                elif len(best_moves) > 1:
+                    return self.tiebreak_moves(best_moves)
             self.has_knocked = True
         return None
 
     def tiebreak_moves(self, moves: list[Move]) -> Move:
         """
+        Default implementation
         """
         return StaticHeatmapPlayer.tiebreak_moves(self, moves)
+
