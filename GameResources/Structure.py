@@ -285,7 +285,6 @@ class GameBoard:
             ret += f'{col:02} '
         ret += '\n   '
         ret += '_' * ((3 * len(self.positions)) + 3)
-        # ret = '_' * ((2 * len(self.positions)) + 3)
         ret += '\n'
         for row in range(0, len(self.positions[0])):
             ret += f'{row:02} | '
