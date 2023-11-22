@@ -1,4 +1,4 @@
-from GameResources.SimUtils import simulate_concurrent_games
+from Simulations.SimUtils import simulate_concurrent_games
 from GameResources.ObjectFactory import ObjectFactory
 from Players.AlgorithmicPlayers import StaticHeatmapPlayer
 
