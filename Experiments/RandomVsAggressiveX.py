@@ -6,8 +6,8 @@ from GameResources.AlgorithmicPlayers import ExhaustiveStaticHeatmapPlayer
 BOARD_SIZE = (20, 20)
 INITIAL_PIECES = ObjectFactory().generate_shapes()
 
-PLAYERS = [ExhaustiveStaticHeatmapPlayer('blue', INITIAL_PIECES[0], BOARD_SIZE, 'file', '../GameResources/res/heatmaps/aggressiveX.txt'),
-    ExhaustiveStaticHeatmapPlayer('green', INITIAL_PIECES[1], BOARD_SIZE, 'file', '../GameResources/res/heatmaps/aggressiveX.txt'),
+PLAYERS = [ExhaustiveStaticHeatmapPlayer('blue', INITIAL_PIECES[0], BOARD_SIZE, '../GameResources/res/heatmaps/aggressiveX.txt'),
+    ExhaustiveStaticHeatmapPlayer('green', INITIAL_PIECES[1], BOARD_SIZE, '../GameResources/res/heatmaps/aggressiveX.txt'),
     ExhaustiveRandomPlayer('red', INITIAL_PIECES[2]),
     ExhaustiveRandomPlayer('yellow', INITIAL_PIECES[3])]
 
