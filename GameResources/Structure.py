@@ -139,7 +139,8 @@ class GameBoard:
             for x in range(0, board_size[0]):
                 row.append(BoardSquare([]))
             self.positions.append(row)
-        self.set_starting_positions(players, starting_positions)
+        self.starting_positions = starting_positions
+        self.set_starting_positions(players)
         self.player_colors = []
         for player in players:
             self.player_colors.append(player.color)
@@ -151,8 +152,7 @@ class GameBoard:
         """
         return len(self.positions), len(self.positions[0])
 
-    def set_starting_positions(self, players: list[GR.SimplePlayers.Player],
-                               starting_positions: list[list[int, int]] = None):
+    def set_starting_positions(self, players: list[GR.SimplePlayers.Player]):
         """
         Set stating positions for players
         Make the locations in starting_positions placeable for corresponding players
@@ -161,11 +161,11 @@ class GameBoard:
         """
         xmax = len(self.positions) - 1
         ymax = len(self.positions[0]) - 1
-        starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
-            if starting_positions is None else starting_positions
-        random.shuffle(starting_positions)
+        self.starting_positions = [[0, 0], [xmax, ymax], [0, ymax], [xmax, 0]] \
+            if self.starting_positions is None else self.starting_positions
+        random.shuffle(self.starting_positions)
         for i in range(len(players)):
-            x, y = starting_positions[i]
+            x, y = self.starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
     def is_stalemate(self, players: list[GR.SimplePlayers.Player]) -> bool:
