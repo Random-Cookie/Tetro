@@ -12,13 +12,14 @@ class StaticHeatmapPlayer(Player):
     Abstract player with a static heatmap
     """
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int]):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'GameResources/res/heatmaps/blank.txt'):
         Player.__init__(self, color, initial_pieces)
         self.board_size = board_size
-        self.current_heatmap = [[0]*self.board_size[1] for i in range(self.board_size[0])]
+        self.current_heatmap = self.load_heatmap(default_heatmap)
 
-    def load_heatmap(self, filepath: str) -> None:
+    @staticmethod
+    def load_heatmap(filepath: str) -> list[list[int]]:
         """
-        TODO: rewrite as a return, to help with dynamic heatmap loading
         Load a heatmap from a file
         :param filepath: File path to load from
         :return: None
@@ -27,12 +28,13 @@ class StaticHeatmapPlayer(Player):
         raw_map = read_file.read()
         read_file.close()
         map_lines = raw_map.split('\n')
-        self.current_heatmap = []
+        heatmap = []
         for x in range(len(map_lines[0])):
             col = []
             for y in range(len(map_lines)):
-                col.append(map_lines[y][x])
-            self.current_heatmap.append(col)
+                col.append(int(map_lines[y][x]))
+            heatmap.append(col)
+        return heatmap
 
     def score_moves(self, board: GameBoard, moves: list[Move]) -> defaultdict[int, list[Move]]:
         """
