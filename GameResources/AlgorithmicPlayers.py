@@ -71,6 +71,7 @@ class StaticHeatmapPlayer(Player):
         :param moves: The moves to be scores
         :return: dict{move, score} Scores in a dict
         """
+        selected_moves = moves if moves is not None else self.get_all_moves(board)
         move_scores = defaultdict(list)
         for move in selected_moves:
             move_scores[self.score_move(move)].append(move)
@@ -87,12 +88,8 @@ class StaticHeatmapPlayer(Player):
 
 
 class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmap_mode: str = 'flat', heatmap_filepath: str = None):
-        StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
-        if heatmap_mode == 'flat':
-            self.current_heatmap = [[1]*self.board_size[1] for i in range(self.board_size[0])]
-        if heatmap_mode == 'file':
-            self.load_heatmap(heatmap_filepath)
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmap_filepath: str):
+        StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size, heatmap_filepath)
 
     def select_move(self, board: GameBoard) -> Move | None:
         """
