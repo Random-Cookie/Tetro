@@ -280,18 +280,27 @@ class GameBoard:
         :param player: If player is specified print the placeable locations for that player
         :return: A Printable representation of the board
         """
-        ret = '_' * ((2 * len(self.positions)) + 3)
+        ret = '     '
+        for col in range(len(self.positions)):
+            ret += f'{col:02} '
+        ret += '\n   '
+        ret += '_' * ((3 * len(self.positions)) + 3)
+        # ret = '_' * ((2 * len(self.positions)) + 3)
         ret += '\n'
-        for y in range(0, len(self.positions[0])):
-            ret += '| '
+        for row in range(0, len(self.positions[0])):
+            ret += f'{row:02} | '
             for x in range(0, len(self.positions)):
-                pos = self.positions[x][y]
+                pos = self.positions[x][row]
                 if pos.color is not None:
-                    ret += colored('▩ ', pos.color)
+                    ret += colored('▩  ', pos.color)
                 elif player is not None and player.color in pos.placeable_by:
-                    ret += colored('▢ ', player.color)
+                    ret += colored('▢  ', player.color)
                 else:
-                    ret += '▢ '
-            ret += '|\n'
-        ret += '‾' * ((2 * len(self.positions)) + 3)
+                    ret += '▢  '
+            ret += f'| {row:02}\n'
+        ret += '   '
+        ret += '‾' * ((3 * len(self.positions)) + 3)
+        ret += '\n     '
+        for col in range(len(self.positions)):
+            ret += f'{col:02} '
         return ret
