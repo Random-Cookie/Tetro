@@ -11,7 +11,6 @@ class StaticHeatmapPlayer(Player):
     """
     Abstract player with a static heatmap
     """
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int]):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'GameResources/res/heatmaps/blank.txt'):
         Player.__init__(self, color, initial_pieces)
         self.board_size = board_size
