@@ -9,7 +9,7 @@ from collections import defaultdict
 
 class StaticHeatmapPlayer(Player):
     """
-    Abstract player with a static heatmap
+    Heuristic Player with a static heatmap.
     """
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'GameResources/res/heatmaps/blank.txt'):
         Player.__init__(self, color, initial_pieces)
@@ -77,20 +77,6 @@ class StaticHeatmapPlayer(Player):
             move_scores[self.score_move(move)].append(move)
         return move_scores
 
-    @abstractmethod
-    def tiebreak_moves(self, moves: list[Move]) -> Move:
-        """
-        Tiebreak function for moves with same score
-        :param moves: Moves to tie-break
-        :return: A single chosen move
-        """
-        return random.choice(moves)
-
-
-class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmap_filepath: str):
-        StaticHeatmapPlayer.__init__(self, color, initial_pieces, board_size, heatmap_filepath)
-
     def select_move(self, board: GameBoard) -> Move | None:
         """
         Use score all possible moves and
@@ -112,9 +98,11 @@ class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
 
     def tiebreak_moves(self, moves: list[Move]) -> Move:
         """
-        Default implementation
+        Tiebreak function for moves with same score
+        :param moves: Moves to tie-break
+        :return: A single chosen move
         """
-        return StaticHeatmapPlayer.tiebreak_moves(self, moves)
+        return random.choice(moves)
 
 
 # DHM = Dynamic Heat map
@@ -202,10 +190,3 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
                     return self.tiebreak_moves(best_moves)
             self.has_knocked = True
         return None
-
-    def tiebreak_moves(self, moves: list[Move]) -> Move:
-        """
-        Default implementation
-        """
-        return StaticHeatmapPlayer.tiebreak_moves(self, moves)
-
