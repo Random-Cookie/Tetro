@@ -4,7 +4,7 @@ import json
 
 from datetime import datetime
 from GameResources.Game import Tetros
-from GameResources.SimplePlayers import Player
+from Players.SimplePlayers import Player
 
 PLAYER_SCORE_TEMPLATE = {
                 'Coverage': 0,

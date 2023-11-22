@@ -1,7 +1,7 @@
 import copy
 import random
 
-from GameResources.SimplePlayers import Player, Move
+from Players.SimplePlayers import Player, Move
 from GameResources.Structure import Piece, GameBoard
 from abc import abstractmethod
 from collections import defaultdict

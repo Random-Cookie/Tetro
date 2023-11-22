@@ -8,7 +8,7 @@ import uuid
 from termcolor2 import colored
 from GameResources.Structure import GameBoard
 from GameResources.ObjectFactory import ObjectFactory
-from GameResources.SimplePlayers import Player, HumanPlayer, RandomPlayer
+from Players.SimplePlayers import Player, HumanPlayer, RandomPlayer
 from timeit import default_timer as timer
 
 
@@ -464,7 +464,7 @@ class Tetros:
                     replay_params = ['game_replay']
                     if turn_pause.lower() == 'y':
                         replay_params.append('pause')
-                    Tetros.replay_game('Experiments/Logs/' + game_to_replay, replay_params)
+                    Tetros.replay_game('GameReplays/' + game_to_replay, replay_params)
                 except Exception as e:
                     print('ERROR' + str(e))
                 return {'display_modes': 'main_menu'}

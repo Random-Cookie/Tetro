@@ -1,6 +1,6 @@
 from GameResources.SimUtils import simulate_games
 from GameResources.ObjectFactory import ObjectFactory
-from GameResources.AlgorithmicPlayers import StaticHeatmapPlayer, HeatmapSwitcher
+from Players.AlgorithmicPlayers import StaticHeatmapPlayer, HeatmapSwitcher
 
 BOARD_SIZE = (20, 20)
 INITIAL_PIECES = ObjectFactory().generate_shapes()

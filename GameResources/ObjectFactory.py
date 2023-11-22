@@ -1,5 +1,5 @@
-from GameResources.SimplePlayers import *
-from GameResources.AlgorithmicPlayers import StaticHeatmapPlayer
+from Players.SimplePlayers import *
+from Players.AlgorithmicPlayers import StaticHeatmapPlayer
 
 
 @dataclass

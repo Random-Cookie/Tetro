@@ -1,6 +1,6 @@
 from GameResources.SimUtils import simulate_concurrent_games
 from GameResources.ObjectFactory import ObjectFactory
-from GameResources.AlgorithmicPlayers import StaticHeatmapPlayer
+from Players.AlgorithmicPlayers import StaticHeatmapPlayer
 
 BOARD_SIZE = (20, 20)
 INITIAL_PIECES = ObjectFactory().generate_shapes()
