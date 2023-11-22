@@ -35,7 +35,36 @@ class StaticHeatmapPlayer(Player):
             heatmap.append(col)
         return heatmap
 
-    def score_moves(self, board: GameBoard, moves: list[Move]) -> defaultdict[int, list[Move]]:
+    def get_all_moves(self, board: GameBoard, pieces: list[Piece] = None) -> list[Move]:
+        selected_pieces = pieces if pieces is not None else self.pieces
+        placeables = self.get_placeables(board)
+        moves = []
+        if placeables:
+            for piece in selected_pieces:
+                selected_piece = copy.deepcopy(piece)
+                for rotation in range(4):
+                    selected_piece.rotate()
+                    for flip in range(2):
+                        selected_piece.flip()
+                        for location in placeables:
+                            if board.check_piece_fits(location[0],
+                                                      location[1],
+                                                      selected_piece):
+                                moves.append(Move(copy.deepcopy(selected_piece), self.pieces.index(piece), location))
+        return moves
+
+    def score_move(self, move: Move) -> int:
+        """
+        Score an individual move by adding up the move positions scores from the heatmap
+        :param move: The move to be scores
+        :return: The move score
+        """
+        score = 0
+        for coord in move.piece.currentCoords:
+            score += self.current_heatmap[move.position[0] + coord[0]][move.position[1] + coord[1]]
+        return score
+
+    def score_all_moves(self, board: GameBoard, moves: list[Move] = None) -> defaultdict[int, list[Move]]:
         """
         Score a set of moves
         :param board: The game board
@@ -43,28 +72,9 @@ class StaticHeatmapPlayer(Player):
         :return: dict{move, score} Scores in a dict
         """
         move_scores = defaultdict(list)
-        for move in moves:
-            move_scores[self.score_move(board, move)].append(move)
+        for move in selected_moves:
+            move_scores[self.score_move(move)].append(move)
         return move_scores
-
-    def score_move(self, board: GameBoard, move: Move) -> int:
-        """
-        Score an individual move by scanning the board for any empty spaces and adding the weight from the heatmap
-        Higher priority squares have a higher value on the heatmap
-        The move is then made on the board, score is calculated by adding all values in the heat map that remain empty
-        Therefore when optimising for the "best move" you should minimise this score
-        :param board: The game board
-        :param move: The move to be scores
-        :return: The move score
-        """
-        temp_board = copy.deepcopy(board)
-        temp_board.place_piece(move.position[0], move.position[1], move.piece)
-        score = 0
-        for x in range(len(board.positions)):
-            for y in range(len(board.positions[0])):
-                if temp_board.positions[x][y].color is None:
-                    score += int(self.current_heatmap[x][y])
-        return score
 
     @abstractmethod
     def tiebreak_moves(self, moves: list[Move]) -> Move:
