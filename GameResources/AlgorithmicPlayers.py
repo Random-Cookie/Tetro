@@ -99,29 +99,15 @@ class ExhaustiveStaticHeatmapPlayer(StaticHeatmapPlayer):
         """
         placeables = self.get_placeables(board)
         if placeables and not self.has_knocked:
-            move_scores = defaultdict(list)
-            for piece in self.pieces:
-                for location in placeables:
-                    for rotation in [0, 1, 2, 3]:
-                        for flip in [True, False]:
-                            selected_piece = copy.deepcopy(piece)
-                            for i in range(0, rotation):
-                                selected_piece.rotate()
-                            if flip:
-                                piece.flip()
-                            if board.check_piece_fits(location[0],
-                                                      location[1],
-                                                      selected_piece):
-                                ittr_move = Move(selected_piece, self.pieces.index(piece), location)
-                                move_scores[self.score_move(board, ittr_move)].append(ittr_move)
+            move_scores = self.score_all_moves(board)
             if len(move_scores.keys()) > 0:
-                best_score = min(move_scores.keys())
+                best_score = max(move_scores.keys())
                 best_moves = move_scores[best_score]
                 if len(best_moves) == 1:
                     return best_moves[0]
                 elif len(best_moves) > 1:
                     return self.tiebreak_moves(best_moves)
-        self.has_knocked = True
+            self.has_knocked = True
         return None
 
     def tiebreak_moves(self, moves: list[Move]) -> Move:
