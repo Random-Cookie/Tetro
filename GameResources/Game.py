@@ -491,12 +491,14 @@ class Tetros:
     def replay_game(filename: str, display_modes: list[str]):
         read_file = open(filename)
         data = json.load(read_file)
-        print('Players: ' + str(data['players']))
         for key in data:
-            if key != 'players':
+            if key.isnumeric():
                 print('Turn ' + str(key) + ':')
                 print(data[key])
                 if 'pause' in display_modes:
                     input('Press Enter to Continue...')
-        # TODO: print scores
+        print()
+        print('Player Types:')
+        print(str(data['players']).strip('{}').replace('\'', ''))
+        print(str(data['scores']))
         input('Replay Complete, press enter to return to the main menu...')
