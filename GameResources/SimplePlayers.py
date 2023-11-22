@@ -40,6 +40,7 @@ class Player(ABC):
         self.has_knocked = False
         # self. final piece is used to detect if the final piece placed was the "one" piece, this grants 5 bonus points
         self.final_piece = None
+        self.turn_count = 0
 
     def __str__(self):
         """
@@ -138,6 +139,7 @@ class Player(ABC):
         while place_params is not None and not self.place_piece(board, place_params):
             place_params = self.select_move(board)
         if place_params is not None:
+            self.turn_count += 1
             return True
         return False
 
