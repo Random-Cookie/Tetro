@@ -252,14 +252,12 @@ class GameBoard:
         """
         for x in range(0, len(self.positions)):
             for y in range(0, len(self.positions[0])):
-                pos = self.positions[x][y]
-                if pos.color is not None:
-                    pos.placeable_by = []
-                else:
+                if [x, y] not in self.starting_positions:
+                    self.positions[x][y].placeable_by = []
+                if self.positions[x][y].color is None:
                     for player in players:
-                        if self.check_diagonal_squares(x, y, player.color)\
-                                and not self.check_adjacent_squares(x, y, player.color):
-                            pos.placeable_by.append(player.color)
+                        if self.check_diagonal_squares(x, y, player.color) and not self.check_adjacent_squares(x, y, player.color):
+                            self.positions[x][y].placeable_by.append(player.color)
 
     def place_piece(self, x: int, y: int, piece: GR.Structure.Piece) -> bool:
         """
