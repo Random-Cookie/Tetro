@@ -183,7 +183,8 @@ class Tetros:
                 'Territory': self.calculate_player_teritory_bonus(player),  # Largest Exclusive area +1 per square
                 'Squares Left': player.squares_left(),
                 'Points': player.squares_left() * -1,  # Number of squares in players remaining pieces -1 per square
-                'Win': 1 if player.out_of_pieces() else 0
+                'Win': 1 if player.out_of_pieces() else 0,
+                'Active Turns': player.turn_count
             }
             if player.squares_left() == 0:
                 player_score['Points'] += 15
@@ -219,14 +220,14 @@ class Tetros:
         """
         Print the score to the CLI
         """
-        player_name_length_limit = 11
-        column_width = 12
-        title = ' Final Scores '
-        h_pad = '-' * round((93 + player_name_length_limit - len(title)) / 2)
         scores = self.calculate_player_scores()
+        column_width = 12
+        title = ' Final  Scores '
+        h_pad = '-'
+        h_pad += '-' * round(((15 * (len(scores[list(scores.keys())[0]]) + 1)) - len(title)) / 2)
         printable_scores = h_pad + title + h_pad
         printable_scores += '\n| '
-        printable_scores += 'Player'.ljust(player_name_length_limit)
+        printable_scores += 'Player'.ljust(column_width)
         printable_scores += ' | '
         for key in scores[list(scores.keys())[0]]:
             printable_scores += key.ljust(column_width)
@@ -235,7 +236,7 @@ class Tetros:
         for key in scores.keys():
             score = scores[key]
             printable_scores += '| '
-            printable_scores += colored(key.ljust(player_name_length_limit), key)
+            printable_scores += colored(key.ljust(column_width), key)
             printable_scores += ' | '
             for sub_key in score.keys():
                 printable_scores += str(score[sub_key]).rjust(column_width)
