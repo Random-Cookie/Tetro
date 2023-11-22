@@ -156,6 +156,15 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
             for y in range(len(self.current_heatmap[0])):
                 self.current_heatmap[x][y] += amount
 
+    def multiply_heatmap(self, mul: int = 1) -> None:
+        """
+        Increment all values in the heatmap by amount
+        :param mul: multiplier
+        :return: None
+        """
+        for x in range(len(self.current_heatmap)):
+            for y in range(len(self.current_heatmap[0])):
+                self.current_heatmap[x][y] *= mul
 
 class BigFirstSeekerDHM(DynamicHeatmapPlayer):
     """
