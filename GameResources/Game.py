@@ -106,7 +106,7 @@ class Tetros:
             for player in self.players:
                 player_dict[player.color] = type(player).__name__
             game_replay_data['players'] = player_dict
-            log_filename = 'Logs/GameReplay' + datetime.now().strftime("%m-%d-%Y-%H-%M-%S") + '.json'
+            log_filename = 'Experiments/Logs/GameReplay' + datetime.now().strftime("%m-%d-%Y-%H-%M-%S") + '.json'
             with open(log_filename, 'w') as write_file:
                 write_file.write(json.dumps(game_replay_data, indent=4))
         if 'end_pause' in self.display_modes:
@@ -399,7 +399,8 @@ class Tetros:
                         'players': ObjectFactory.generate_random_players(),
                         'starting_positions': [[0, 0], [0, 19], [19, 0], [19, 19]],
                         'initial_pieces': ObjectFactory.generate_shapes(),
-                        'display_modes': ['final_board', 'scores', 'end_pause', 'times']
+                        'display_modes': ['final_board', 'scores', 'end_pause', 'times'],
+                        'logging_modes': ['game_replay']
                        }
             if input_string == 'exrandom' or input_string == 'er':
                 print('Simulating game with exhaustive random players...')
