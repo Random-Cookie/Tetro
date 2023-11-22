@@ -11,7 +11,7 @@ class StaticHeatmapPlayer(Player):
     """
     Heuristic Player with a static heatmap.
     """
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'GameResources/res/heatmaps/blank.txt'):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'Players/heatmaps/blank.txt'):
         Player.__init__(self, color, initial_pieces)
         self.board_size = board_size
         self.current_heatmap = self.load_heatmap(default_heatmap)
@@ -162,7 +162,7 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
 class HeatmapSwitcher(DynamicHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: dict[int, str] = None):
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
-        self.heatmaps = heatmaps if heatmaps is not None else {0: 'GameResources/res/heatmaps/aggressiveX.txt', 6: 'GameResources/res/heatmaps/sidewinder.txt'}
+        self.heatmaps = heatmaps if heatmaps is not None else {0: 'Players/heatmaps/aggressiveX.txt', 6: 'Players/heatmaps/sidewinder.txt'}
         self.current_heatmap = self.load_heatmap(self.heatmaps[0])
 
     def update_heatmap(self, board: GameBoard) -> None:

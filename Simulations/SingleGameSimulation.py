@@ -5,8 +5,8 @@ from Players.AlgorithmicPlayers import StaticHeatmapPlayer, HeatmapSwitcher
 BOARD_SIZE = (20, 20)
 INITIAL_PIECES = ObjectFactory().generate_shapes()
 
-PLAYERS = [StaticHeatmapPlayer('blue', INITIAL_PIECES[0], BOARD_SIZE, 'GameResources/res/heatmaps/aggressiveX.txt'),
-    StaticHeatmapPlayer('green', INITIAL_PIECES[1], BOARD_SIZE, 'GameResources/res/heatmaps/aggressiveX.txt'),
+PLAYERS = [StaticHeatmapPlayer('blue', INITIAL_PIECES[0], BOARD_SIZE, 'Players/heatmaps/aggressiveX.txt'),
+    StaticHeatmapPlayer('green', INITIAL_PIECES[1], BOARD_SIZE, 'Players/heatmaps/aggressiveX.txt'),
     HeatmapSwitcher('red', INITIAL_PIECES[2], BOARD_SIZE),
     HeatmapSwitcher('yellow', INITIAL_PIECES[3], BOARD_SIZE)]
 
