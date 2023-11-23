@@ -27,10 +27,10 @@ class StaticHeatmapPlayer(Player):
         raw_map = read_file.read()
         read_file.close()
         map_lines = raw_map.split('\n')
-        heatmap = []
+        parsed_heatmap = []
         for line in map_lines:
-            heatmap.append([char for char in line])
-        return heatmap
+            parsed_heatmap.append([int(char) for char in line])
+        return parsed_heatmap
 
     def get_all_moves(self, board: GameBoard, pieces: list[Piece] = None) -> list[Move]:
         selected_pieces = pieces if pieces is not None else self.pieces
