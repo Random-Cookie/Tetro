@@ -19,7 +19,6 @@ class StaticHeatmapPlayer(Player):
         :param default_heatmap:
         """
         Player.__init__(self, color, initial_pieces)
-        self.board_size = board_size
         self.current_heatmap = self.load_txt_heatmap(default_heatmap)
 
     @staticmethod
@@ -237,7 +236,7 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         """
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces)
         self.heatmaps = heatmaps if heatmaps is not None else {15: 'Players/heatmaps/new_aggressive_x.txt', 20:  'Players/heatmaps/sidewinder.txt'}
-        self.current_heatmap = self.load_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
+        self.current_heatmap = self.load_txt_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
 
     def update_heatmap(self, board: GameBoard) -> None:
         """
@@ -248,7 +247,7 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         """
         for threshold in self.heatmaps.keys():
             if self.turn_count <= threshold:
-                self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
+                self.current_heatmap = self.load_txt_heatmap(self.heatmaps[threshold])
                 return
 
 
