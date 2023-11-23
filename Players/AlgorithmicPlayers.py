@@ -186,10 +186,11 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
 class HeatmapSwitcher(DynamicHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: dict[int, str] = None):
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
-        self.heatmaps = heatmaps if heatmaps is not None else {0: 'Players/heatmaps/aggressiveX.txt', 6: 'Players/heatmaps/sidewinder.txt'}
-        self.current_heatmap = self.load_heatmap(self.heatmaps[0])
+        self.heatmaps = heatmaps if heatmaps is not None else {15: 'Players/heatmaps/new_aggressive_x.txt', 20:  'Players/heatmaps/sidewinder.txt'}
+        self.current_heatmap = self.load_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
 
     def update_heatmap(self, board: GameBoard) -> None:
         for threshold in self.heatmaps.keys():
-            if self.turn_count == threshold:
+            if self.turn_count <= threshold:
                 self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
+                return
