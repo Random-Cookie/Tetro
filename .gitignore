@@ -3,5 +3,7 @@
 /GameResources/__pycache__/
 /Experiments/
 /GameReplays/
-Players/__pycache__/AlgorithmicPlayers.cpython-311.pyc
-Players/__pycache__/SimplePlayers.cpython-311.pyc
+Players/__pycache__/
+/Logs/
+Simulations/__pycache__/SimUtils.cpython-311.pyc
+Simulations/__pycache__/SimUtils.cpython-311.pyc

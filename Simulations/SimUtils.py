@@ -14,7 +14,8 @@ PLAYER_SCORE_TEMPLATE = {
                 'Territory': 0,
                 'Squares Left': 0,
                 'Points': 0,
-                'Win': 0
+                'Win': 0,
+                'Active Turns': 0
             }
 
 
