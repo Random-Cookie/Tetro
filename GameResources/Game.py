@@ -45,6 +45,7 @@ class Tetros:
         self.display_modes = display_modes if display_modes is not None else ['final_board', 'scores', 'end_pause']
         self.logging_modes = logging_modes if logging_modes is not None else []
         self.turn_times = []
+        self.uuid = uuid.uuid4()
 
     def check_any_player_win(self):
         """
@@ -107,7 +108,7 @@ class Tetros:
                 player_dict[player.color] = type(player).__name__
             game_replay_data['scores'] = self.get_printable_scores()
             game_replay_data['players'] = player_dict
-            log_filename = 'GameReplays/GameReplay-' + str(uuid.uuid4()) + '.json'
+            log_filename = f'GameReplays/GameReplay-{self.uuid}.json'
             with open(log_filename, 'w') as write_file:
                 write_file.write(json.dumps(game_replay_data, indent=4))
         if 'end_pause' in self.display_modes:
