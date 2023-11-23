@@ -1,6 +1,7 @@
 import copy
 import random
 
+from termcolor import colored
 from Players.SimplePlayers import Player, Move
 from GameResources.Structure import Piece, GameBoard
 from abc import abstractmethod
@@ -34,6 +35,29 @@ class StaticHeatmapPlayer(Player):
                 col.append(int(map_lines[y][x]))
             heatmap.append(col)
         return heatmap
+
+    def get_printable_heatmap(self, board: GameBoard):
+        ret = '     '
+        for col in range(len(board.positions)):
+            ret += f'{col:02} '
+        ret += '\n   '
+        ret += '_' * ((3 * len(board.positions)) + 3)
+        ret += '\n'
+        for row in range(0, len(board.positions[0])):
+            ret += f'{row:02} | '
+            for x in range(0, len(board.positions)):
+                pos = board.positions[x][row]
+                if pos.color is not None:
+                    ret += colored('▩  ', pos.color)
+                else:
+                    ret += f'{self.current_heatmap[x][row]}'.ljust(3)
+            ret += f'| {row:02}\n'
+        ret += '   '
+        ret += '‾' * ((3 * len(board.positions)) + 3)
+        ret += '\n     '
+        for col in range(len(board.positions)):
+            ret += f'{col:02} '
+        return ret
 
     def get_all_moves(self, board: GameBoard, pieces: list[Piece] = None) -> list[Move]:
         selected_pieces = pieces if pieces is not None else self.pieces
