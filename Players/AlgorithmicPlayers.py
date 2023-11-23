@@ -194,3 +194,21 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
             if self.turn_count <= threshold:
                 self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
                 return
+
+
+class AggressiveDynamic(HeatmapSwitcher):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: dict[int, str] = None):
+        HeatmapSwitcher.__init__(self, color, initial_pieces, board_size, heatmaps)
+        self.placeable_weight = 5
+        self.adjacent_weight = -1
+
+    def update_heatmap(self, board: GameBoard) -> None:
+        HeatmapSwitcher.update_heatmap(self, board)
+        for x in range(len(board.positions)):
+            for y in range(len(board.positions[0])):
+                for player in board.player_colors:
+                    if player in board.positions[x][y].placeable_by and player != self.color:
+                        self.current_heatmap[x][y] += self.placeable_weight
+                    if board.check_adjacent_squares(x, y, player):
+                        self.current_heatmap[x][y] += self.adjacent_weight
+        print(self.get_printable_heatmap(board))
