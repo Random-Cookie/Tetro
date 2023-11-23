@@ -176,6 +176,19 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
         self.update_heatmap(board)
         return StaticHeatmapPlayer.select_move(self, board)
 
+    def tiebreak_moves(self, moves: list[Move]) -> Move:
+        """
+        Return one of the moves containing the "largest piece"
+        :param moves: Moves to tie-break
+        :return: A single chosen move
+        """
+        max_index = max([move.piece_index for move in moves])
+        culled_moves = []
+        for move in moves:
+            if move.piece_index == max_index:
+                culled_moves.append(move)
+        return random.choice(culled_moves)
+
     def heatmap_min_max(self) -> tuple[int, int]:
         """
         Get min and max values in heatmap.
@@ -211,18 +224,13 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
             for y in range(len(self.current_heatmap[0])):
                 self.current_heatmap[x][y] *= mul
 
-    def tiebreak_moves(self, moves: list[Move]) -> Move:
+    def rotate_heatmap(self, rotations: int = 1) -> None:
         """
-        Return one of the moves containing the "largest piece"
-        :param moves: Moves to tie-break
-        :return: A single chosen move
+        Rotate the current heatmap 90 degrees clockwise.
+        :param rotations: Number of times to rotate
         """
-        max_index = max([move.piece_index for move in moves])
-        culled_moves = []
-        for move in moves:
-            if move.piece_index == max_index:
-                culled_moves.append(move)
-        return random.choice(culled_moves)
+        for i in range(rotations):
+            self.current_heatmap = list(list(x) for x in zip(*self.current_heatmap))[::-1]
 
 
 class HeatmapSwitcher(DynamicHeatmapPlayer):
@@ -234,7 +242,7 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         """
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces)
         self.heatmaps = heatmaps if heatmaps is not None else {15: 'Players/heatmaps/new_aggressive_x.txt', 20:  'Players/heatmaps/sidewinder.txt'}
-        self.current_heatmap = self.load_txt_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
+        self.current_heatmap = self.load_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
 
     def update_heatmap(self, board: GameBoard) -> None:
         """
