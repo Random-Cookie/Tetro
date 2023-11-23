@@ -490,7 +490,12 @@ class Tetros:
         return None
 
     @staticmethod
-    def replay_game(filename: str, display_modes: list[str]):
+    def replay_game(filename: str, display_modes: list[str]) -> None:
+        """
+        Replay a game from a replay file.
+        :param filename: Filename of the replay
+        :param display_modes: Replay display modes
+        """
         read_file = open(filename)
         data = json.load(read_file)
         for key in data:
