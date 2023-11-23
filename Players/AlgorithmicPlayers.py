@@ -279,3 +279,28 @@ class AggressiveDynamic(HeatmapSwitcher):
                     elif player in board.positions[x][y].placeable_by and player != self.color:
                         self.current_heatmap[x][y] += self.placeable_weight
         print(self.get_printable_heatmap(board))
+
+
+class DefensiveDynamic(HeatmapSwitcher):
+    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
+        HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
+
+    def update_heatmap(self, board: GameBoard) -> None:
+        pass
+
+
+class DenseDynamic(HeatmapSwitcher):
+    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
+        HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
+
+    def update_heatmap(self, board: GameBoard) -> None:
+        pass
+
+
+class LandGrabber(HeatmapSwitcher):
+    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
+        HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
+
+    def update_heatmap(self, board: GameBoard) -> None:
+        pass
+
