@@ -182,6 +182,21 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
             for y in range(len(self.current_heatmap[0])):
                 self.current_heatmap[x][y] *= mul
 
+    def tiebreak_moves(self, moves: list[Move]) -> Move:
+        """
+        Return one of the moves containing the "largest piece"
+        :param moves: Moves to tie-break
+        :return: A single chosen move
+        """
+        max_index = max([move.piece_index for move in moves])
+        culled_moves = []
+        for move in moves:
+            if move.piece_index == max_index:
+                culled_moves.append(move)
+        return random.choice(culled_moves)
+
+
+
 
 class HeatmapSwitcher(DynamicHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: dict[int, str] = None):
