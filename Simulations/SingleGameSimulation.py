@@ -1,14 +1,14 @@
 from Simulations.SimUtils import simulate_games
 from GameResources.ObjectFactory import ObjectFactory
-from Players.AlgorithmicPlayers import StaticHeatmapPlayer, HeatmapSwitcher
+from Players.AlgorithmicPlayers import StaticHeatmapPlayer, HeatmapSwitcher, AggressiveDynamic
 
 BOARD_SIZE = (20, 20)
 INITIAL_PIECES = ObjectFactory().generate_shapes()
 
-PLAYERS = [StaticHeatmapPlayer('blue', INITIAL_PIECES[0], BOARD_SIZE, 'Players/heatmaps/aggressiveX.txt'),
-    StaticHeatmapPlayer('green', INITIAL_PIECES[1], BOARD_SIZE, 'Players/heatmaps/aggressiveX.txt'),
-    HeatmapSwitcher('red', INITIAL_PIECES[2], BOARD_SIZE),
-    HeatmapSwitcher('yellow', INITIAL_PIECES[3], BOARD_SIZE)]
+PLAYERS = [StaticHeatmapPlayer('blue', INITIAL_PIECES[0], 'Players/heatmaps/aggressiveX.txt'),
+    StaticHeatmapPlayer('green', INITIAL_PIECES[1], 'Players/heatmaps/new_aggressive_x.txt'),
+    HeatmapSwitcher('red', INITIAL_PIECES[2]),
+    AggressiveDynamic('yellow', INITIAL_PIECES[3], {30: 'Players/heatmaps/bullseye.txt'})]
 
 GAME_PARAMS = {'board_size': BOARD_SIZE,
                'players': PLAYERS,

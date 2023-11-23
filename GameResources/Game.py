@@ -245,7 +245,11 @@ class Tetros:
             printable_scores += '\n'
         winners = self.find_winner(scores)
         if len(winners) > 1:
-            printable_scores += 'The winners were: ' + str(winners).strip('[]')
+            printable_scores += 'The winners were: '
+            for player in winners:
+                printable_scores += colored(player.color, player.color)
+                printable_scores += ','
+            printable_scores.strip(',')
         else:
             printable_scores += 'The winner was: ' + colored(winners[0].color, winners[0].color)
         printable_scores += '\n'
