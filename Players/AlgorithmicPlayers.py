@@ -19,36 +19,34 @@ class StaticHeatmapPlayer(Player):
         :param default_heatmap:
         """
         Player.__init__(self, color, initial_pieces)
-        self.current_heatmap = self.load_txt_heatmap(default_heatmap)
+        self.current_heatmap = self.load_heatmap(default_heatmap)
 
     @staticmethod
-    def load_txt_heatmap(filepath: str) -> list[list[int]]:
+    def load_heatmap(filepath: str) -> list[list[int]]:
         """
         Load a heatmap from a text file.
         :param filepath: File path to load from
         :return: None
         """
-        read_file = open(filepath)
-        raw_map = read_file.read()
-        read_file.close()
-        map_lines = raw_map.split('\n')
+        read_heatmap = []
+        file_ext = filepath.split('.')[-1]
+        with open(filepath) as heatmap_file:
+            if file_ext == 'txt':
+                data = heatmap_file.read().split('\n')
+                for row in data:
+                    read_heatmap.append([int(char) for char in row])
+            elif file_ext == 'csv':
+                data = csv.reader(heatmap_file)
+                for row in data:
+                    read_heatmap.append([int(char) for char in row])
+            else:
+                raise Exception('Invalid heatmap file type!')
         parsed_heatmap = []
-        for line in map_lines:
-            parsed_heatmap.append([int(char) for char in line])
-        return parsed_heatmap
-
-    @staticmethod
-    def load_csv_heatmap(filepath: str) -> list[list[int]]:
-        """
-        Load a heatmap from a text file
-        :param filepath: File path to load from
-        :return: None
-        """
-        parsed_heatmap = []
-        with open(filepath) as csv_map:
-            data = csv.reader(csv_map)
-            for row in data:
-                parsed_heatmap.append([int(char) for char in row])
+        for x in range(len(read_heatmap)):
+            row = []
+            for y in range(len(read_heatmap[0])):
+                row.append(read_heatmap[y][x])
+            parsed_heatmap.append(row)
         return parsed_heatmap
 
     def get_printable_heatmap(self, board: GameBoard) -> str:
