@@ -207,8 +207,11 @@ class AggressiveDynamic(HeatmapSwitcher):
         for x in range(len(board.positions)):
             for y in range(len(board.positions[0])):
                 for player in board.player_colors:
-                    if player in board.positions[x][y].placeable_by and player != self.color:
-                        self.current_heatmap[x][y] += self.placeable_weight
                     if board.check_adjacent_squares(x, y, player):
-                        self.current_heatmap[x][y] += self.adjacent_weight
+                        if player == self.color:
+                            self.current_heatmap[x][y] = 0
+                        else:
+                            self.current_heatmap[x][y] += self.adjacent_weight
+                    elif player in board.positions[x][y].placeable_by and player != self.color:
+                        self.current_heatmap[x][y] += self.placeable_weight
         print(self.get_printable_heatmap(board))
