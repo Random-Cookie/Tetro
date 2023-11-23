@@ -253,7 +253,15 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         """
         for threshold in self.heatmaps.keys():
             if self.turn_count <= threshold:
-                self.current_heatmap = self.load_txt_heatmap(self.heatmaps[threshold])
+                self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
+                max_x = len(board.positions) - 1
+                max_y = len(board.positions[0]) - 1
+                if board.positions[max_x][0] == self.color or self.color in board.positions[max_x][0].placeable_by:
+                    self.rotate_heatmap()
+                elif board.positions[max_x][max_y] == self.color or self.color in board.positions[max_x][max_y].placeable_by:
+                    self.rotate_heatmap(2)
+                elif board.positions[0][max_y] == self.color or self.color in board.positions[0][max_y].placeable_by:
+                    self.rotate_heatmap(3)
                 return
 
 
