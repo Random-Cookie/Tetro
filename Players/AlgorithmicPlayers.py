@@ -1,4 +1,5 @@
 import copy
+import csv
 import random
 
 from Players.SimplePlayers import Player, Move
@@ -30,6 +31,20 @@ class StaticHeatmapPlayer(Player):
         parsed_heatmap = []
         for line in map_lines:
             parsed_heatmap.append([int(char) for char in line])
+        return parsed_heatmap
+
+    @staticmethod
+    def load_csv_heatmap(filepath: str) -> list[list[int]]:
+        """
+        Load a heatmap from a text file
+        :param filepath: File path to load from
+        :return: None
+        """
+        parsed_heatmap = []
+        with open(filepath) as csv_map:
+            data = csv.reader(csv_map)
+            for row in data:
+                parsed_heatmap.append([int(char) for char in row])
         return parsed_heatmap
 
     def get_all_moves(self, board: GameBoard, pieces: list[Piece] = None) -> list[Move]:
