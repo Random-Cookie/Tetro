@@ -281,26 +281,26 @@ class GameBoard:
         :param player: If player is specified print the placeable locations for that player
         :return: A Printable representation of the board
         """
-        ret = '     '
+        printable_board = '     '
         for col in range(len(self.positions)):
-            ret += f'{col:02} '
-        ret += '\n   '
-        ret += '_' * ((3 * len(self.positions)) + 3)
-        ret += '\n'
+            printable_board += f'{col:02} '
+        printable_board += '\n   '
+        printable_board += '_' * ((3 * len(self.positions)) + 3)
+        printable_board += '\n'
         for row in range(0, len(self.positions[0])):
-            ret += f'{row:02} | '
+            printable_board += f'{row:02} | '
             for x in range(0, len(self.positions)):
                 pos = self.positions[x][row]
                 if pos.color is not None:
-                    ret += colored('▩  ', pos.color)
+                    printable_board += colored('▩  ', pos.color)
                 elif player is not None and player.color in pos.placeable_by:
-                    ret += colored('▢  ', player.color)
+                    printable_board += colored('▢  ', player.color)
                 else:
-                    ret += '▢  '
-            ret += f'| {row:02}\n'
-        ret += '   '
-        ret += '‾' * ((3 * len(self.positions)) + 3)
-        ret += '\n     '
+                    printable_board += '▢  '
+            printable_board += f'| {row:02}\n'
+        printable_board += '   '
+        printable_board += '‾' * ((3 * len(self.positions)) + 3)
+        printable_board += '\n     '
         for col in range(len(self.positions)):
-            ret += f'{col:02} '
-        return ret
+            printable_board += f'{col:02} '
+        return printable_board

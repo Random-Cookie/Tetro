@@ -1,4 +1,5 @@
 import copy
+import csv
 import random
 
 from termcolor import colored
@@ -18,12 +19,13 @@ class StaticHeatmapPlayer(Player):
         :param default_heatmap:
         """
         Player.__init__(self, color, initial_pieces)
-        self.current_heatmap = self.load_heatmap(default_heatmap)
+        self.board_size = board_size
+        self.current_heatmap = self.load_txt_heatmap(default_heatmap)
 
     @staticmethod
-    def load_heatmap(filepath: str) -> list[list[int]]:
+    def load_txt_heatmap(filepath: str) -> list[list[int]]:
         """
-        Load a heatmap from a file.
+        Load a heatmap from a text file.
         :param filepath: File path to load from
         :return: None
         """
@@ -31,13 +33,24 @@ class StaticHeatmapPlayer(Player):
         raw_map = read_file.read()
         read_file.close()
         map_lines = raw_map.split('\n')
-        heatmap = []
-        for x in range(len(map_lines[0])):
-            col = []
-            for y in range(len(map_lines)):
-                col.append(int(map_lines[y][x]))
-            heatmap.append(col)
-        return heatmap
+        parsed_heatmap = []
+        for line in map_lines:
+            parsed_heatmap.append([int(char) for char in line])
+        return parsed_heatmap
+
+    @staticmethod
+    def load_csv_heatmap(filepath: str) -> list[list[int]]:
+        """
+        Load a heatmap from a text file
+        :param filepath: File path to load from
+        :return: None
+        """
+        parsed_heatmap = []
+        with open(filepath) as csv_map:
+            data = csv.reader(csv_map)
+            for row in data:
+                parsed_heatmap.append([int(char) for char in row])
+        return parsed_heatmap
 
     def get_printable_heatmap(self, board: GameBoard) -> str:
         """
