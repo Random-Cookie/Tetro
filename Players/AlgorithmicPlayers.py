@@ -1,7 +1,8 @@
 import copy
+import csv
 import random
 
-from GameResources.SimplePlayers import Player, Move
+from Players.SimplePlayers import Player, Move
 from GameResources.Structure import Piece, GameBoard
 from abc import abstractmethod
 from collections import defaultdict
@@ -11,15 +12,15 @@ class StaticHeatmapPlayer(Player):
     """
     Heuristic Player with a static heatmap.
     """
-    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'GameResources/res/heatmaps/blank.txt'):
+    def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'Players/heatmaps/blank.txt'):
         Player.__init__(self, color, initial_pieces)
         self.board_size = board_size
-        self.current_heatmap = self.load_heatmap(default_heatmap)
+        self.current_heatmap = self.load_txt_heatmap(default_heatmap)
 
     @staticmethod
-    def load_heatmap(filepath: str) -> list[list[int]]:
+    def load_txt_heatmap(filepath: str) -> list[list[int]]:
         """
-        Load a heatmap from a file
+        Load a heatmap from a text file
         :param filepath: File path to load from
         :return: None
         """
@@ -27,13 +28,24 @@ class StaticHeatmapPlayer(Player):
         raw_map = read_file.read()
         read_file.close()
         map_lines = raw_map.split('\n')
-        heatmap = []
-        for x in range(len(map_lines[0])):
-            col = []
-            for y in range(len(map_lines)):
-                col.append(int(map_lines[y][x]))
-            heatmap.append(col)
-        return heatmap
+        parsed_heatmap = []
+        for line in map_lines:
+            parsed_heatmap.append([int(char) for char in line])
+        return parsed_heatmap
+
+    @staticmethod
+    def load_csv_heatmap(filepath: str) -> list[list[int]]:
+        """
+        Load a heatmap from a text file
+        :param filepath: File path to load from
+        :return: None
+        """
+        parsed_heatmap = []
+        with open(filepath) as csv_map:
+            data = csv.reader(csv_map)
+            for row in data:
+                parsed_heatmap.append([int(char) for char in row])
+        return parsed_heatmap
 
     def get_all_moves(self, board: GameBoard, pieces: list[Piece] = None) -> list[Move]:
         selected_pieces = pieces if pieces is not None else self.pieces
@@ -162,10 +174,10 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
 class HeatmapSwitcher(DynamicHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: dict[int, str] = None):
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
-        self.heatmaps = heatmaps if heatmaps is not None else {0: 'GameResources/res/heatmaps/aggressiveX.txt', 6: 'GameResources/res/heatmaps/sidewinder.txt'}
-        self.current_heatmap = self.load_heatmap(self.heatmaps[0])
+        self.heatmaps = heatmaps if heatmaps is not None else {0: 'Players/heatmaps/aggressiveX.txt', 6: 'Players/heatmaps/sidewinder.txt'}
+        self.current_heatmap = self.load_txt_heatmap(self.heatmaps[0])
 
     def update_heatmap(self, board: GameBoard) -> None:
         for threshold in self.heatmaps.keys():
             if self.turn_count == threshold:
-                self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
+                self.current_heatmap = self.load_txt_heatmap(self.heatmaps[threshold])

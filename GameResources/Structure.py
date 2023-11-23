@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-
+import Players
 import GameResources as GR
 from dataclasses import dataclass
 from termcolor2 import colored
@@ -126,7 +126,7 @@ class BoardSquare:
 class GameBoard:
     def __init__(self,
                  board_size: tuple[int, int],
-                 players: list[GR.SimplePlayers.Player],
+                 players: list[Players.SimplePlayers.Player],
                  starting_positions: list[[int, int]] = None):
         """ Initialize a board of board_size * board_size
         :param board_size: Size of the board (x,y)
@@ -152,7 +152,7 @@ class GameBoard:
         """
         return len(self.positions), len(self.positions[0])
 
-    def set_starting_positions(self, players: list[GR.SimplePlayers.Player]):
+    def set_starting_positions(self, players: list[Players.SimplePlayers.Player]):
         """
         Set stating positions for players
         Make the locations in starting_positions placeable for corresponding players
@@ -168,7 +168,7 @@ class GameBoard:
             x, y = self.starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
-    def is_stalemate(self, players: list[GR.SimplePlayers.Player]) -> bool:
+    def is_stalemate(self, players: list[Players.SimplePlayers.Player]) -> bool:
         """
         Is the board a stalemate?
         Either no placeable locations or all players have knocked
@@ -274,32 +274,32 @@ class GameBoard:
             return True
         return False
 
-    def get_printable_board(self, player: GR.SimplePlayers.Player = None) -> str:
+    def get_printable_board(self, player: Players.SimplePlayers.Player = None) -> str:
         """
         Return a printable board
         :param player: If player is specified print the placeable locations for that player
         :return: A Printable representation of the board
         """
-        ret = '     '
+        printable_board = '     '
         for col in range(len(self.positions)):
-            ret += f'{col:02} '
-        ret += '\n   '
-        ret += '_' * ((3 * len(self.positions)) + 3)
-        ret += '\n'
+            printable_board += f'{col:02} '
+        printable_board += '\n   '
+        printable_board += '_' * ((3 * len(self.positions)) + 3)
+        printable_board += '\n'
         for row in range(0, len(self.positions[0])):
-            ret += f'{row:02} | '
+            printable_board += f'{row:02} | '
             for x in range(0, len(self.positions)):
                 pos = self.positions[x][row]
                 if pos.color is not None:
-                    ret += colored('▩  ', pos.color)
+                    printable_board += colored('▩  ', pos.color)
                 elif player is not None and player.color in pos.placeable_by:
-                    ret += colored('▢  ', player.color)
+                    printable_board += colored('▢  ', player.color)
                 else:
-                    ret += '▢  '
-            ret += f'| {row:02}\n'
-        ret += '   '
-        ret += '‾' * ((3 * len(self.positions)) + 3)
-        ret += '\n     '
+                    printable_board += '▢  '
+            printable_board += f'| {row:02}\n'
+        printable_board += '   '
+        printable_board += '‾' * ((3 * len(self.positions)) + 3)
+        printable_board += '\n     '
         for col in range(len(self.positions)):
-            ret += f'{col:02} '
-        return ret
+            printable_board += f'{col:02} '
+        return printable_board

@@ -1,5 +1,9 @@
 /venv/
 /.idea/
 /GameResources/__pycache__/
-/Experiments/Logs/
-Experiments/__pycache__/SimUtils.cpython-311.pyc
+/Experiments/
+/GameReplays/
+Players/__pycache__/
+/Logs/
+Simulations/__pycache__/SimUtils.cpython-311.pyc
+Simulations/__pycache__/SimUtils.cpython-311.pyc

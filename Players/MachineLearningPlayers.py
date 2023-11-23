@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
-from GameResources.SimplePlayers import Player
+from Players.SimplePlayers import Player
 from GameResources.Structure import Piece, GameBoard
 from SimplePlayers import Move
 

@@ -1,10 +1,11 @@
 import concurrent.futures
 import copy
 import json
+import uuid
 
 from datetime import datetime
 from GameResources.Game import Tetros
-from GameResources.SimplePlayers import Player
+from Players.SimplePlayers import Player
 
 PLAYER_SCORE_TEMPLATE = {
                 'Coverage': 0,
@@ -13,7 +14,8 @@ PLAYER_SCORE_TEMPLATE = {
                 'Territory': 0,
                 'Squares Left': 0,
                 'Points': 0,
-                'Win': 0
+                'Win': 0,
+                'Active Turns': 0
             }
 
 
@@ -63,7 +65,7 @@ def simulate_games(sim_params: dict, no_games: int):
                     total_times.append(0)
                 for j in range(len(game_times)):
                     total_times[j] += game_times[j]
-            log_filename = 'Logs/Game' + str(i) + 'Scores' + logfile_date + '.json'
+            log_filename = f'Logs/Game-{game.uuid}.json'
             if log_obj != {}:
                 with open(log_filename, 'w') as write_file:
                     write_file.write(json.dumps(log_obj, indent=4))
@@ -83,7 +85,7 @@ def simulate_games(sim_params: dict, no_games: int):
             for total_time in total_times:
                 avg_times.append(total_time / no_games)
             log_obj['average_turn_times'] = make_loggable_turn_times(avg_times)
-        log_filename = 'Logs/Aggregate' + logfile_date + '.json'
+        log_filename = f'Logs/Aggregate-{logfile_date}.json'
         if log_obj != {}:
             with open(log_filename, 'w') as write_file:
                 write_file.write(json.dumps(log_obj, indent=4))
