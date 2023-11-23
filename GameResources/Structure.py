@@ -167,6 +167,7 @@ class GameBoard:
         random.shuffle(self.starting_positions)
         for i in range(len(players)):
             x, y = self.starting_positions[i]
+            players[i].starting_position = self.starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
     def is_stalemate(self, players: list[Players.SimplePlayers.Player]) -> bool:
