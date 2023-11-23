@@ -28,11 +28,8 @@ class StaticHeatmapPlayer(Player):
         read_file.close()
         map_lines = raw_map.split('\n')
         heatmap = []
-        for x in range(len(map_lines[0])):
-            col = []
-            for y in range(len(map_lines)):
-                col.append(int(map_lines[y][x]))
-            heatmap.append(col)
+        for line in map_lines:
+            heatmap.append([char for char in line])
         return heatmap
 
     def get_all_moves(self, board: GameBoard, pieces: list[Piece] = None) -> list[Move]:
