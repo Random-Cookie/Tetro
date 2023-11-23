@@ -14,12 +14,12 @@ class StaticHeatmapPlayer(Player):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], default_heatmap: str = 'Players/heatmaps/blank.txt'):
         Player.__init__(self, color, initial_pieces)
         self.board_size = board_size
-        self.current_heatmap = self.load_heatmap(default_heatmap)
+        self.current_heatmap = self.load_txt_heatmap(default_heatmap)
 
     @staticmethod
-    def load_heatmap(filepath: str) -> list[list[int]]:
+    def load_txt_heatmap(filepath: str) -> list[list[int]]:
         """
-        Load a heatmap from a file
+        Load a heatmap from a text file
         :param filepath: File path to load from
         :return: None
         """
@@ -163,9 +163,9 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece], board_size: tuple[int, int], heatmaps: dict[int, str] = None):
         DynamicHeatmapPlayer.__init__(self, color, initial_pieces, board_size)
         self.heatmaps = heatmaps if heatmaps is not None else {0: 'Players/heatmaps/aggressiveX.txt', 6: 'Players/heatmaps/sidewinder.txt'}
-        self.current_heatmap = self.load_heatmap(self.heatmaps[0])
+        self.current_heatmap = self.load_txt_heatmap(self.heatmaps[0])
 
     def update_heatmap(self, board: GameBoard) -> None:
         for threshold in self.heatmaps.keys():
             if self.turn_count == threshold:
-                self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
+                self.current_heatmap = self.load_txt_heatmap(self.heatmaps[threshold])
