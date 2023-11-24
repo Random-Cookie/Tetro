@@ -7,6 +7,23 @@ from datetime import datetime
 from GameResources.Game import Tetros
 from Players.SimplePlayers import Player
 
+ANSI_COLORS = ['black',
+               'red',
+               'green',
+               'yellow',
+               'blue',
+               'magenta',
+               'cyan',
+               'white',
+               'light_grey',
+               'dark_grey',
+               'light_red',
+               'light_green',
+               'light_yellow',
+               'light_blue',
+               'light_magenta',
+               'light_cyan']
+
 PLAYER_SCORE_TEMPLATE = {
                 'Coverage': 0,
                 'Density': 0,
