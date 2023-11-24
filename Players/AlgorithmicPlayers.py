@@ -21,6 +21,9 @@ class StaticHeatmapPlayer(Player):
         Player.__init__(self, color, initial_pieces)
         self.current_heatmap = self.load_txt_heatmap(default_heatmap)
 
+    def __str__(self):
+        return f'StaticHeatmapPlayer{{{super().__str__()}}}'
+
     @staticmethod
     def load_txt_heatmap(filepath: str) -> list[list[int]]:
         """
@@ -160,6 +163,9 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
     def __init__(self, color: str, initial_pieces: list[Piece]) -> None:
         StaticHeatmapPlayer.__init__(self, color, initial_pieces)
 
+    def __str__(self):
+        return super().__str__()
+
     @abstractmethod
     def update_heatmap(self, board: GameBoard) -> None:
         """
@@ -238,6 +244,9 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         self.heatmaps = heatmaps if heatmaps is not None else {15: 'Players/heatmaps/new_aggressive_x.txt', 20:  'Players/heatmaps/sidewinder.txt'}
         self.current_heatmap = self.load_txt_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
 
+    def __str__(self):
+        return f'HeatmapSwitcher{{{super().__str__()}, heatmaps: {self.heatmaps}}}'
+
     def update_heatmap(self, board: GameBoard) -> None:
         """
         Load the current heatmap, then return.
@@ -259,6 +268,9 @@ class AggressiveDynamic(HeatmapSwitcher):
         HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
         self.placeable_weight = 5
         self.adjacent_weight = -1
+
+    def __str__(self):
+        return f'AggressiveDynamic{{{super().__str__()}, placeable_weight: {self.placeable_weight}, adjacent_weight: {self.adjacent_weight}}}'
 
     def update_heatmap(self, board: GameBoard) -> None:
         """
