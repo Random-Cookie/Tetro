@@ -42,6 +42,7 @@ class StaticHeatmapPlayer(Player):
             else:
                 raise Exception('Invalid heatmap file type!')
         parsed_heatmap = []
+        # 'Flip' the heatmap so that it is in the same orientation as in the file
         for x in range(len(read_heatmap)):
             row = []
             for y in range(len(read_heatmap[0])):

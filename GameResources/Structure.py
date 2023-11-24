@@ -158,7 +158,6 @@ class GameBoard:
         Set stating positions for players
         Make the locations in starting_positions placeable for corresponding players
         :param players: Players to set starting positions for
-        :param starting_positions: desired starting positions
         """
         xmax = len(self.positions) - 1
         ymax = len(self.positions[0]) - 1
