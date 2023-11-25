@@ -20,9 +20,10 @@ class StaticHeatmapPlayer(Player):
         """
         Player.__init__(self, color, initial_pieces)
         self.current_heatmap = self.load_txt_heatmap(default_heatmap)
+        self.heatmap_name = default_heatmap
 
     def __str__(self):
-        return f'StaticHeatmapPlayer{{{super().__str__()}}}'
+        return f'StaticHeatmapPlayer{{{super().__str__()}, heatmap: {self.heatmap_name}}}'
 
     @staticmethod
     def load_txt_heatmap(filepath: str) -> list[list[int]]:
