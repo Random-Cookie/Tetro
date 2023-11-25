@@ -104,6 +104,14 @@ class ObjectFactory:
         return ret
 
     @staticmethod
+    def generate_single_default_shape_set(color: str):
+        shapes = ObjectFactory.STANDARD_SHAPES.values()
+        player_shapes = []
+        for shape in shapes:
+            player_shapes.append(Piece(shape['name'], shape['coords'], color))
+        return player_shapes
+
+    @staticmethod
     def generate_human_players(player_colors: list = None, initial_pieces: dict = None) -> list[HumanPlayer]:
         ret = []
         player_colors = ['blue', 'green', 'red', 'yellow'] if player_colors is None else player_colors
