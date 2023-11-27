@@ -103,10 +103,12 @@ def simulate_games(sim_params: dict, no_games: int):
                 avg_times.append(total_time / no_games)
             log_obj['average_turn_times'] = make_loggable_turn_times(avg_times)
         log_obj['no_games'] = no_games
-        log_filename = f'Logs/Aggregate-{logfile_date}.json'
+        log_filepath = f'Logs/Aggregate-{uuid.uuid4()}.json'
         if log_obj != {}:
-            with open(log_filename, 'w') as write_file:
+            with open(log_filepath, 'w') as write_file:
                 write_file.write(json.dumps(log_obj, indent=4))
+        return log_filepath
+    return ""
 
 
 def make_logable_players(players: list[Player]):
