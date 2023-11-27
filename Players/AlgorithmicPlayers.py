@@ -1,6 +1,7 @@
 import copy
 import csv
 import random
+import GameResources
 
 from termcolor import colored
 from Players.SimplePlayers import Player, Move
@@ -13,12 +14,12 @@ class StaticHeatmapPlayer(Player):
     """
     Heuristic Player with a static heatmap.
     """
-    def __init__(self, color: str, initial_pieces: list[Piece], default_heatmap: str = 'Players/heatmaps/blank.txt') -> None:
+    def __init__(self, color: str, default_heatmap: str = 'Players/heatmaps/blank.txt', initial_pieces: list[Piece] = None) -> None:
         """
         Call super constructor, then initialise self.current_heatmap
         :param default_heatmap:
         """
-        Player.__init__(self, color, initial_pieces)
+        Player.__init__(self, color, initial_pieces if initial_pieces is not None else GameResources.ObjectFactory.ObjectFactory.generate_single_default_shape_set(color))
         self.current_heatmap = self.load_txt_heatmap(default_heatmap)
         self.heatmap_name = default_heatmap
 
@@ -161,8 +162,8 @@ class StaticHeatmapPlayer(Player):
 
 
 class DynamicHeatmapPlayer(StaticHeatmapPlayer):
-    def __init__(self, color: str, initial_pieces: list[Piece]) -> None:
-        StaticHeatmapPlayer.__init__(self, color, initial_pieces)
+    def __init__(self, color: str) -> None:
+        StaticHeatmapPlayer.__init__(self, color)
 
     def __str__(self):
         return super().__str__()
@@ -235,13 +236,13 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
 
 
 class HeatmapSwitcher(DynamicHeatmapPlayer):
-    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
+    def __init__(self, color: str, heatmaps: dict[int, str] = None):
         """
         Call super constructor, load the heatmaps, initialise the current heatmap.
         Heatmaps should be provided in a dict {threshold: filename}, in ascending order of threshold.
         :param heatmaps:
         """
-        DynamicHeatmapPlayer.__init__(self, color, initial_pieces)
+        DynamicHeatmapPlayer.__init__(self, color)
         self.heatmaps = heatmaps if heatmaps is not None else {15: 'Players/heatmaps/new_aggressive_x.txt', 20:  'Players/heatmaps/sidewinder.txt'}
         self.current_heatmap = self.load_txt_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
 
@@ -262,11 +263,11 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
 
 
 class AggressiveDynamic(HeatmapSwitcher):
-    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
+    def __init__(self, color: str, heatmaps: dict[int, str] = None):
         """
         Aggressive heatmap builds on heatmap switcher by targeting other players placeable locations.
         """
-        HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
+        HeatmapSwitcher.__init__(self, color, heatmaps)
         self.placeable_weight = 5
         self.adjacent_weight = -1
 
@@ -290,28 +291,28 @@ class AggressiveDynamic(HeatmapSwitcher):
                             self.current_heatmap[x][y] += self.adjacent_weight
                     elif player in board.positions[x][y].placeable_by and player != self.color:
                         self.current_heatmap[x][y] += self.placeable_weight
-        print(self.get_printable_heatmap(board))
+        # print(self.get_printable_heatmap(board))
 
 
 class DefensiveDynamic(HeatmapSwitcher):
-    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
-        HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
+    def __init__(self, color: str, heatmaps: dict[int, str] = None):
+        HeatmapSwitcher.__init__(self, color, heatmaps)
 
     def update_heatmap(self, board: GameBoard) -> None:
         pass
 
 
 class DenseDynamic(HeatmapSwitcher):
-    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
-        HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
+    def __init__(self, color: str, heatmaps: dict[int, str] = None):
+        HeatmapSwitcher.__init__(self, color, heatmaps)
 
     def update_heatmap(self, board: GameBoard) -> None:
         pass
 
 
 class LandGrabber(HeatmapSwitcher):
-    def __init__(self, color: str, initial_pieces: list[Piece], heatmaps: dict[int, str] = None):
-        HeatmapSwitcher.__init__(self, color, initial_pieces, heatmaps)
+    def __init__(self, color: str, heatmaps: dict[int, str] = None):
+        HeatmapSwitcher.__init__(self, color, heatmaps)
 
     def update_heatmap(self, board: GameBoard) -> None:
         pass
