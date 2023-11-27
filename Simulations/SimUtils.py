@@ -90,7 +90,7 @@ def simulate_games(sim_params: dict, no_games: int):
     if sim_params['logging_modes']:
         log_obj = {}
         if 'players' in sim_params['logging_modes']:
-            log_obj['players'] = make_logable_players(game.players)
+            log_obj['players'] = [str(player) for player in game.players]
         if 'total_scores' in sim_params['logging_modes']:
             log_obj['total_scores'] = total_scores
         if 'average_scores' in sim_params['logging_modes']:
@@ -102,6 +102,7 @@ def simulate_games(sim_params: dict, no_games: int):
             for total_time in total_times:
                 avg_times.append(total_time / no_games)
             log_obj['average_turn_times'] = make_loggable_turn_times(avg_times)
+        log_obj['no_games'] = no_games
         log_filename = f'Logs/Aggregate-{logfile_date}.json'
         if log_obj != {}:
             with open(log_filename, 'w') as write_file:
