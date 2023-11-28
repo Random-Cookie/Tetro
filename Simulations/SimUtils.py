@@ -35,12 +35,16 @@ PLAYER_SCORE_TEMPLATE = {
                 'Active Turns': 0
             }
 
+MAX_CONCURRENT_WORKERS = 8
+
 
 def simulate_concurrent_games(sim_params: dict, total_threads: int, games_per_thread: int, max_concurrent_threads: int = 8):
     sim_params_list = [sim_params] * total_threads
     games_per_thread_list = [games_per_thread] * total_threads
+    results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent_threads) as executor:
-        executor.map(simulate_games, sim_params_list, games_per_thread_list)
+        results = list(executor.map(simulate_games, sim_params_list, games_per_thread_list))
+    return results
 
 
 def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):

@@ -103,10 +103,7 @@ class Tetros:
             print(top_row)
             print(bottom_row)
         if 'game_replay' in self.logging_modes:
-            printable_players = []
-            for player in self.players:
-                printable_players.append(str(player))
-            game_replay_data['players'] = printable_players
+            game_replay_data['players'] = [str(player) for player in self.players]
             game_replay_data['scores'] = self.get_printable_scores()
             log_filename = f'GameReplays/GameReplay-{self.uuid}.json'
             with open(log_filename, 'w') as write_file:
