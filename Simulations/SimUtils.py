@@ -43,8 +43,7 @@ def simulate_concurrent_games(sim_params: dict, total_threads: int, games_per_th
         executor.map(simulate_games, sim_params_list, games_per_thread_list)
 
 
-def simulate_games(sim_params: dict, no_games: int):
-    logfile_date = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
+def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
     total_scores = {}
     total_times = []
     for player in sim_params['players']:
@@ -52,7 +51,8 @@ def simulate_games(sim_params: dict, no_games: int):
     no_games = no_games if no_games >= 1 else 1
     game = Tetros()
     for i in range(no_games):
-        print('Playing Game ' + str(i))
+        if verbose:
+            print('Playing Game ' + str(i))
         game = Tetros(sim_params['board_size'],
                       copy.deepcopy(sim_params['initial_pieces']),
                       copy.deepcopy(sim_params['players']),
