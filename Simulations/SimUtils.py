@@ -241,10 +241,7 @@ def aggregate_league_scores(log_files: list[str], players: list[Player], games_p
                             aggregated_logs[key][player] = scores[player]
         if destructive:
             remove(log_file_path)
-    for player in aggregated_logs['total_scores'].keys():
-        aggregated_logs['average_scores'][player] = {}
-        for score_type in aggregated_logs['total_scores'][player]:
-            aggregated_logs['average_scores'][player][score_type] = aggregated_logs['total_scores'][player][score_type] / aggregated_logs['no_games_per_player']
+    aggregated_logs['average_scores'] = calculate_average_scores(aggregated_logs['total_scores'], aggregated_logs['no_games_per_player'])
     aggregated_logfile_name = f'Logs/Tournament-{uuid4()}.json'
     with open(aggregated_logfile_name, 'w') as write_file:
         write_file.write(json.dumps(aggregated_logs, indent=4))
