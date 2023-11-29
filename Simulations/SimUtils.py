@@ -41,7 +41,16 @@ PLAYER_SCORE_TEMPLATE = {
 MAX_CONCURRENT_WORKERS = 8
 
 
-def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_per_thread: int = 100, max_concurrent_threads: int = 8):
+def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_per_thread: int = 100, max_concurrent_workers: int = 8) -> list[str]:
+    """
+    Simulate games with the same parameters over multiple processes.
+    Uses concurrent.futures.ProcessPoolExecutor, ensure to use if __name__ == '__main__'
+    :param sim_params: The simulation parameters
+    :param total_threads: Total threads to run
+    :param games_per_thread: How many games to play on each thread.
+    :param max_concurrent_workers: Maximum concurrent workers
+    :return:
+    """
     sim_params_list = [sim_params] * total_threads
     games_per_thread_list = [games_per_thread] * total_threads
     results = []
@@ -50,7 +59,13 @@ def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_pe
     return results
 
 
-def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
+def simulate_games(sim_params: dict, no_games: int) -> str:
+    """
+    Simulate the given number of games on a single thread
+    :param sim_params: The simulation parameters
+    :param no_games: Number of games to play
+    :return: aggregate logfile name, empty if no logfile
+    """
     total_scores = {}
     total_times = []
     sim_id = uuid4()
@@ -151,14 +166,25 @@ def run_league(players: list[Player], games_per_combination: int = 20, keep_inte
     print(f'League complete, log file at: \"{agg_log_path}\"')
 
 
-def make_logable_players(players: list[Player]):
+def make_logable_players(players: list[Player]) -> dict[str, str]:
+    """
+    Generate a dict with the string representation of the players.
+    :param players: List of players
+    :return: Player colors to plater strings
+    """
     player_dict = {}
     for player in players:
         player_dict[player.color] = type(player).__name__
     return player_dict
 
 
-def calculate_average_scores(total_scores: dict, no_games: int):
+def calculate_average_scores(total_scores: dict, no_games: int) -> dict[str, dict[str, int]]:
+    """
+    Calculate average scores.
+    :param total_scores: Total score dictionary
+    :param no_games: number of games played
+    :return: Dict containing player average scores
+    """
     average_scores = {}
     for player in total_scores.keys():
         average_scores[player] = deepcopy(PLAYER_SCORE_TEMPLATE)
@@ -167,7 +193,12 @@ def calculate_average_scores(total_scores: dict, no_games: int):
     return average_scores
 
 
-def make_loggable_turn_times(turn_times: list[float]):
+def make_loggable_turn_times(turn_times: list[float]) -> dict[str, float]:
+    """
+    Make the turn times that can be logged
+    :param turn_times: list of turn times
+    :return: Loggable turn times
+    """
     turn_times_dict = {}
     total_time = 0
     for i in range(len(turn_times)):
