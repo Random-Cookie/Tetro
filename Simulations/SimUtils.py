@@ -121,6 +121,36 @@ def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
     return ""
 
 
+def run_league(players: list[Player], games_per_combination: int = 20, keep_intermediate_logs: bool = False, board_size: tuple[int, int] = (20, 20)):
+    """
+    Run a tournament with every possible combination of the given players, and write the result to an aggregated log
+    file.
+    Uses concurrent.futures.ProcessPoolExecutor, ensure to use if __name__ == '__main__'
+    :param players: List of players, max 16.
+    :param games_per_combination: Number of games each combination of players will play
+    :param keep_intermediate_logs: Keep logs for each individual combination?
+    :param  board_size: Size of the board. Default (20, 20)
+    :return:
+    """
+    player_sets = [list(player_set_i) for player_set_i in combinations(players, 4)]
+    print(f'Beginning tournaments, {len(player_sets)} tournaments to run...')
+    league_game_params = []
+    for player_set in player_sets:
+        league_game_params.append({'board_size': board_size,
+                             'players': player_set,
+                             'starting_positions': [[0, 0], [0, board_size[1] - 1], [board_size[0] - 1, 0],
+                                                    [board_size[0] - 1, board_size[1] - 1]],
+                             'initial_pieces': ObjectFactory.generate_shapes(),
+                             'display_modes': ['games_complete'],
+                             'logging_modes': ['players', 'total_scores', 'average_scores']})
+    games_per_thread_list = [games_per_combination] * len(league_game_params)
+    logfile_paths = []
+    with ProcessPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+        logfile_paths.extend(executor.map(simulate_games, league_game_params, games_per_thread_list))
+    agg_log_path = aggregate_league_scores(logfile_paths, players, not keep_intermediate_logs)
+    print(f'League complete, log file at: \"{agg_log_path}\"')
+
+
 def make_logable_players(players: list[Player]):
     player_dict = {}
     for player in players:
@@ -145,3 +175,40 @@ def make_loggable_turn_times(turn_times: list[float]):
         total_time += turn_times[i]
     turn_times_dict['total'] = total_time
     return turn_times_dict
+
+
+def aggregate_league_scores(log_files: list[str], players: list[Player], destructive: bool = True) -> str:
+    """
+    Aggregate the scores from the given list of log files into one logfile.
+    :param log_files: List of logfiles to aggregate
+    :param players: list of players (to be written to log)
+    :param destructive: Destroy the aggregated log files?
+    """
+    aggregated_logs = {'players': [str(player) for player in players],
+                       'no_games_per_player': comb(len(players), 4) * (4 / len(players)),
+                       'total_scores': {},
+                       'average_scores': {}}
+    for log_file_path in log_files:
+        with open(log_file_path) as aggregate_log:
+            data = json.load(aggregate_log)
+            for key in data:
+                if key == 'players':
+                    pass
+                elif key == 'total_scores':
+                    scores = data[key]
+                    for player in scores.keys():
+                        if player in aggregated_logs[key].keys():
+                            for score_type in scores[player]:
+                                aggregated_logs[key][player][score_type] += scores[player][score_type]
+                        else:
+                            aggregated_logs[key][player] = scores[player]
+        if destructive:
+            remove(log_file_path)
+    for player in aggregated_logs['total_scores'].keys():
+        aggregated_logs['average_scores'][player] = {}
+        for score_type in aggregated_logs['total_scores'][player]:
+            aggregated_logs['average_scores'][player][score_type] = aggregated_logs['total_scores'][player][score_type] / aggregated_logs['no_games_per_player']
+    aggregated_logfile_name = f'Logs/Tournament-{uuid4()}.json'
+    with open(aggregated_logfile_name, 'w') as write_file:
+        write_file.write(json.dumps(aggregated_logs, indent=4))
+    return aggregated_logfile_name
