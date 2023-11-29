@@ -43,7 +43,7 @@ def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_pe
     games_per_thread_list = [games_per_thread] * total_threads
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent_threads) as executor:
-        results = list(executor.map(simulate_games, sim_params_list, games_per_thread_list))
+        results.extend(list(executor.map(simulate_games, sim_params_list, games_per_thread_list)))
     return results
 
 
