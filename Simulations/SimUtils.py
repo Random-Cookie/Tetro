@@ -38,7 +38,7 @@ PLAYER_SCORE_TEMPLATE = {
 MAX_CONCURRENT_WORKERS = 8
 
 
-def simulate_concurrent_games(sim_params: dict, total_threads: int, games_per_thread: int, max_concurrent_threads: int = 8):
+def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_per_thread: int = 100, max_concurrent_threads: int = 8):
     sim_params_list = [sim_params] * total_threads
     games_per_thread_list = [games_per_thread] * total_threads
     results = []
