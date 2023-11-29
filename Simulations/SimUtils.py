@@ -1,11 +1,14 @@
-import concurrent.futures
-import copy
 import json
-import uuid
 
-from datetime import datetime
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from copy import deepcopy
 from GameResources.Game import Tetros
+from GameResources.ObjectFactory import ObjectFactory
+from itertools import combinations
+from math import comb
+from os import remove
 from Players.SimplePlayers import Player
+from uuid import uuid4
 
 ANSI_COLORS = ['black',
                'red',
@@ -42,7 +45,7 @@ def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_pe
     sim_params_list = [sim_params] * total_threads
     games_per_thread_list = [games_per_thread] * total_threads
     results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent_threads) as executor:
+    with ThreadPoolExecutor(max_workers=max_concurrent_threads) as executor:
         results.extend(list(executor.map(simulate_games, sim_params_list, games_per_thread_list)))
     return results
 
@@ -51,15 +54,15 @@ def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
     total_scores = {}
     total_times = []
     for player in sim_params['players']:
-        total_scores[player.color] = copy.deepcopy(PLAYER_SCORE_TEMPLATE)
+        total_scores[player.color] = deepcopy(PLAYER_SCORE_TEMPLATE)
     no_games = no_games if no_games >= 1 else 1
     game = Tetros()
     for i in range(no_games):
         if verbose:
             print('Playing Game ' + str(i))
         game = Tetros(sim_params['board_size'],
-                      copy.deepcopy(sim_params['initial_pieces']),
-                      copy.deepcopy(sim_params['players']),
+                      deepcopy(sim_params['initial_pieces']),
+                      deepcopy(sim_params['players']),
                       sim_params['starting_positions'],
                       sim_params['display_modes'],
                       sim_params['logging_modes'])
@@ -125,7 +128,7 @@ def make_logable_players(players: list[Player]):
 def calculate_average_scores(total_scores: dict, no_games: int):
     average_scores = {}
     for player in total_scores.keys():
-        average_scores[player] = copy.deepcopy(PLAYER_SCORE_TEMPLATE)
+        average_scores[player] = deepcopy(PLAYER_SCORE_TEMPLATE)
         for key in total_scores[player]:
             average_scores[player][key] = total_scores[player][key] / no_games
     return average_scores
