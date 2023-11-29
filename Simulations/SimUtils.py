@@ -53,6 +53,7 @@ def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_pe
 def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
     total_scores = {}
     total_times = []
+    sim_id = uuid4()
     for player in sim_params['players']:
         total_scores[player.color] = deepcopy(PLAYER_SCORE_TEMPLATE)
     no_games = no_games if no_games >= 1 else 1
@@ -110,7 +111,7 @@ def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
                 avg_times.append(total_time / no_games)
             log_obj['average_turn_times'] = make_loggable_turn_times(avg_times)
         log_obj['no_games'] = no_games
-        log_filepath = f'Logs/Aggregate-{uuid.uuid4()}.json'
+        log_filepath = f'Logs/Aggregate-{sim_id}.json'
         if log_obj != {}:
             with open(log_filepath, 'w') as write_file:
                 write_file.write(json.dumps(log_obj, indent=4))
