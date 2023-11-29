@@ -38,10 +38,11 @@ PLAYER_SCORE_TEMPLATE = {
                 'Active Turns': 0
             }
 
-MAX_CONCURRENT_WORKERS = 8
 
-
-def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_per_thread: int = 100, max_concurrent_workers: int = 8) -> list[str]:
+def simulate_concurrent_games(sim_params: dict,
+                              total_threads: int = 8,
+                              games_per_thread: int = 100,
+                              max_concurrent_workers: int = 8) -> list[str]:
     """
     Simulate games with the same parameters over multiple processes.
     Uses concurrent.futures.ProcessPoolExecutor, ensure to use if __name__ == '__main__'
@@ -136,7 +137,11 @@ def simulate_games(sim_params: dict, no_games: int) -> str:
     return ''
 
 
-def run_league(players: list[Player], games_per_combination: int = 20, keep_intermediate_logs: bool = False, board_size: tuple[int, int] = (20, 20)):
+def run_league(players: list[Player],
+               games_per_combination: int = 20,
+               keep_intermediate_logs: bool = False,
+               board_size: tuple[int, int] = (20, 20),
+               max_concurrent_workers: int = 8):
     """
     Run a tournament with every possible combination of the given players, and write the result to an aggregated log
     file.
@@ -145,6 +150,7 @@ def run_league(players: list[Player], games_per_combination: int = 20, keep_inte
     :param games_per_combination: Number of games each combination of players will play
     :param keep_intermediate_logs: Keep logs for each individual combination?
     :param  board_size: Size of the board. Default (20, 20)
+    :param max_concurrent_workers: Maximum concurrent workers
     :return:
     """
     player_sets = [list(player_set_i) for player_set_i in combinations(players, 4)]
@@ -160,7 +166,7 @@ def run_league(players: list[Player], games_per_combination: int = 20, keep_inte
                              'logging_modes': ['players', 'total_scores', 'average_scores']})
     games_per_thread_list = [games_per_combination] * len(league_game_params)
     logfile_paths = []
-    with ProcessPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+    with ProcessPoolExecutor(max_workers=max_concurrent_workers) as executor:
         logfile_paths.extend(executor.map(simulate_games, league_game_params, games_per_thread_list))
     agg_log_path = aggregate_league_scores(logfile_paths, players, games_per_combination, not keep_intermediate_logs)
     print(f'League complete, log file at: \"{agg_log_path}\"')
@@ -216,10 +222,9 @@ def aggregate_league_scores(log_files: list[str], players: list[Player], games_p
     :param games_per_combination: games per combo
     :param destructive: Destroy the aggregated log files?
     """
-    aggregated_logs = {'players': [str(player) for player in players],
-                       'no_games_per_player': comb(len(players), 4) * (4 / len(players)),
-                       'total_scores': {},
-                       'average_scores': {}}
+    aggregated_logs = {'players': make_logable_players(players),
+                       'no_games_per_player': int(comb(len(players), 4) * (4 / len(players))) * games_per_combination,
+                       'total_scores': {}}
     for log_file_path in log_files:
         with open(log_file_path) as aggregate_log:
             data = json.load(aggregate_log)
