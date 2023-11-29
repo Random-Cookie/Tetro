@@ -138,7 +138,7 @@ def simulate_games(sim_params: dict, no_games: int) -> str:
 
 
 def run_league(players: list[Player],
-               games_per_combination: int = 20,
+               games_per_combination: int = 100,
                keep_intermediate_logs: bool = False,
                board_size: tuple[int, int] = (20, 20),
                max_concurrent_workers: int = 8):
