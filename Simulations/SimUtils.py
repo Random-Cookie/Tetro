@@ -1,6 +1,6 @@
 import json
 
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from copy import deepcopy
 from GameResources.Game import Tetros
 from GameResources.ObjectFactory import ObjectFactory
@@ -54,7 +54,7 @@ def simulate_concurrent_games(sim_params: dict, total_threads: int = 8, games_pe
     sim_params_list = [sim_params] * total_threads
     games_per_thread_list = [games_per_thread] * total_threads
     results = []
-    with ThreadPoolExecutor(max_workers=max_concurrent_threads) as executor:
+    with ProcessPoolExecutor(max_workers=max_concurrent_workers) as executor:
         results.extend(list(executor.map(simulate_games, sim_params_list, games_per_thread_list)))
     return results
 
@@ -133,7 +133,7 @@ def simulate_games(sim_params: dict, no_games: int) -> str:
             with open(log_filepath, 'w') as write_file:
                 write_file.write(json.dumps(log_obj, indent=4))
         return log_filepath
-    return ""
+    return ''
 
 
 def run_league(players: list[Player], games_per_combination: int = 20, keep_intermediate_logs: bool = False, board_size: tuple[int, int] = (20, 20)):
@@ -174,7 +174,7 @@ def make_logable_players(players: list[Player]) -> dict[str, str]:
     """
     player_dict = {}
     for player in players:
-        player_dict[player.color] = type(player).__name__
+        player_dict[player.color] = str(player)
     return player_dict
 
 
