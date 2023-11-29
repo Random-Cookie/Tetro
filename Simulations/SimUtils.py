@@ -162,7 +162,7 @@ def run_league(players: list[Player], games_per_combination: int = 20, keep_inte
     logfile_paths = []
     with ProcessPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
         logfile_paths.extend(executor.map(simulate_games, league_game_params, games_per_thread_list))
-    agg_log_path = aggregate_league_scores(logfile_paths, players, not keep_intermediate_logs)
+    agg_log_path = aggregate_league_scores(logfile_paths, players, games_per_combination, not keep_intermediate_logs)
     print(f'League complete, log file at: \"{agg_log_path}\"')
 
 
@@ -208,11 +208,12 @@ def make_loggable_turn_times(turn_times: list[float]) -> dict[str, float]:
     return turn_times_dict
 
 
-def aggregate_league_scores(log_files: list[str], players: list[Player], destructive: bool = True) -> str:
+def aggregate_league_scores(log_files: list[str], players: list[Player], games_per_combination: int, destructive: bool = True) -> str:
     """
     Aggregate the scores from the given list of log files into one logfile.
     :param log_files: List of logfiles to aggregate
     :param players: list of players (to be written to log)
+    :param games_per_combination: games per combo
     :param destructive: Destroy the aggregated log files?
     """
     aggregated_logs = {'players': [str(player) for player in players],
