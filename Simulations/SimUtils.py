@@ -59,7 +59,7 @@ def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
     no_games = no_games if no_games >= 1 else 1
     game = Tetros()
     for i in range(no_games):
-        if verbose:
+        if 'game_complete' in sim_params['display_modes']:
             print('Playing Game ' + str(i))
         game = Tetros(sim_params['board_size'],
                       deepcopy(sim_params['initial_pieces']),
@@ -94,6 +94,8 @@ def simulate_games(sim_params: dict, no_games: int, verbose: bool = False):
             if log_obj != {}:
                 with open(log_filename, 'w') as write_file:
                     write_file.write(json.dumps(log_obj, indent=4))
+    if 'games_complete' in sim_params['display_modes']:
+        print(f'Simulation {sim_id} complete, {no_games} games completed.')
     # Aggregate Logging
     if sim_params['logging_modes']:
         log_obj = {}
