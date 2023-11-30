@@ -20,40 +20,39 @@ class StaticHeatmapPlayer(Player):
         :param default_heatmap:
         """
         Player.__init__(self, color, initial_pieces if initial_pieces is not None else GameResources.ObjectFactory.ObjectFactory.generate_single_default_shape_set(color))
-        self.current_heatmap = self.load_txt_heatmap(default_heatmap)
+        self.current_heatmap = self.load_heatmap(default_heatmap)
         self.heatmap_name = default_heatmap
 
     def __str__(self):
         return f'StaticHeatmapPlayer{{{super().__str__()}, heatmap: {self.heatmap_name}}}'
 
     @staticmethod
-    def load_txt_heatmap(filepath: str) -> list[list[int]]:
+    def load_heatmap(filepath: str) -> list[list[int]]:
         """
         Load a heatmap from a text file.
         :param filepath: File path to load from
         :return: None
         """
-        read_file = open(filepath)
-        raw_map = read_file.read()
-        read_file.close()
-        map_lines = raw_map.split('\n')
+        read_heatmap = []
+        file_ext = filepath.split('.')[-1]
+        with open(filepath) as heatmap_file:
+            if file_ext == 'txt':
+                data = heatmap_file.read().split('\n')
+                for row in data:
+                    read_heatmap.append([int(char) for char in row])
+            elif file_ext == 'csv':
+                data = csv.reader(heatmap_file)
+                for row in data:
+                    read_heatmap.append([int(char) for char in row])
+            else:
+                raise Exception('Invalid heatmap file type!')
         parsed_heatmap = []
-        for line in map_lines:
-            parsed_heatmap.append([int(char) for char in line])
-        return parsed_heatmap
-
-    @staticmethod
-    def load_csv_heatmap(filepath: str) -> list[list[int]]:
-        """
-        Load a heatmap from a text file
-        :param filepath: File path to load from
-        :return: None
-        """
-        parsed_heatmap = []
-        with open(filepath) as csv_map:
-            data = csv.reader(csv_map)
-            for row in data:
-                parsed_heatmap.append([int(char) for char in row])
+        # 'Flip' the heatmap so that it is in the same orientation as in the file
+        for x in range(len(read_heatmap)):
+            row = []
+            for y in range(len(read_heatmap[0])):
+                row.append(read_heatmap[y][x])
+            parsed_heatmap.append(row)
         return parsed_heatmap
 
     def get_printable_heatmap(self, board: GameBoard) -> str:
@@ -186,6 +185,19 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
         self.update_heatmap(board)
         return StaticHeatmapPlayer.select_move(self, board)
 
+    def tiebreak_moves(self, moves: list[Move]) -> Move:
+        """
+        Return one of the moves containing the "largest piece"
+        :param moves: Moves to tie-break
+        :return: A single chosen move
+        """
+        max_index = max([move.piece_index for move in moves])
+        culled_moves = []
+        for move in moves:
+            if move.piece_index == max_index:
+                culled_moves.append(move)
+        return random.choice(culled_moves)
+
     def heatmap_min_max(self) -> tuple[int, int]:
         """
         Get min and max values in heatmap.
@@ -221,18 +233,13 @@ class DynamicHeatmapPlayer(StaticHeatmapPlayer):
             for y in range(len(self.current_heatmap[0])):
                 self.current_heatmap[x][y] *= mul
 
-    def tiebreak_moves(self, moves: list[Move]) -> Move:
+    def rotate_heatmap(self, rotations: int = 1) -> None:
         """
-        Return one of the moves containing the "largest piece"
-        :param moves: Moves to tie-break
-        :return: A single chosen move
+        Rotate the current heatmap 90 degrees clockwise.
+        :param rotations: Number of times to rotate
         """
-        max_index = max([move.piece_index for move in moves])
-        culled_moves = []
-        for move in moves:
-            if move.piece_index == max_index:
-                culled_moves.append(move)
-        return random.choice(culled_moves)
+        for i in range(rotations):
+            self.current_heatmap = list(list(x) for x in zip(*self.current_heatmap))[::-1]
 
 
 class HeatmapSwitcher(DynamicHeatmapPlayer):
@@ -244,7 +251,7 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         """
         DynamicHeatmapPlayer.__init__(self, color)
         self.heatmaps = heatmaps if heatmaps is not None else {15: 'Players/heatmaps/new_aggressive_x.txt', 20:  'Players/heatmaps/sidewinder.txt'}
-        self.current_heatmap = self.load_txt_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
+        self.current_heatmap = self.load_heatmap(self.heatmaps[list(self.heatmaps.keys())[0]])
 
     def __str__(self):
         return f'HeatmapSwitcher{{{super().__str__()}, heatmaps: {self.heatmaps}}}'
@@ -258,7 +265,15 @@ class HeatmapSwitcher(DynamicHeatmapPlayer):
         """
         for threshold in self.heatmaps.keys():
             if self.turn_count <= threshold:
-                self.current_heatmap = self.load_txt_heatmap(self.heatmaps[threshold])
+                self.current_heatmap = self.load_heatmap(self.heatmaps[threshold])
+                max_x = len(board.positions) - 1
+                max_y = len(board.positions[0]) - 1
+                if board.positions[max_x][0] == self.color or self.color in board.positions[max_x][0].placeable_by:
+                    self.rotate_heatmap()
+                elif board.positions[max_x][max_y] == self.color or self.color in board.positions[max_x][max_y].placeable_by:
+                    self.rotate_heatmap(2)
+                elif board.positions[0][max_y] == self.color or self.color in board.positions[0][max_y].placeable_by:
+                    self.rotate_heatmap(3)
                 return
 
 

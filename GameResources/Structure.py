@@ -135,9 +135,9 @@ class GameBoard:
         :param starting_positions: Optional starting positions
         """
         self.positions = []
-        for y in range(0, board_size[1]):
+        for y in range(board_size[1]):
             row = []
-            for x in range(0, board_size[0]):
+            for x in range(board_size[0]):
                 row.append(BoardSquare([]))
             self.positions.append(row)
         self.starting_positions = starting_positions
@@ -166,6 +166,7 @@ class GameBoard:
         random.shuffle(self.starting_positions)
         for i in range(len(players)):
             x, y = self.starting_positions[i]
+            players[i].starting_position = self.starting_positions[i]
             self.positions[x][y].placeable_by.append(players[i].color)
 
     def is_stalemate(self, players: list[Players.SimplePlayers.Player]) -> bool:

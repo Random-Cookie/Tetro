@@ -41,6 +41,7 @@ class Player(ABC):
         # self. final piece is used to detect if the final piece placed was the "one" piece, this grants 5 bonus points
         self.final_piece = None
         self.turn_count = 0
+        self.starting_position = []
 
     def __str__(self):
         """

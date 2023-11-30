@@ -8,7 +8,7 @@ INITIAL_PIECES = ObjectFactory().generate_shapes()
 PLAYERS = [StaticHeatmapPlayer('blue', INITIAL_PIECES[0], 'Players/heatmaps/aggressiveX.txt'),
     StaticHeatmapPlayer('green', INITIAL_PIECES[1], 'Players/heatmaps/new_aggressive_x.txt'),
     HeatmapSwitcher('red', INITIAL_PIECES[2]),
-    AggressiveDynamic('yellow', INITIAL_PIECES[3], {30: 'Players/heatmaps/bullseye.txt'})]
+    AggressiveDynamic('yellow', INITIAL_PIECES[3], {30: 'Players/heatmaps/blank.csv'})]
 
 GAME_PARAMS = {'board_size': BOARD_SIZE,
                'players': PLAYERS,
