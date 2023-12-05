@@ -55,9 +55,8 @@ class Player(ABC):
         """
         ret = '| '
         for i in range(len(self.pieces)):
-            ret += str(i) + ' : ' + self.pieces[i].name
-            ret += ' | '
-        return ret + '\n'
+            ret += f'{str(i)}: {self.pieces[i].name} | '
+        return f'{ret}\n'
 
     def get_printable_shapes(self) -> str:
         """
@@ -101,18 +100,6 @@ class Player(ABC):
                     placeables.append((x, y))
         return placeables
 
-    @abstractmethod
-    def select_move(self, board: GameBoard) -> Move | None:
-        """
-        Abstract method for selecting a piece all subclasses must implement
-        If a piece cannot be placed return none
-        If you cannot place any pieces, set self.has_knocked = true to indicate you are passing all turns
-        :param board: The game board for analysis or printing
-        :return: Placement parameters: (piece, piece_index, (x,y)), None if a piece cannot be placed
-        """
-        self.has_knocked = True
-        return None
-
     def place_piece(self, board: GameBoard, move: Move) -> bool:
         """
         Place a piece
@@ -121,7 +108,6 @@ class Player(ABC):
         :return: Was the piece placed?
         """
         x, y = move.position
-
         if board.place_piece(x, y, move.piece):
             if len(self.pieces) == 1:
                 self.final_piece = move.piece
@@ -135,10 +121,8 @@ class Player(ABC):
         :param board: The gameboard to analyse
         @:returns True if piece was placed
         """
-        place_params = self.select_move(board)
-        while place_params is not None and not self.place_piece(board, place_params):
-            place_params = self.select_move(board)
-        if place_params is not None:
+        move = self.select_move(board)
+        if move is not None and self.place_piece(board, move):
             self.turn_count += 1
             return True
         return False
@@ -160,6 +144,18 @@ class Player(ABC):
         for piece in self.pieces:
             count += len(piece.currentCoords)
         return count
+
+    @abstractmethod
+    def select_move(self, board: GameBoard) -> Move | None:
+        """
+        Abstract method for selecting a piece all subclasses must implement
+        If a piece cannot be placed return none
+        If you cannot place any pieces, set self.has_knocked = true to indicate you are passing all turns
+        :param board: The game board for analysis or printing
+        :return: Placement parameters: (piece, piece_index, (x,y)), None if a piece cannot be placed
+        """
+        self.has_knocked = True
+        return None
 
 
 class HumanPlayer(Player):
